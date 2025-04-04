@@ -1,4 +1,4 @@
-package APIGateway;
+package API;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,14 +7,15 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
-public class Handler implements Runnable {
+public class Handler implements Runnable{
 
-    private final Socket socket;
+    private final Socket socket; 
+    private APIGateway gateway;   
+    private int instances = 0;
 
-    public Handler(Socket socket , APIGateway gateway) {
-
-        this.socket = socket;
-
+    public Handler(Socket socket,APIGateway gateway) {
+        this.gateway = gateway;
+        this.socket = socket;        
     }
 
     @Override
@@ -43,7 +44,8 @@ public class Handler implements Runnable {
 
             if(headerLine.equals("INIT SERVER")){
                 System.out.println("Starting to Add Server " + socket);
-                gateway.AddServer(Integer.parseInt(socket.getInetAddress().toString()),);
+                String name = "Instance "+instances++;
+                gateway.AddServer(Integer.parseInt(socket.getInetAddress().getHostAddress()),socket.getPort(), name);
             }
 
             StringTokenizer tokenizer = new StringTokenizer(headerLine);
@@ -140,6 +142,6 @@ public class Handler implements Runnable {
         }
 
     }
-
+    
 }
 
