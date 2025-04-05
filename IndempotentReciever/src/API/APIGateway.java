@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 
 public class APIGateway {
     private int MAX_CONNECTIONS = 50;
-    private int TIMEOUT = 5000;
+    private static int TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
     public void AddServer(int ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
@@ -23,8 +23,7 @@ public class APIGateway {
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();
-        try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        ServerSocket Server = new ServerSocket(8080,MAX_CONNECTIONS);){            
+        try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();ServerSocket Server = new ServerSocket(8080,MAX_CONNECTIONS);){            
             System.out.println("Gateway Listening to Requests");
             while(true){
                 try{
