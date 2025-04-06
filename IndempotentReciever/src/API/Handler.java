@@ -1,147 +1,66 @@
 package API;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
-public class Handler implements Runnable{
+public class Handler implements Runnable {
 
-    private final Socket socket; 
-    private APIGateway gateway;   
+    private final Socket socket;
+    private APIGateway gateway;
     private int instances = 0;
 
-    public Handler(Socket socket,APIGateway gateway) {
+    public Handler(Socket socket, APIGateway gateway) {
         this.gateway = gateway;
-        this.socket = socket;        
+        this.socket = socket;
     }
 
     @Override
-
     public void run() {
-
-        System.out.println("\nHandler Started for " +
-
-                this.socket);
-
+        System.out.println("\nHandler Started for " + this.socket);
         handleRequest(this.socket);
-
-        System.out.println("Handler Terminated for "
-
-                + this.socket + "\n");
-
+        System.out.println("Handler Terminated for " + this.socket + "\n");
     }
 
     public void handleRequest(Socket socket) {
-
-        try (BufferedReader in = new BufferedReader(
-
-                new InputStreamReader(socket.getInputStream()));) {
-
+        try (
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream())
+        ) {
+            // Leitura do cabeçalho
             String headerLine = in.readLine();
-
-            if(headerLine.equals("INIT SERVER")){
-                System.out.println("Starting to Add Server " + socket);
-                String name = "Instance "+instances++;
-                gateway.AddServer(Integer.parseInt(socket.getInetAddress().getHostAddress()),socket.getPort(), name);
+            if (headerLine == null || headerLine.isEmpty()) {
+                System.out.println("Requisição inválida recebida.");
+                return;
             }
 
             StringTokenizer tokenizer = new StringTokenizer(headerLine);
+            String method = tokenizer.nextToken();
 
-            String httpMethod = tokenizer.nextToken();
-
-            if (httpMethod.equals("GET")) {
-
-                System.out.println("Get method processed");
-
-                String httpQueryString = tokenizer.nextToken();
-
-                StringBuilder responseBuffer = new StringBuilder();
-
-                responseBuffer
-
-                        .append("<html><h1>WebServer Home Page.... </h1><br>")
-
-                        .append("<b>Bem vindo ao Meu web server! </b><BR>")
-
-                        .append("</html>");
-
-                sendResponse(socket, 200, responseBuffer.toString());
-
-            } else {
-
-                System.out.println("The HTTP method is not recognized");
-
-                sendResponse(socket, 405, "Method Not Allowed");
-
+            // Captura o corpo da mensagem como byte array
+            ByteArrayOutputStream bodyBuffer = new ByteArrayOutputStream();
+            String line;
+            while ((line = in.readLine()) != null && !line.isEmpty()) {
+                bodyBuffer.write(line.getBytes());
+                bodyBuffer.write("\n".getBytes());
             }
+            byte[] bodyBytes = bodyBuffer.toByteArray();
 
-        } catch (Exception e) {
-
+            // Tomar ações com base no cabeçalho
+            if (method.equals("INIT SERVER")) {
+                System.out.println("Iniciando a adição de servidor: " + socket);
+                String name = "Instance " + instances++;
+                gateway.AddServer(Integer.parseInt(socket.getInetAddress().getHostAddress()), socket.getPort(), name);
+                System.out.println("Servidor adicionado: " + name);
+            } else if (method.equals("REQUEST")) {
+                System.out.println("Processando requisição...");
+                String reply = gateway.RedirectRequest(new String(bodyBytes));
+                out.writeBytes(reply); // Envia a resposta ao cliente
+            } else {
+                System.out.println("Método desconhecido: " + method);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-
         }
-
     }
-
-    public void sendResponse(Socket socket, int statusCode, String responseString) {
-
-        String statusLine;
-
-        String serverHeader = "Server: WebServer\r\n";
-
-        String contentTypeHeader = "Content-Type: text/html\r\n";
-
-        try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
-
-            if (statusCode == 200) {
-
-                statusLine = "HTTP/1.0 200 OK" + "\r\n";
-
-                String contentLengthHeader = "Content-Length: " + responseString.length() + "\r\n";
-
-                out.writeBytes(statusLine);
-
-                out.writeBytes(serverHeader);
-
-                out.writeBytes(contentTypeHeader);
-
-                out.writeBytes(contentLengthHeader);
-
-                out.writeBytes("\r\n");
-
-                out.writeBytes(responseString);
-
-            } else if (statusCode == 405) {
-
-                statusLine = "HTTP/1.0 405 Method Not Allowed" + "\r\n";
-
-                out.writeBytes(statusLine);
-
-                out.writeBytes("\r\n");
-
-            } else {
-
-                statusLine = "HTTP/1.0 404 Not Found" + "\r\n";
-
-                out.writeBytes(statusLine);
-
-                out.writeBytes("\r\n");
-
-            }
-
-            out.close();
-            socket.close();
-
-        } catch (IOException ex) {
-
-            ex.printStackTrace();
-
-        }
-
-    }
-    
 }
-

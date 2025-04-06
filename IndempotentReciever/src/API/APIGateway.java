@@ -4,22 +4,49 @@ import Classes.Server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.*;
 
 public class APIGateway {
+    private Random rand = new Random();
     private int MAX_CONNECTIONS = 50;
     private static int TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
-    public void AddServer(int ip, int port, String name){
+    public void addServer(int ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
     }
-    public void RemoveServer(Server server){
+    public void removeServer(Server server){
         AliveServers.remove(server);
+    }
+
+    public String redirectRequest(byte[] body){
+        Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));        
+        try (Socket forwardSocket = new Socket(selected_server.getInetAddress(), selected_server.getPort())) {
+            OutputStream forwardOutput = forwardSocket.getOutputStream();
+            forwardOutput.write(body);
+            forwardOutput.flush();
+
+            // Recebe a resposta do segundo servidor
+            InputStream forwardInput = forwardSocket.getInputStream();
+            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
+            while ((bytesRead = forwardInput.read(buffer)) != -1) {
+                responseBuffer.write(buffer, 0, bytesRead);
+            }
+            byte[] response = responseBuffer.toByteArray();
+
+            // Envia a resposta de volta ao cliente
+            clientOutput.write(response);
+            clientOutput.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void CheckAliveServers(){
         //TODO
     }
+
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();
