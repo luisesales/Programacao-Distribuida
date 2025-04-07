@@ -50,7 +50,7 @@ public class Handler implements Runnable {
             if (method.equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
-                gateway.AddServer(Integer.parseInt(socket.getInetAddress().getHostAddress()), socket.getPort(), name);
+                gateway.AddServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);
                 System.out.println("Servidor adicionado: " + name);
             } else if (method.equals("REQUEST")) {
                 System.out.println("Processando requisição...");

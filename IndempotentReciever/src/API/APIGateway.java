@@ -10,13 +10,16 @@ import java.util.concurrent.*;
 public class APIGateway {
     private Random rand = new Random();
     private int MAX_CONNECTIONS = 50;
-    private static int TIMEOUT = 5000;
+    private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
-    public void addServer(int ip, int port, String name){
+    public void addServer(String ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
     }
     public void removeServer(Server server){
         AliveServers.remove(server);
+    }
+    public ArrayList<Server> getAliveServers(){
+        return new ArrayList<Server>(AliveServers);
     }
 
     public String redirectRequest(byte[] body){
@@ -40,13 +43,8 @@ public class APIGateway {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
-
-    private static void CheckAliveServers(){
-        //TODO
-    }
-
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();
@@ -56,8 +54,7 @@ public class APIGateway {
                 try{
                     Socket remote = Server.accept();
 
-                    executor.execute(new Handler(remote,this));
-                    CheckAliveServers();
+                    executor.execute(new Handler(remote,this));                    
                 } catch (IOException e2) {
                     e2.printStackTrace();
                 }
@@ -71,7 +68,7 @@ public class APIGateway {
     
     public static void main(String[] args) {
         APIGateway gateway = new APIGateway();
-        Heartbeat monitor = new Heartbeat(gateway,TIMEOUT);
+        Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
         new Thread(monitor).start();
 
     }
