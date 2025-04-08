@@ -2,7 +2,7 @@ package API;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.StringTokenizer;
+import java.net.UnknownHostException;
 
 public class Handler implements Runnable {
 
@@ -23,45 +23,49 @@ public class Handler implements Runnable {
     }
 
     public void handleRequest(Socket socket) {
-        try (
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream())
-        ) {
+        ObjectOutputStream output = null;
+		ObjectInputStream input = null;
+        try {            
             // Leitura do cabeçalho
-            String headerLine = in.readLine();
-            if (headerLine == null || headerLine.isEmpty()) {
+            System.out.println("Lidando com a requisição");         
+            input = new ObjectInputStream(socket.getInputStream());		
+            output = new ObjectOutputStream(socket.getOutputStream());
+			String msg = (String) input.readObject();
+            System.out.println("\nmsg: "+msg);                        
+            if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
                 return;
-            }
-
-            StringTokenizer tokenizer = new StringTokenizer(headerLine);
-            String method = tokenizer.nextToken();
-
+            }                
             
-            ByteArrayOutputStream bodyBuffer = new ByteArrayOutputStream();
-            String line;
-            while ((line = in.readLine()) != null && !line.isEmpty()) {
-                bodyBuffer.write(line.getBytes());
-                bodyBuffer.write("\n".getBytes());
-            }
-            byte[] bodyBytes = bodyBuffer.toByteArray();
-
             // Tomar ações com base no cabeçalho
-            if (method.equals("INIT SERVER")) {
+            if (msg.equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
                 gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);
                 System.out.println("Servidor adicionado: " + name);
-            } else if (method.equals("REQUEST")) {
+            } else if (msg.equals("REQUEST")) {
                 System.out.println("Processando requisição...");
-                byte[] reply = gateway.redirectRequest(bodyBytes);
-                out.write(reply); // Envia a resposta ao cliente
-                out.flush();
+                byte[] redirect = msg.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                byte[] reply = gateway.redirectRequest(redirect);                
+                output.write(reply); // Envia a resposta ao cliente
+                output.flush();
             } else {
-                System.out.println("Método desconhecido: " + method);
+                System.out.println("Método desconhecido: " + msg);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				input.close();
+				output.close();
+			    socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
     }
 }

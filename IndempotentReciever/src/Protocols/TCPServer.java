@@ -1,9 +1,9 @@
 package Protocols;
 
+import Classes.Bank;
+import Classes.ProcessPayload;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,10 +11,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.StringTokenizer;
-
-import Classes.Bank;
-import Classes.ProcessPayload;
 
 public class TCPServer {
 	private static int PORT;
@@ -28,8 +24,8 @@ public class TCPServer {
 			System.out.println("TCP Server Instance Started");
 			conexao = new Socket("localhost", 8080);
 			output = new ObjectOutputStream(conexao.getOutputStream());
-			String inputMsg = "INIT SERVER";
-			output.writeObject(inputMsg);
+			String Msg = "INIT SERVER";			
+			output.writeObject(Msg);
 			output.flush();
 			input = new ObjectInputStream(conexao.getInputStream());
 			String msg = (String) input.readObject();
