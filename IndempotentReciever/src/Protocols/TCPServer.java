@@ -55,7 +55,7 @@ public class TCPServer {
 			server = new ServerSocket(PORT, 300);
 		} catch (IOException e2) {
 			e2.printStackTrace();
-		}
+		}	
 		while (true) {
 			try {
 				Socket conection = server.accept();
@@ -71,6 +71,12 @@ public class TCPServer {
 				conection.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}finally {
+				try {
+					server.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
