@@ -10,19 +10,53 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
 import Classes.Bank;
 import Classes.ProcessPayload;
 
 public class TCPServer {
+	private static int PORT;
+
+	public TCPServer(int port){
+		PORT = port;
+		Socket conexao = null;
+		ObjectOutputStream output = null;
+		ObjectInputStream input = null;
+		try {
+			System.out.println("TCP Server Instance Started");
+			conexao = new Socket("localhost", 8080);
+			output = new ObjectOutputStream(conexao.getOutputStream());
+			String inputMsg = "INIT SERVER";
+			output.writeObject(inputMsg);
+			output.flush();
+			input = new ObjectInputStream(conexao.getInputStream());
+			String msg = (String) input.readObject();
+			System.out.println("Retorno do Servidor:"+msg);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				input.close();
+				output.close();
+				conexao.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public static void main(String args[]) {
 		System.out.println("TCP Server Bank Started");
 		ServerSocket server = null;
 		Bank bank = new Bank();
 		ProcessPayload processplayload = new ProcessPayload(bank);
 		try {
-			server = new ServerSocket(8080, 300);
+			server = new ServerSocket(PORT, 300);
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}

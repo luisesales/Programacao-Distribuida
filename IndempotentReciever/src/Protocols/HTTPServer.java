@@ -1,4 +1,4 @@
-package Protocols;
+/*package Protocols;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,7 +14,7 @@ public class HTTPServer {
 
 			while (true) {
 
-				System.out.println("Waiting for client request"+serverSocket.getInetAddress());
+				System.out.println("Waiting for client request" + serverSocket.getInetAddress());
 
 				Socket remote = serverSocket.accept();
 
@@ -31,10 +31,4 @@ public class HTTPServer {
 		}
 
 	}
-
-	public static void main(String args[]) {
-
-		new WebServer();
-
-	}
-}
+}*/
