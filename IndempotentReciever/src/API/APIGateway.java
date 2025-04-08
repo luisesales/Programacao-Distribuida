@@ -28,8 +28,10 @@ public class APIGateway {
             OutputStream forwardOutput = forwardSocket.getOutputStream();
             forwardOutput.write(body);
             forwardOutput.flush();
-
+            
             // Recebe a resposta do segundo servidor
+            byte[] buffer = new byte[4096];
+            int bytesRead;
             InputStream forwardInput = forwardSocket.getInputStream();
             ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
             while ((bytesRead = forwardInput.read(buffer)) != -1) {
@@ -47,19 +49,19 @@ public class APIGateway {
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();
-        try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();ServerSocket Server = new ServerSocket(8080,MAX_CONNECTIONS);){            
-            System.out.println("Gateway Listening to Requests");
-            while(true){
-                try{
-                    Socket remote = Server.accept();
-
+        try (ServerSocket server = new ServerSocket(8080, MAX_CONNECTIONS)) {
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+            try{
+                System.out.println("Gateway Listening to Requests");
+                while(true){
+                    Socket remote = server.accept();
                     executor.execute(new Handler(remote,this));                    
-                } catch (IOException e2) {
-                    e2.printStackTrace();
                 }
+            }finally {
+                executor.shutdown();
             }
         }catch (IOException e2) {
-            e2.printStackTrace();
+        e2.printStackTrace();
         }
         System.out.println("Gateway terminating");
     }
