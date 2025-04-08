@@ -37,7 +37,7 @@ public class Handler implements Runnable {
             StringTokenizer tokenizer = new StringTokenizer(headerLine);
             String method = tokenizer.nextToken();
 
-            // Captura o corpo da mensagem como byte array
+            
             ByteArrayOutputStream bodyBuffer = new ByteArrayOutputStream();
             String line;
             while ((line = in.readLine()) != null && !line.isEmpty()) {
@@ -50,12 +50,13 @@ public class Handler implements Runnable {
             if (method.equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
-                gateway.AddServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);
+                gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);
                 System.out.println("Servidor adicionado: " + name);
             } else if (method.equals("REQUEST")) {
                 System.out.println("Processando requisição...");
-                String reply = gateway.RedirectRequest(new String(bodyBytes));
-                out.writeBytes(reply); // Envia a resposta ao cliente
+                byte[] reply = gateway.redirectRequest(bodyBytes);
+                out.write(reply); // Envia a resposta ao cliente
+                out.flush();
             } else {
                 System.out.println("Método desconhecido: " + method);
             }

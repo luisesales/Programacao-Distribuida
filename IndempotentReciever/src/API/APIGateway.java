@@ -22,7 +22,7 @@ public class APIGateway {
         return new ArrayList<Server>(AliveServers);
     }
 
-    public String redirectRequest(byte[] body){
+    public byte[] redirectRequest(byte[] body){
         Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));        
         try (Socket forwardSocket = new Socket(selected_server.getInetAddress(), selected_server.getPort())) {
             OutputStream forwardOutput = forwardSocket.getOutputStream();
@@ -35,11 +35,10 @@ public class APIGateway {
             while ((bytesRead = forwardInput.read(buffer)) != -1) {
                 responseBuffer.write(buffer, 0, bytesRead);
             }
-            byte[] response = responseBuffer.toByteArray();
+            return responseBuffer.toByteArray();
 
             // Envia a resposta de volta ao cliente
-            clientOutput.write(response);
-            clientOutput.flush();
+           
         } catch (IOException e) {
             e.printStackTrace();
         }
