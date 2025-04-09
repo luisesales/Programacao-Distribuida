@@ -36,22 +36,24 @@ public class Handler implements Runnable {
                 System.out.println("Requisição inválida recebida.");
                 return;
             }                
-            
+            byte[] reply;
             // Tomar ações com base no cabeçalho
             if (msg.equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
-                gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);
-                System.out.println("Servidor adicionado: " + name);
+                gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);                
+                reply = ("Servidor adicionado: " + name).getBytes(java.nio.charset.StandardCharsets.UTF_8);
             } else if (msg.equals("REQUEST")) {
-                System.out.println("Processando requisição...");
-                byte[] redirect = msg.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-                byte[] reply = gateway.redirectRequest(redirect);                
-                output.write(reply); // Envia a resposta ao cliente
-                output.flush();
+                System.out.println("Processando requisição...");                
+                reply = gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8));                                
             } else {
-                System.out.println("Método desconhecido: " + msg);
+                reply = ("Método desconhecido: " + msg).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                
+                
             }
+            System.out.println(new String(reply));
+            output.write(reply); // Envia a resposta ao cliente
+            output.flush();
         } catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
