@@ -49,7 +49,7 @@ public class APIGateway {
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();
-        try (ServerSocket server = new ServerSocket(8080, MAX_CONNECTIONS)) {
+        try (ServerSocket server = new ServerSocket(8081, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try{
                 System.out.println("Gateway Listening to Requests");

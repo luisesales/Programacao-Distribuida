@@ -22,7 +22,7 @@ public class TCPServer {
 		ObjectInputStream input = null;
 		try {
 			System.out.println("TCP Server Instance Started");
-			conexao = new Socket("localhost", 8080);
+			conexao = new Socket("localhost", 8081);
 			output = new ObjectOutputStream(conexao.getOutputStream());
 			String Msg = "INIT SERVER";			
 			output.writeObject(Msg);
@@ -36,14 +36,6 @@ public class TCPServer {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				input.close();
-				output.close();
-				conexao.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 	public static void main(String args[]) {

@@ -36,23 +36,23 @@ public class Handler implements Runnable {
                 System.out.println("Requisição inválida recebida.");
                 return;
             }                
-            byte[] reply;
+            String reply;
             // Tomar ações com base no cabeçalho
             if (msg.equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
                 gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);                
-                reply = ("Servidor adicionado: " + name).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                reply = "Servidor adicionado: " + name;
             } else if (msg.equals("REQUEST")) {
                 System.out.println("Processando requisição...");                
-                reply = gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8));                                
+                reply = new String(gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8)));                                
             } else {
-                reply = ("Método desconhecido: " + msg).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                reply = "Método desconhecido: " + msg;
                 
                 
             }
-            System.out.println(new String(reply));
-            output.write(reply); // Envia a resposta ao cliente
+            System.out.println(reply);
+            output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
         } catch (UnknownHostException e) {
 			e.printStackTrace();
