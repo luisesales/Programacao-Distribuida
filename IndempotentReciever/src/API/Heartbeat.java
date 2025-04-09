@@ -24,9 +24,9 @@ public class Heartbeat implements Runnable {
             
             System.out.println("Checking Alive servers...");
 
-            for (Server server : servers) {                
-                heartbeat(server);
-                System.out.println("Server " + server.getPort() + " is alive.");
+            for (Server server : servers) {              
+                System.out.println("Server " + server.getPort() + " is alive... until now");  
+                heartbeat(server);                
             }
 
             try {

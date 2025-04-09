@@ -2,12 +2,7 @@ package Protocols;
 
 import Classes.Bank;
 import Classes.ProcessPayload;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -17,28 +12,8 @@ public class TCPServer {
 
 	public TCPServer(int port){
 		PORT = port;
-		Socket conexao = null;
-		ObjectOutputStream output = null;
-		ObjectInputStream input = null;
-		try {
-			System.out.println("TCP Server Instance Started");
-			conexao = new Socket("localhost", 8081);
-			output = new ObjectOutputStream(conexao.getOutputStream());
-			String Msg = "INIT SERVER";			
-			output.writeObject(Msg);
-			output.flush();
-			input = new ObjectInputStream(conexao.getInputStream());
-			String msg = (String) input.readObject();
-			System.out.println("Retorno do Servidor:"+msg);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
-	public static void main(String args[]) {
+	public void RunServer(){
 		System.out.println("TCP Server Bank Started");
 		ServerSocket server = null;
 		Bank bank = new Bank();
@@ -58,7 +33,7 @@ public class TCPServer {
 				String reply =  processplayload.processData(msg);
 				
 				PrintWriter output = new PrintWriter(conection.getOutputStream(), true);
-				output.println("Server response: " + reply);
+				output.println("Gateway response: " + reply);
 				output.flush();
 				conection.close();
 			} catch (IOException e) {
@@ -70,6 +45,30 @@ public class TCPServer {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	public void InitServer(){
+		Socket conexao = null;
+		ObjectOutputStream output = null;
+		ObjectInputStream input = null;
+		try {
+			System.out.println("TCP Server Instance Started");
+			conexao = new Socket("localhost", 8081);
+			output = new ObjectOutputStream(conexao.getOutputStream());
+			String request = "INIT SERVER";			
+			output.writeObject(request);
+			output.flush();
+			input = new ObjectInputStream(conexao.getInputStream());
+			String reply = (String) input.readObject();
+			System.out.println("Gateway response: " + reply);
+			RunServer();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 }
