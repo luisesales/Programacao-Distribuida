@@ -48,14 +48,19 @@ public class APIGateway {
     }
 
     public APIGateway(){
-        AliveServers = new ArrayList<Server>();
+        AliveServers = new ArrayList<Server>();        
+    }
+
+    private void RunGateway(APIGateway gateway){           
         try (ServerSocket server = new ServerSocket(8081, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try{
                 System.out.println("Gateway Listening to Requests");
+                Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
+                new Thread(monitor).start();
                 while(true){
                     Socket remote = server.accept();
-                    executor.execute(new Handler(remote,this));                    
+                    executor.execute(new Handler(remote,this));                                        
                 }
             }finally {
                 executor.shutdown();
@@ -69,8 +74,6 @@ public class APIGateway {
     
     public static void main(String[] args) {
         APIGateway gateway = new APIGateway();
-        Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
-        new Thread(monitor).start();
-
+        gateway.RunGateway(gateway);        
     }
 }
