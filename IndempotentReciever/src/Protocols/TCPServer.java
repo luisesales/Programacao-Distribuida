@@ -80,12 +80,14 @@ public class TCPServer {
 				conection.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}finally {
+			}finally{
 				try {
+					input.close();
+					output.close();
 					server.close();
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
+				}	
 			}
 		}
 	}
@@ -98,13 +100,12 @@ public class TCPServer {
 			System.out.println("TCP Server Instance Started");
 			connection = new Socket("localhost", 8081);
 			output = new ObjectOutputStream(connection.getOutputStream());
-			String request = "INIT_SERVER;"+connection.getLocalAddress()+";"+PORT;			
+			String request = "INIT_SERVER;"+connection.getInetAddress().getHostAddress()+";"+PORT;			
 			output.writeObject(request);
 			output.flush();
 			input = new ObjectInputStream(connection.getInputStream());
 			String reply = (String) input.readObject();
-			System.out.println("Gateway response: " + reply);
-			RunServer();
+			System.out.println("Gateway response: " + reply);			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -121,5 +122,6 @@ public class TCPServer {
 				e.printStackTrace();
 			}	
 		}
+		RunServer();
 	}
 }
