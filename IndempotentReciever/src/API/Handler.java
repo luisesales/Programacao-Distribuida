@@ -37,13 +37,14 @@ public class Handler implements Runnable {
                 return;
             }                
             String reply;
+            String[] request = msg.split(";");
             // Tomar ações com base no cabeçalho
-            if (msg.equals("INIT SERVER")) {
+            if (request[0].equals("INIT SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
-                gateway.addServer(socket.getInetAddress().getHostAddress(), socket.getPort(), name);                
+                gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
                 reply = "Servidor adicionado: " + name;
-            } else if (msg.equals("REQUEST")) {
+            } else if (request[0].equals("REQUEST")) {
                 System.out.println("Processando requisição...");                
                 reply = new String(gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8)));                                
             } else {

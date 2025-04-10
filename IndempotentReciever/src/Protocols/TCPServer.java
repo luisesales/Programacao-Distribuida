@@ -13,7 +13,9 @@ public class TCPServer {
 	public TCPServer(int port){
 		PORT = port;
 	}
-	public void RunServer(){
+	public void RunServer(){		
+		ObjectOutputStream output = null;
+		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");
 		ServerSocket server = null;
 		Bank bank = new Bank();
@@ -26,21 +28,17 @@ public class TCPServer {
 		while (true) {
 			try {
 				Socket conection = server.accept();
-				BufferedReader input = new BufferedReader(new InputStreamReader(conection.getInputStream()));
-				String msg = input.readLine(); 
+				input = new BufferedReader(new InputStreamReader(conection.getInputStream()));
+				String msg = input.readLine();
+				String[] request = msg.split(";"); 
 				String reply = "";
 				System.out.println("Operação recebida:"+msg);
-				if(msg.equals("HEARTBEAT")){
-					conexao = new Socket("localhost", 8081);
-					output = new ObjectOutputStream(conexao.getOutputStream());
-					String request = "INIT SERVER";			
-					output.writeObject(request);
-					output.flush()conexao = new Socket("localhost", 8081);
-					output = new ObjectOutputStream(conexao.getOutputStream());
-					String request = "INIT SERVER";			
-					output.writeObject(request);
+				if(msg.equals("HEARTBEAT")){					
+					output = new ObjectOutputStream(conection.getOutputStream());
+					reply = "HEATBEATREPLY";								
+					output.writeObject(reply);
 					output.flush();
-					input = new ObjectInputStream(conexao.getInputStream());
+					
 					String reply = (String) input.readObject();
 					System.out.println("Gateway response: " + reply);;
 					input = new ObjectInputStream(conexao.getInputStream());
@@ -75,7 +73,7 @@ public class TCPServer {
 			System.out.println("TCP Server Instance Started");
 			conexao = new Socket("localhost", 8081);
 			output = new ObjectOutputStream(conexao.getOutputStream());
-			String request = "INIT SERVER";			
+			String request = "INIT SERVER;localhost;"+PORT;			
 			output.writeObject(request);
 			output.flush();
 			input = new ObjectInputStream(conexao.getInputStream());
