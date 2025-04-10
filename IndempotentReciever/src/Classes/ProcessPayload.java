@@ -27,10 +27,10 @@ public class ProcessPayload {
 		String reply = "operation realizada:" + operation + "-" ;
 		String opResult = reply;
 		switch (operation) {
-		case "criar":
+		case "create":
 			bank.addAccount(account);
 			break;
-		case "depositar":
+		case "deposit":
 			bank.deposit(account, valor);
 			break;
 		case "balance":

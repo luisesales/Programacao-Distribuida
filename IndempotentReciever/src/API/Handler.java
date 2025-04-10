@@ -39,7 +39,7 @@ public class Handler implements Runnable {
             String reply;
             String[] request = msg.split(";");
             // Tomar ações com base no cabeçalho
-            if (request[0].equals("INIT SERVER")) {
+            if (request[0].equals("INIT_SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances++;
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
@@ -48,7 +48,7 @@ public class Handler implements Runnable {
                 System.out.println("Processando requisição...");                
                 reply = new String(gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8)));                                
             } else {
-                reply = "Método desconhecido: " + msg;
+                reply = "ERROR;Método desconhecido: " + msg;
                 
                 
             }

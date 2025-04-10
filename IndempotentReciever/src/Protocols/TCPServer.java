@@ -3,12 +3,43 @@ package Protocols;
 import Classes.Bank;
 import Classes.ProcessPayload;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class TCPServer {
 	private static int PORT;
+
+	private boolean ValidateOperation(String op){
+		return !(op.equals("create") || op.equals("deposit") || op.equals("balance"));
+	}
+
+	private boolean ValidateRequest(String request){
+		String operation =null;
+		int account = 0;
+		int valor = 0;
+		StringTokenizer tokenizer = new StringTokenizer(request, ";");
+		if(!tokenizer.nextToken().equals("REQUEST"))
+			return false;		
+		while (tokenizer.hasMoreElements()) {
+			try{
+			operation = tokenizer.nextToken();
+			account = Integer.parseInt(tokenizer.nextToken());
+			valor = Integer.parseInt(tokenizer.nextToken().trim());
+			if(ValidateOperation(operation)){
+				return false;
+			}
+			} catch(NumberFormatException e){
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+	
 
 	public TCPServer(int port){
 		PORT = port;
@@ -35,22 +66,16 @@ public class TCPServer {
 				System.out.println("Operação recebida:"+msg);
 				if(msg.equals("HEARTBEAT")){					
 					output = new ObjectOutputStream(conection.getOutputStream());
-					reply = "HEATBEATREPLY";								
-					output.writeObject(reply);
-					output.flush();
-					
-					String reply = (String) input.readObject();
-					System.out.println("Gateway response: " + reply);;
-					input = new ObjectInputStream(conexao.getInputStream());
-					String reply = (String) input.readObject();
-					System.out.println("Gateway response: " + reply);
+					reply = "HEARTBEAT_REPLY";								
+															
 				}
-				else if(msg.equals("REQUEST")){
-					reply =  processplayload.processData(msg);				
-					
+				else if(ValidateRequest(msg)){
+					reply =  processplayload.processData(msg);									
 				}
-				PrintWriter output = new PrintWriter(conection.getOutputStream(), true);
-				output.println("Gateway response: " + reply);
+				else{
+					reply = "ERROR;Requisição Inválida";
+				}
+				output.writeObject(reply);
 				output.flush();
 				conection.close();
 			} catch (IOException e) {
@@ -66,17 +91,17 @@ public class TCPServer {
 	}
 
 	public void InitServer(){
-		Socket conexao = null;
+		Socket conection = null;
 		ObjectOutputStream output = null;
 		ObjectInputStream input = null;
 		try {
 			System.out.println("TCP Server Instance Started");
-			conexao = new Socket("localhost", 8081);
-			output = new ObjectOutputStream(conexao.getOutputStream());
-			String request = "INIT SERVER;localhost;"+PORT;			
+			conection = new Socket("localhost", 8081);
+			output = new ObjectOutputStream(conection.getOutputStream());
+			String request = "INIT_SERVER;"+conection.getLocalAddress()+";"+PORT;			
 			output.writeObject(request);
 			output.flush();
-			input = new ObjectInputStream(conexao.getInputStream());
+			input = new ObjectInputStream(conection.getInputStream());
 			String reply = (String) input.readObject();
 			System.out.println("Gateway response: " + reply);
 			RunServer();
