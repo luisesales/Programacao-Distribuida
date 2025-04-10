@@ -41,7 +41,7 @@ public class Heartbeat implements Runnable {
         try{
             Socket socket = new Socket(server.getInetAddress(), server.getPort());
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("HEARTBEAT;");
+            out.println("HEARTBEAT");            
             out.flush();
             out.close();
             socket.close();

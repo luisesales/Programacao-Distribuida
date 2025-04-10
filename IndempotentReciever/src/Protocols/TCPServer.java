@@ -28,10 +28,29 @@ public class TCPServer {
 				Socket conection = server.accept();
 				BufferedReader input = new BufferedReader(new InputStreamReader(conection.getInputStream()));
 				String msg = input.readLine(); 
+				String reply = "";
 				System.out.println("Operação recebida:"+msg);
-				
-				String reply =  processplayload.processData(msg);
-				
+				if(msg.equals("HEARTBEAT")){
+					conexao = new Socket("localhost", 8081);
+					output = new ObjectOutputStream(conexao.getOutputStream());
+					String request = "INIT SERVER";			
+					output.writeObject(request);
+					output.flush()conexao = new Socket("localhost", 8081);
+					output = new ObjectOutputStream(conexao.getOutputStream());
+					String request = "INIT SERVER";			
+					output.writeObject(request);
+					output.flush();
+					input = new ObjectInputStream(conexao.getInputStream());
+					String reply = (String) input.readObject();
+					System.out.println("Gateway response: " + reply);;
+					input = new ObjectInputStream(conexao.getInputStream());
+					String reply = (String) input.readObject();
+					System.out.println("Gateway response: " + reply);
+				}
+				else if(msg.equals("REQUEST")){
+					reply =  processplayload.processData(msg);				
+					
+				}
 				PrintWriter output = new PrintWriter(conection.getOutputStream(), true);
 				output.println("Gateway response: " + reply);
 				output.flush();

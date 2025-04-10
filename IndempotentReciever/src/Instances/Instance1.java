@@ -5,7 +5,7 @@ import Protocols.*;
 public class Instance1 {
     public static void main(String[] args) {
         //UDPServer udp = new UDPServer("9003");
-        TCPServer tcp = new TCPServer(8090);
+        TCPServer tcp = new TCPServer(8190);
         tcp.InitServer();
     }
 }
