@@ -49,6 +49,7 @@ public class TCPServer {
 		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");
 		ServerSocket server = null;
+		boolean check_heartbeat;
 		Bank bank = new Bank();
 		ProcessPayload processplayload = new ProcessPayload(bank);
 		try {
@@ -58,6 +59,7 @@ public class TCPServer {
 		}	
 		while (true) {
 			try {
+				check_heartbeat = true;
 				Socket conection = server.accept();
 				input = new BufferedReader(new InputStreamReader(conection.getInputStream()));
 				String msg = input.readLine();
@@ -66,18 +68,20 @@ public class TCPServer {
 				System.out.println("Operação recebida:"+msg);
 				if(msg.equals("HEARTBEAT")){					
 					output = new ObjectOutputStream(conection.getOutputStream());
-					reply = "HEARTBEAT_REPLY";								
-															
+					reply = "OK"												;
+					check_heartbeat = false;		
 				}
 				else if(ValidateRequest(msg)){
 					reply =  processplayload.processData(msg);									
 				}
 				else{
 					reply = "ERROR;Requisição Inválida";
-				}
-				output.writeObject(reply);
-				output.flush();
-				conection.close();
+				}	
+				if(check_heartbeat){			
+					output.writeObject(reply);
+					output.flush();
+					conection.close();	
+				}			
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
