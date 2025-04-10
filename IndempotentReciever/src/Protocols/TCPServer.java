@@ -91,17 +91,17 @@ public class TCPServer {
 	}
 
 	public void InitServer(){
-		Socket conection = null;
+		Socket connection = null;
 		ObjectOutputStream output = null;
 		ObjectInputStream input = null;
 		try {
 			System.out.println("TCP Server Instance Started");
-			conection = new Socket("localhost", 8081);
-			output = new ObjectOutputStream(conection.getOutputStream());
-			String request = "INIT_SERVER;"+conection.getLocalAddress()+";"+PORT;			
+			connection = new Socket("localhost", 8081);
+			output = new ObjectOutputStream(connection.getOutputStream());
+			String request = "INIT_SERVER;"+connection.getLocalAddress()+";"+PORT;			
 			output.writeObject(request);
 			output.flush();
-			input = new ObjectInputStream(conection.getInputStream());
+			input = new ObjectInputStream(connection.getInputStream());
 			String reply = (String) input.readObject();
 			System.out.println("Gateway response: " + reply);
 			RunServer();
@@ -111,6 +111,15 @@ public class TCPServer {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		}
+		finally{
+			try {
+				input.close();
+				output.close();
+			    connection.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 }
