@@ -6,12 +6,14 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class APIGateway {
     private Random rand = new Random();
     private int MAX_CONNECTIONS = 50;
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
+    private AtomicInteger instances = new AtomicInteger(0);
     public void addServer(String ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
     }
@@ -22,22 +24,20 @@ public class APIGateway {
         return new ArrayList<Server>(AliveServers);
     }
 
-    public byte[] redirectRequest(byte[] body){
+    public String redirectRequest(String body){
         Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));        
         try (Socket forwardSocket = new Socket(selected_server.getInetAddress(), selected_server.getPort())) {
-            OutputStream forwardOutput = forwardSocket.getOutputStream();
-            forwardOutput.write(body);
+            PrintWriter forwardOutput = new PrintWriter(forwardSocket.getOutputStream(), true);
+            forwardOutput.println(body);                 
             forwardOutput.flush();
             
-            // Recebe a resposta do segundo servidor
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            InputStream forwardInput = forwardSocket.getInputStream();
-            ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream();
-            while ((bytesRead = forwardInput.read(buffer)) != -1) {
-                responseBuffer.write(buffer, 0, bytesRead);
-            }
-            return responseBuffer.toByteArray();
+            // Recebe a resposta do segundo servidor            
+            BufferedReader forwardInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String response = forwardInput.readLine();
+            forwardInput.close();
+            forwardOutput.close();
+            forwardSocket.close();
+            return response;
 
             // Envia a resposta de volta ao cliente
            
@@ -60,7 +60,7 @@ public class APIGateway {
                 new Thread(monitor).start();
                 while(true){
                     Socket remote = server.accept();
-                    executor.execute(new Handler(remote,this));                                        
+                    executor.execute(new Handler(remote,this,instances));                                        
                 }
             }finally {
                 executor.shutdown();

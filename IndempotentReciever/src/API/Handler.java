@@ -3,16 +3,19 @@ package API;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Handler implements Runnable {
 
     private final Socket socket;
     private APIGateway gateway;
-    private int instances = 0;
+    private AtomicInteger instances;
+    
 
-    public Handler(Socket socket, APIGateway gateway) {
+    public Handler(Socket socket, APIGateway gateway, AtomicInteger instances) {
         this.gateway = gateway;
         this.socket = socket;
+        this.instances = instances;
     }
 
     @Override
@@ -41,12 +44,12 @@ public class Handler implements Runnable {
             // Tomar ações com base no cabeçalho
             if (request[0].equals("INIT_SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
-                String name = "Instance " + instances++;
+                String name = "Instance " + instances.getAndIncrement();
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
                 reply = "Servidor adicionado: " + name;
             } else if (request[0].equals("REQUEST")) {
                 System.out.println("Processando requisição...");                
-                reply = new String(gateway.redirectRequest(msg.getBytes(java.nio.charset.StandardCharsets.UTF_8)));                                
+                reply = gateway.redirectRequest(msg);                                
             } else {
                 reply = "ERROR;Método desconhecido: " + msg;
                 
