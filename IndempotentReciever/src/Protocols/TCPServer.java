@@ -23,10 +23,13 @@ public class TCPServer {
 		if(!tokenizer.nextToken().equals("REQUEST"))
 			return false;		
 		while (tokenizer.hasMoreElements()) {
-			try{
+			try{			
 			operation = tokenizer.nextToken();
+			System.out.println(operation);
 			account = Integer.parseInt(tokenizer.nextToken());
+			System.out.println(account);
 			valor = Integer.parseInt(tokenizer.nextToken().trim());
+			System.out.println(valor);
 			if(ValidateOperation(operation)){
 				return false;
 			}

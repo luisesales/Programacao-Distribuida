@@ -32,7 +32,7 @@ public class APIGateway {
             forwardOutput.flush();
             
             // Recebe a resposta do segundo servidor            
-            BufferedReader forwardInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            BufferedReader forwardInput = new BufferedReader(new InputStreamReader(forwardSocket.getInputStream()));
             String response = forwardInput.readLine();
             forwardInput.close();
             forwardOutput.close();
