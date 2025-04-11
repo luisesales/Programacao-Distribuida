@@ -52,7 +52,7 @@ public class APIGateway {
     }
 
     private void RunGateway(APIGateway gateway){           
-        try (ServerSocket server = new ServerSocket(8081, MAX_CONNECTIONS)) {
+        try (ServerSocket server = new ServerSocket(8080, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try{
                 System.out.println("Gateway Listening to Requests");
@@ -65,11 +65,11 @@ public class APIGateway {
             }finally {
                 executor.shutdown();
                 server.close();
+                System.out.println("Gateway terminating");
             }
         }catch (IOException e2) {
         e2.printStackTrace();
-        }
-        System.out.println("Gateway terminating");
+        }       
     }
     
     

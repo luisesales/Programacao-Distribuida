@@ -14,7 +14,7 @@ public class TCPClient {
         ObjectInputStream input = null;
         try {
             System.out.println("TCP Client Bank Started");
-            conexao = new Socket("localhost", 8081);
+            conexao = new Socket("localhost", 8080);
             output = new ObjectOutputStream(conexao.getOutputStream());
             String inputMsg = "REQUEST;create;1;1000";
             output.writeObject(inputMsg);

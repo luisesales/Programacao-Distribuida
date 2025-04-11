@@ -88,13 +88,14 @@ public class TCPServer {
 			}
 		} catch (IOException e2) {
 		e2.printStackTrace();
-		}finally{
+		}/*finally{
 			try {
-				server.close();									
+				if(server != null)
+				server.close();					
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
-		}	
+		}*/	
 	}
 
 	public void InitServer(){
@@ -103,7 +104,7 @@ public class TCPServer {
 		ObjectInputStream input = null;
 		try {
 			System.out.println("TCP Server Instance Started");
-			connection = new Socket("localhost", 8081);
+			connection = new Socket("localhost", 8080);
 			output = new ObjectOutputStream(connection.getOutputStream());
 			String request = "INIT_SERVER;"+connection.getInetAddress().getHostAddress()+";"+PORT;			
 			output.writeObject(request);
