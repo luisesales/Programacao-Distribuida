@@ -64,6 +64,7 @@ public class APIGateway {
                 }
             }finally {
                 executor.shutdown();
+                server.close();
             }
         }catch (IOException e2) {
         e2.printStackTrace();

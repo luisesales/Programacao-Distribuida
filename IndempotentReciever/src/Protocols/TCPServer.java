@@ -53,42 +53,48 @@ public class TCPServer {
 		Bank bank = new Bank();
 		ProcessPayload processplayload = new ProcessPayload(bank);
 		try {
-			server = new ServerSocket(PORT, 300);
-		} catch (IOException e2) {
-			e2.printStackTrace();
-		}	
-		while (true) {
-			try {				
-				Socket connection = server.accept();
-				output = new ObjectOutputStream(connection.getOutputStream());
-				input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				String msg = input.readLine();
-				String[] request = msg.split(";"); 
-				String reply = new String();
-				System.out.println("Operação recebida:"+msg);
-				if(msg.equals("HEARTBEAT")){										
-					reply = "OK"												;					
-				}
-				else if(ValidateRequest(msg)){
-					reply =  processplayload.processData(msg);									
-				}
-				else{
-					reply = "ERROR;Requisição Inválida";
-				}											
-				output.writeObject(reply);
-				output.flush();				
-						
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally{
-				try {
-					input.close();
-					output.close();					
+			server = new ServerSocket(PORT, 300);			
+			while (true) {
+				try {				
+					Socket connection = server.accept();
+					output = new ObjectOutputStream(connection.getOutputStream());
+					input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					String msg = input.readLine();
+					String[] request = msg.split(";"); 
+					String reply = new String();
+					System.out.println("Operação recebida:"+msg);
+					if(msg.equals("HEARTBEAT")){										
+						reply = "OK"												;					
+					}
+					else if(ValidateRequest(msg)){
+						reply =  processplayload.processData(msg);									
+					}
+					else{
+						reply = "ERROR;Requisição Inválida";
+					}											
+					output.writeObject(reply);
+					output.flush();				
+							
 				} catch (IOException e) {
 					e.printStackTrace();
-				}	
+				}finally{
+					try {
+						input.close();
+						output.close();										
+					} catch (IOException e) {
+						e.printStackTrace();
+					}	
+				}
 			}
-		}
+		} catch (IOException e2) {
+		e2.printStackTrace();
+		}finally{
+			try {
+				server.close();									
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+		}	
 	}
 
 	public void InitServer(){
