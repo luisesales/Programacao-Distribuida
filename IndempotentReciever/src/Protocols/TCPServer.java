@@ -3,11 +3,9 @@ package Protocols;
 import Classes.Bank;
 import Classes.ProcessPayload;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class TCPServer {
@@ -48,8 +46,7 @@ public class TCPServer {
 		ObjectOutputStream output = null;
 		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");
-		ServerSocket server = null;
-		boolean check_heartbeat;
+		ServerSocket server = null;		
 		Bank bank = new Bank();
 		ProcessPayload processplayload = new ProcessPayload(bank);
 		try {
@@ -58,37 +55,32 @@ public class TCPServer {
 			e2.printStackTrace();
 		}	
 		while (true) {
-			try {
-				check_heartbeat = true;
-				Socket conection = server.accept();
-				input = new BufferedReader(new InputStreamReader(conection.getInputStream()));
+			try {				
+				Socket connection = server.accept();
+				output = new ObjectOutputStream(connection.getOutputStream());
+				input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String msg = input.readLine();
 				String[] request = msg.split(";"); 
-				String reply = "";
+				String reply = new String();
 				System.out.println("Operação recebida:"+msg);
-				if(msg.equals("HEARTBEAT")){					
-					output = new ObjectOutputStream(conection.getOutputStream());
-					reply = "OK"												;
-					check_heartbeat = false;		
+				if(msg.equals("HEARTBEAT")){										
+					reply = "OK"												;					
 				}
 				else if(ValidateRequest(msg)){
 					reply =  processplayload.processData(msg);									
 				}
 				else{
 					reply = "ERROR;Requisição Inválida";
-				}	
-				if(check_heartbeat){			
-					output.writeObject(reply);
-					output.flush();
-					conection.close();	
-				}			
+				}											
+				output.writeObject(reply);
+				output.flush();				
+						
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
 				try {
 					input.close();
-					output.close();
-					server.close();
+					output.close();					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}	
@@ -109,7 +101,7 @@ public class TCPServer {
 			output.flush();
 			input = new ObjectInputStream(connection.getInputStream());
 			String reply = (String) input.readObject();
-			System.out.println("Gateway response: " + reply);			
+			System.out.println("Gateway response: " + reply);		
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -122,10 +114,11 @@ public class TCPServer {
 				input.close();
 				output.close();
 			    connection.close();
+				RunServer();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
 		}
-		RunServer();
+		
 	}
 }
