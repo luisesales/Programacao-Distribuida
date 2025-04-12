@@ -8,7 +8,7 @@ public class ProcessPayload {
 		this.bank = bank;
 	}
 	public String processData(String msg) {
-		
+		System.out.println("Processing Data on Bank");
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
@@ -19,11 +19,11 @@ public class ProcessPayload {
 		int valor = 0;
 		
 		StringTokenizer tokenizer = new StringTokenizer(msg, ";");
-		 while (tokenizer.hasMoreElements()) {
-		        operation = tokenizer.nextToken();
-		        account = Integer.parseInt(tokenizer.nextToken());
-		        valor = Integer.parseInt(tokenizer.nextToken().trim());
-		  }
+		while (tokenizer.hasMoreElements()) {					
+			operation = tokenizer.nextToken();			
+			account = Integer.parseInt(tokenizer.nextToken());			
+			valor = Integer.parseInt(tokenizer.nextToken().trim());			
+		}
 		String reply = "operation realizada:" + operation + "-" ;
 		String opResult = reply;
 		switch (operation) {

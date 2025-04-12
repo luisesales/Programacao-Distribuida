@@ -24,12 +24,9 @@ public class TCPServer {
 			return false;		
 		while (tokenizer.hasMoreElements()) {
 			try{			
-			operation = tokenizer.nextToken();
-			System.out.println(operation);
-			account = Integer.parseInt(tokenizer.nextToken());
-			System.out.println(account);
-			valor = Integer.parseInt(tokenizer.nextToken().trim());
-			System.out.println(valor);
+			operation = tokenizer.nextToken();			
+			account = Integer.parseInt(tokenizer.nextToken());			
+			valor = Integer.parseInt(tokenizer.nextToken().trim());			
 			if(ValidateOperation(operation)){
 				return false;
 			}
@@ -66,7 +63,8 @@ public class TCPServer {
 					if(msg.equals("HEARTBEAT")){										
 						reply = "OK"												;					
 					}
-					else if(ValidateRequest(msg)){
+					else if(ValidateRequest(msg)){	
+						msg = msg.replace("REQUEST;","");										
 						reply =  processplayload.processData(msg);									
 					}
 					else{
