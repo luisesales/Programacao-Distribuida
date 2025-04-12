@@ -9,17 +9,17 @@ import java.net.UnknownHostException;
 public class TCPClient {
 
     public static void main(String args[]) {
-        Socket conexao = null;
+        Socket connection = null;
         ObjectOutputStream output = null;
         ObjectInputStream input = null;
         try {
             System.out.println("TCP Client Bank Started");
-            conexao = new Socket("localhost", 8080);
-            output = new ObjectOutputStream(conexao.getOutputStream());
-            String inputMsg = "REQUEST;create;1;1000";
+            connection = new Socket("localhost", 8080);
+            output = new ObjectOutputStream(connection.getOutputStream());
+            String inputMsg = connection.getInetAddress().getHostAddress()+";"+connection.getPort()+";REQUEST;create;1;1000";
             output.writeObject(inputMsg);
             output.flush();
-            input = new ObjectInputStream(conexao.getInputStream());
+            input = new ObjectInputStream(connection.getInputStream());
             String msg = (String) input.readObject();
             System.out.println("Retorno do Servidor:"+msg);
         } catch (UnknownHostException e) {
@@ -32,7 +32,7 @@ public class TCPClient {
             try {
                 input.close();
                 output.close();
-                conexao.close();
+                connection.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
