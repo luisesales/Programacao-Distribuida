@@ -1,6 +1,7 @@
 package Protocols;
 
 import Classes.Bank;
+import Classes.IdempotencyStore;
 import Classes.ProcessPayload;
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,6 +11,7 @@ import java.util.StringTokenizer;
 
 
 public class TCPServer {
+	private IdempotencyStore idempotency;
 	private static int PORT;
 
 	private boolean ValidateOperation(String op){
@@ -22,7 +24,8 @@ public class TCPServer {
 		int valor = 0;
 		StringTokenizer tokenizer = new StringTokenizer(request, ";");
 		if(!tokenizer.nextToken().equals("REQUEST"))
-			return false;		
+			return false;	
+		String id = tokenizer.nextToken();	
 		while (tokenizer.hasMoreElements()) {
 			try{			
 			operation = tokenizer.nextToken();			
@@ -43,7 +46,8 @@ public class TCPServer {
 	public TCPServer(int port){
 		PORT = port;
 	}
-	public void RunServer(){		
+	public void RunServer(){	
+		idempotency = new IdempotencyStore();	
 		ObjectOutputStream output = null;
 		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");
