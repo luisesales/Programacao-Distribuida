@@ -4,8 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import Classes.WalLogger;
+import redis.clients.jedis.Jedis;
 
 public class Handler implements Runnable {
 
@@ -29,8 +28,7 @@ public class Handler implements Runnable {
 
     public void handleRequest(Socket socket) {
         ObjectOutputStream output = null;
-		ObjectInputStream input = null;
-        WalLogger wal = null;
+		ObjectInputStream input = null;        
         try {            
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");         
@@ -50,8 +48,7 @@ public class Handler implements Runnable {
                 String name = "Instance " + instances.getAndIncrement();
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
                 reply = "Servidor adicionado: " + name;
-            } else if (request[2].equals("REQUEST")) {      
-                wal = new WalLogger("../../WriteAheadLogs",msg);                             
+            } else if (request[2].equals("REQUEST")) {                                                  
                 System.out.println("Processando requisição...");   
                 msg.replace(request[0]+";", "");
                 msg.replace(request[1]+";", "");
@@ -72,9 +69,7 @@ public class Handler implements Runnable {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-                if(wal != null)
-                    wal.writeLog();
+			try {                
 				input.close();
 				output.close();
 			    socket.close();
