@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
-import redis.clients.jedis.Jedis;
+
 
 public class TCPServer {
 	private static int PORT;

@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
-import redis.clients.jedis.Jedis;
 
 public class Handler implements Runnable {
 
