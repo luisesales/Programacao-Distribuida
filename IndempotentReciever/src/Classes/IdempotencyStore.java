@@ -20,8 +20,8 @@ public class IdempotencyStore {
         }
     }
 
-    public static boolean isDuplicate(String requestId) {
-        return processedRequests.contains(requestId);
+    public static boolean isDuplicate(String request) {
+        return processedRequests.contains(request);
     }
 
     public static void save(String request) {
@@ -33,5 +33,5 @@ public class IdempotencyStore {
                 e.printStackTrace();
             }
         }
-    }
+    }    
 }

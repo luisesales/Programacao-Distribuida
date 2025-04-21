@@ -16,7 +16,7 @@ public class TCPClient {
             System.out.println("TCP Client Bank Started");
             connection = new Socket("localhost", 8080);
             output = new ObjectOutputStream(connection.getOutputStream());
-            String inputMsg = "REQUEST;"+ connection.getInetAddress().getHostAddress()+";"+connection.getPort()+";3204;create;1;1000";
+            String inputMsg = "REQUEST;"+ connection.getInetAddress().getHostAddress()+";"+connection.getPort()+";create;1;1000";
             output.writeObject(inputMsg);
             output.flush();
             input = new ObjectInputStream(connection.getInputStream());

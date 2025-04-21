@@ -10,8 +10,7 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
 
-public class TCPServer {
-	private IdempotencyStore idempotency;
+public class TCPServer {	
 	private static int PORT;
 
 	private boolean ValidateOperation(String op){
@@ -45,8 +44,7 @@ public class TCPServer {
 	public TCPServer(int port){
 		PORT = port;
 	}
-	public void RunServer(){	
-		idempotency = new IdempotencyStore();	
+	public void RunServer(){			
 		ObjectOutputStream output = null;
 		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");

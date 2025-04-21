@@ -1,9 +1,13 @@
 package API;
 
 import Classes.IdempotencyStore;
+import Classes.WalEntry;
+import Classes.RequestStatus;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Handler implements Runnable {
@@ -29,7 +33,7 @@ public class Handler implements Runnable {
     public void handleRequest(Socket socket) {
         ObjectOutputStream output = null;
 		ObjectInputStream input = null;             
-
+        WalEntry entry = null;
         try {            
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");         
@@ -50,26 +54,30 @@ public class Handler implements Runnable {
                 String name = "Instance " + instances.getAndIncrement();
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
                 reply = "Servidor adicionado: " + name;
-            } else if (request[0].equals("REQUEST")) {
-                String id = request[3];
-                if (IdempotencyStore.isDuplicate(id)) {
-                    System.out.println("Requisição duplicada ignorada: " + id);
+            } else if (request[0].equals("REQUEST")) {          
+                String requestId = UUID.randomUUID().toString();      
+                entry = new WalEntry(requestId,msg);
+                if (IdempotencyStore.isDuplicate(msg)) {
+                    System.out.println("Requisição duplicada ignorada: "+ msg);
                     return;
                 }                                                  
                 System.out.println("Processando requisição...");
                 String newMsg;
-                String removeTarget = request[1]+";"+request[2]+";"+request[3]+";";   
+                String removeTarget = request[1]+";"+request[2]+";";   
                 newMsg = msg.replace(removeTarget, "");             
                 newMsg = newMsg.trim();                
-                reply = gateway.redirectRequest(newMsg);      
-                IdempotencyStore.save(msg);
-                                    
+                reply = gateway.redirectRequest(newMsg);                     
             } else {
                 reply = "ERROR;Método desconhecido: " + msg;
                 
                 
             }
-
+            if(reply.contains("operação realizada")){
+                entry.setStatus(RequestStatus.PROCESSED);
+            }
+            else{
+                entry.setStatus(RequestStatus.FAILED);
+            }            
             System.out.println(reply);
             output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
@@ -80,10 +88,11 @@ public class Handler implements Runnable {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			try {        
+			try {                        
 				input.close();
 				output.close();
-			    socket.close();
+			    socket.close();     
+                IdempotencyStore.save(entry.getWalEntry());           
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
