@@ -1,5 +1,6 @@
 package API;
 
+import Classes.IdempotencyStore;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -27,13 +28,15 @@ public class Handler implements Runnable {
 
     public void handleRequest(Socket socket) {
         ObjectOutputStream output = null;
-		ObjectInputStream input = null;        
+		ObjectInputStream input = null;             
+
         try {            
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");         
             input = new ObjectInputStream(socket.getInputStream());		
             output = new ObjectOutputStream(socket.getOutputStream());
 			String msg = (String) input.readObject();
+            
             System.out.println("\nmsg: "+msg);                        
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
@@ -42,22 +45,31 @@ public class Handler implements Runnable {
             String reply;
             String[] request = msg.split(";");
             // Tomar ações com base no cabeçalho
-            if (request[2].equals("INIT_SERVER")) {
+            if (request[0].equals("INIT_SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + socket);
                 String name = "Instance " + instances.getAndIncrement();
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);                
                 reply = "Servidor adicionado: " + name;
-            } else if (request[2].equals("REQUEST")) {                                                  
-                System.out.println("Processando requisição...");   
-                msg.replace(request[0]+";", "");
-                msg.replace(request[1]+";", "");
-                reply = gateway.redirectRequest(msg);         
+            } else if (request[0].equals("REQUEST")) {
+                String id = request[3];
+                if (IdempotencyStore.isDuplicate(id)) {
+                    System.out.println("Requisição duplicada ignorada: " + id);
+                    return;
+                }                                                  
+                System.out.println("Processando requisição...");
+                String newMsg;
+                String removeTarget = request[1]+";"+request[2]+";"+request[3]+";";   
+                newMsg = msg.replace(removeTarget, "");             
+                newMsg = newMsg.trim();                
+                reply = gateway.redirectRequest(newMsg);      
+                IdempotencyStore.save(msg);
                                     
             } else {
                 reply = "ERROR;Método desconhecido: " + msg;
                 
                 
             }
+
             System.out.println(reply);
             output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
@@ -68,7 +80,7 @@ public class Handler implements Runnable {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			try {                
+			try {        
 				input.close();
 				output.close();
 			    socket.close();

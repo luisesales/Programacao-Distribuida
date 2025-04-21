@@ -24,17 +24,14 @@ public class IdempotencyStore {
         return processedRequests.contains(requestId);
     }
 
-    public static void save(String requestId) {
-        if (processedRequests.add(requestId)) {
+    public static void save(String request) {
+        if (processedRequests.add(request)) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
-                writer.write(requestId);
+                writer.write(request);
                 writer.newLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-}
- {
-    
 }

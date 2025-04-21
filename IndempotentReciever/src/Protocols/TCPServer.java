@@ -24,8 +24,7 @@ public class TCPServer {
 		int valor = 0;
 		StringTokenizer tokenizer = new StringTokenizer(request, ";");
 		if(!tokenizer.nextToken().equals("REQUEST"))
-			return false;	
-		String id = tokenizer.nextToken();	
+			return false;		
 		while (tokenizer.hasMoreElements()) {
 			try{			
 			operation = tokenizer.nextToken();			
