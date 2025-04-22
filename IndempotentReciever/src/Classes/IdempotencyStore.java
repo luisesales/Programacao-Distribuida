@@ -13,7 +13,7 @@ public class IdempotencyStore {
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                WalEntry entry = new WalEntry(WalEntry.getWalEntry(line));
+                WalEntry entry = WalEntry.getWalEntry(line);
                 if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
                     processedRequests.add(entry.getPayload());
                 }                
@@ -28,7 +28,7 @@ public class IdempotencyStore {
     }
 
     public static void save(String request) {
-        if (processedRequests.add(request)) {
+        if (processedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
                 writer.newLine();

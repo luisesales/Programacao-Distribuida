@@ -31,7 +31,7 @@ public class WalEntry {
     public String getPayload(){
         return payload;
     }
-
+    
     public String getWalEntry(){
         return requestId+" - "+payload+" - "+status.getLabel();
     }

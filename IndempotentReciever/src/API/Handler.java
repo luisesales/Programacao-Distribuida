@@ -63,8 +63,9 @@ public class Handler implements Runnable {
                 String newMsg;
                 String removeTarget = request[1] + ";" + request[2] + ";";
                 newMsg = msg.replace(removeTarget, "");
-                newMsg = newMsg.trim();
-
+                newMsg = newMsg.trim();              
+                // Adiciona a requisição ao WAL   
+                IdempotencyStore.save(entry.getWalEntry());                                             
                 // Tentar redirecionar a requisição até obter uma resposta positiva
                 while (true) {
                     reply = gateway.redirectRequest(newMsg);
@@ -73,7 +74,7 @@ public class Handler implements Runnable {
                         break;
                     } else {
                         System.out.println("Falha ao processar requisição. Tentando novamente...");
-                        entry.setStatus(RequestStatus.FAILED);
+                        entry.setStatus(RequestStatus.FAILED);                        
                         Thread.sleep(1000); // Aguarda 1 segundo antes de tentar novamente
                     }
                 }
@@ -98,9 +99,10 @@ public class Handler implements Runnable {
                 if (input != null) input.close();
                 if (output != null) output.close();
                 socket.close();
-                if (entry != null) {
+                if(entry != null) {
                     IdempotencyStore.save(entry.getWalEntry());
                 }
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }
