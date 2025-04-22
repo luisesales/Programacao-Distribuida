@@ -1,3 +1,5 @@
+package Classes;
+
 public enum RequestStatus {
     FAILED(-1, "FAILED"),
     PENDING(0, "PENDING"),

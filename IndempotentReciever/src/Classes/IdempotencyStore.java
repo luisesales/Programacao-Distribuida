@@ -13,7 +13,10 @@ public class IdempotencyStore {
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                processedRequests.add(line.trim());
+                WalEntry entry = new WalEntry(WalEntry.getWalEntry(line));
+                if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
+                    processedRequests.add(entry.getPayload());
+                }                
             }
         } catch (IOException e) {
             System.out.println("Nenhum WAL existente, iniciando novo.");
