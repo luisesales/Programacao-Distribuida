@@ -13,19 +13,22 @@ public class IdempotencyStore {
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                processedRequests.add(line.trim());
+                WalEntry entry = WalEntry.getWalEntry(line);
+                if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
+                    processedRequests.add(entry.getPayload());
+                }                
             }
         } catch (IOException e) {
             System.out.println("Nenhum WAL existente, iniciando novo.");
         }
     }
 
-    public static boolean isDuplicate(String requestId) {
-        return processedRequests.contains(requestId);
+    public static boolean isDuplicate(String request) {
+        return processedRequests.contains(request);
     }
 
     public static void save(String request) {
-        if (processedRequests.add(request)) {
+        if (processedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
                 writer.newLine();
@@ -33,5 +36,5 @@ public class IdempotencyStore {
                 e.printStackTrace();
             }
         }
-    }
+    }    
 }
