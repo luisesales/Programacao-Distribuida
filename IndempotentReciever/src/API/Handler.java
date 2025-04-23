@@ -100,6 +100,7 @@ public class Handler implements Runnable {
                 if (output != null) output.close();
                 socket.close();
                 if(entry != null) {
+                    System.out.println(entry.getWalEntry());
                     IdempotencyStore.save(entry.getWalEntry());
                 }
                 

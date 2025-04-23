@@ -33,10 +33,44 @@ public class IdempotencyStore {
         if (processedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
-                writer.newLine();
+                writer.newLine();                
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }    
-}
+        else {            
+            try {
+                File inputFile = new File(WAL_FILE);
+                File tempFile = new File("temp_" + WAL_FILE);
+
+                try (
+                    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+                ) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if(line.isBlank()) break;
+                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
+                        if (existingPayload.equals(WalEntry.getWalEntry(request).getPayload())) {
+                            writer.write(request); // Substitui linha
+                        } else {
+                            writer.write(line); // Mantém linha original
+                        }
+                        writer.newLine();
+                    }
+                }
+
+                // Substitui o arquivo antigo pelo novo
+                if (!inputFile.delete()) {
+                    throw new IOException("Não foi possível deletar o arquivo original.");
+                }
+                if (!tempFile.renameTo(inputFile)) {
+                    throw new IOException("Não foi possível renomear o arquivo temporário.");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}    
