@@ -7,17 +7,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IdempotencyStore {
     private static final String WAL_FILE = "wal.log";
     private static final Set<String> processedRequests = ConcurrentHashMap.newKeySet();
-    
-
-    public static void readDocument(){       
+    static{      
         // Carrega WAL ao iniciar
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                WalEntry entry = WalEntry.getWalEntry(line);
+                line = line.trim();      
+                if(line.isBlank()) 
+                    break;          
+                WalEntry entry = WalEntry.getWalEntry(line);                             
                 if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
-                    processedRequests.add(entry.getPayload());
-                }                
+                    processedRequests.add(entry.getWalEntry());
+                }                                
             }
         } catch (IOException e) {
             System.out.println("Nenhum WAL existente, iniciando novo.");
