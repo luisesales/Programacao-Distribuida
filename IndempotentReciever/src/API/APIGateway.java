@@ -1,5 +1,6 @@
 package API;
 
+import Classes.IdempotencyStore;
 import Classes.Server;
 import java.io.*;
 import java.net.*;
@@ -15,6 +16,7 @@ public class APIGateway {
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
     private AtomicInteger instances = new AtomicInteger(0);
+    private static IdempotencyStore idempotency = new IdempotencyStore();
     public void addServer(String ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
     }
@@ -60,8 +62,9 @@ public class APIGateway {
                 Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
                 new Thread(monitor).start();
                 while(true){
+                    idempotency.readDocument();
                     Socket remote = server.accept();
-                    executor.execute(new Handler(remote,this,instances));                                        
+                    executor.execute(new Handler(remote,this,instances, idempotency));                                        
                 }
             }finally {
                 executor.shutdown();

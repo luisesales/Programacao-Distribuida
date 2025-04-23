@@ -14,11 +14,13 @@ public class Handler implements Runnable {
     private final Socket socket;
     private APIGateway gateway;
     private AtomicInteger instances;
+    private IdempotencyStore store;
 
-    public Handler(Socket socket, APIGateway gateway, AtomicInteger instances) {
+    public Handler(Socket socket, APIGateway gateway, AtomicInteger instances, IdempotencyStore store) {
         this.gateway = gateway;
         this.socket = socket;
         this.instances = instances;
+        this.store = store;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class Handler implements Runnable {
             } else if (request[0].equals("REQUEST")) {
                 String requestId = UUID.randomUUID().toString();
                 entry = new WalEntry(requestId, msg);
-                if (IdempotencyStore.isDuplicate(msg)) {
+                if (store.isDuplicate(msg)) {
                     System.out.println("Requisição duplicada ignorada: " + msg);
                     return;
                 }

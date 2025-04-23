@@ -7,8 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IdempotencyStore {
     private static final String WAL_FILE = "wal.log";
     private static final Set<String> processedRequests = ConcurrentHashMap.newKeySet();
+    
 
-    static {
+    public static void readDocument(){       
         // Carrega WAL ao iniciar
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
