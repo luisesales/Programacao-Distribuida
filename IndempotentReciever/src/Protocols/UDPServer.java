@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.StringTokenizer;
 
 import Classes.*;
@@ -52,7 +53,7 @@ public class UDPServer {
 		}
 		
 		 */
-		DatagramSocket serverSocket;
+		DatagramSocket serverSocket = null;
 		DatagramPacket sendPacket;
 		try {
 			serverSocket = new DatagramSocket(PORT);			
@@ -70,19 +71,11 @@ public class UDPServer {
 			String message = new String(receivePacket.getData());
 			String reply = payload.processData(message);
 			System.out.println("Gateway response: " + reply);
+			serverSocket.close();				
+			RunServer();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally{
-			try {
-				receivePacket;
-				output.close();
-			    connection.close();
-				RunServer();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
-		}
+		}		
 	}
 
 	public void RunServer() {

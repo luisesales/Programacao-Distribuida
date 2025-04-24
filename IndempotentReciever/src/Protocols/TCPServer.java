@@ -85,24 +85,17 @@ public class TCPServer {
 			output.flush();
 			input = new ObjectInputStream(connection.getInputStream());
 			String reply = (String) input.readObject();
-			System.out.println("Gateway response: " + reply);		
+			System.out.println("Gateway response: " + reply);	
+			input.close();
+			output.close();
+			connection.close();
+			RunServer();	
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		}
-		finally{
-			try {
-				input.close();
-				output.close();
-			    connection.close();
-				RunServer();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
-		}
-		
+		}				
 	}
 }
