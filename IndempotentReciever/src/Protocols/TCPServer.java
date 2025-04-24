@@ -3,6 +3,7 @@ package Protocols;
 import Classes.Bank;
 import Classes.IdempotencyStore;
 import Classes.ProcessPayload;
+import Classes.RequestValidator;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,33 +13,6 @@ import java.util.StringTokenizer;
 
 public class TCPServer {	
 	private static int PORT;
-
-	private boolean ValidateOperation(String op){
-		return !(op.equals("create") || op.equals("deposit") || op.equals("balance"));
-	}
-
-	private boolean ValidateRequest(String request){
-		String operation =null;
-		int account = 0;
-		int valor = 0;
-		StringTokenizer tokenizer = new StringTokenizer(request, ";");
-		if(!tokenizer.nextToken().equals("REQUEST"))
-			return false;		
-		while (tokenizer.hasMoreElements()) {
-			try{			
-			operation = tokenizer.nextToken();			
-			account = Integer.parseInt(tokenizer.nextToken());			
-			valor = Integer.parseInt(tokenizer.nextToken().trim());			
-			if(ValidateOperation(operation)){
-				return false;
-			}
-			} catch(NumberFormatException e){
-				e.printStackTrace();
-				return false;
-			}
-		}
-		return true;
-	}
 	
 
 	public TCPServer(int port){
@@ -65,7 +39,7 @@ public class TCPServer {
 					if(msg.equals("HEARTBEAT")){										
 						reply = "OK"												;					
 					}
-					else if(ValidateRequest(msg)){	
+					else if(RequestValidator.ValidateRequest(msg)){	
 						msg = msg.replace("REQUEST;","");										
 						reply =  processplayload.processData(msg);									
 					}
