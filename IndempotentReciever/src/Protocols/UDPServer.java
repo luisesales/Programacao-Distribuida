@@ -1,13 +1,10 @@
 package Protocols;
 
+import Classes.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.StringTokenizer;
-
-import Classes.*;
 
 public class UDPServer {
 	private final int PORT;
@@ -19,40 +16,7 @@ public class UDPServer {
 
 	public void InitServer(){
 		
-		/*
-		 public void InitServer(){
-		Socket connection = null;
-		ObjectOutputStream output = null;
-		ObjectInputStream input = null;
-		try {
-			System.out.println("TCP Server Instance Started");
-			connection = new Socket("localhost", 8080);
-			output = new ObjectOutputStream(connection.getOutputStream());
-			String request = "INIT_SERVER;"+connection.getInetAddress().getHostAddress()+";"+PORT;			
-			output.writeObject(request);
-			output.flush();
-			input = new ObjectInputStream(connection.getInputStream());
-			String reply = (String) input.readObject();
-			System.out.println("Gateway response: " + reply);		
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		finally{
-			try {
-				input.close();
-				output.close();
-			    connection.close();
-				RunServer();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
-		}
 		
-		 */
 		DatagramSocket serverSocket = null;
 		DatagramPacket sendPacket;
 		try {
@@ -92,8 +56,19 @@ public class UDPServer {
 				byte[] receivemessage = new byte[1024];
 				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
 				serversocket.receive(receivepacket);
-				String message = new String(receivepacket.getData());
-				String reply = payload.processData(message);
+				String msg = new String(receivepacket.getData());				
+				String reply = new String();
+				System.out.println("Operação recebida:"+msg);
+				if(msg.equals("HEARTBEAT")){										
+					reply = "OK"												;					
+				}
+				else if(RequestValidator.ValidateRequest(msg)){
+					msg = msg.replace("REQUEST;","");
+					reply = payload.processData(msg);
+				}
+				else{
+					reply = "ERROR;Requisição Inválida";
+				}	
 				byte[] replymsg = reply.getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(replymsg,replymsg.length,
 						receivepacket.getAddress(),receivepacket.getPort());

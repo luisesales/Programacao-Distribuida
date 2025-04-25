@@ -38,7 +38,8 @@ public class IdempotencyStore {
                 e.printStackTrace();
             }
         }
-        else {            
+        else {      
+            processedRequests.remove(WalEntry.getWalEntry(request).getPayload());
             try {
                 File inputFile = new File(WAL_FILE);
                 File tempFile = new File("temp_" + WAL_FILE);

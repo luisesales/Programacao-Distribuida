@@ -30,8 +30,7 @@ public class TCPServer {
 					Socket connection = server.accept();
 					output = new ObjectOutputStream(connection.getOutputStream());
 					input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-					String msg = input.readLine();
-					String[] request = msg.split(";"); 
+					String msg = input.readLine();					
 					String reply = new String();
 					System.out.println("Operação recebida:"+msg);
 					if(msg.equals("HEARTBEAT")){										

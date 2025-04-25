@@ -27,7 +27,7 @@ public class APIGateway {
         return new ArrayList<Server>(AliveServers);
     }
 
-    public String redirectRequest(String body){
+    public String redirectRequestTCP(String body){
         Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));        
         try (Socket forwardSocket = new Socket(selected_server.getInetAddress(), selected_server.getPort())) {
             PrintWriter forwardOutput = new PrintWriter(forwardSocket.getOutputStream(), true);
@@ -54,7 +54,7 @@ public class APIGateway {
         AliveServers = new ArrayList<Server>();        
     }
 
-    private void RunGateway(APIGateway gateway){           
+    private void RunGatewayTCP(APIGateway gateway){           
         try (ServerSocket server = new ServerSocket(8080, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try{
@@ -63,7 +63,7 @@ public class APIGateway {
                 new Thread(monitor).start();
                 while(true){                    
                     Socket remote = server.accept();
-                    executor.execute(new Handler(remote,this,instances));                                        
+                    executor.execute(new HandlerTCP(remote,this,instances));                                        
                 }
             }finally {
                 executor.shutdown();
@@ -78,6 +78,6 @@ public class APIGateway {
     
     public static void main(String[] args) {
         APIGateway gateway = new APIGateway();
-        gateway.RunGateway(gateway);        
+        gateway.RunGatewayTCP(gateway);        
     }
 }

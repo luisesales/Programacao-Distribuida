@@ -9,13 +9,13 @@ import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Handler implements Runnable {
+public class HandlerTCP implements Runnable {
 
     private final Socket socket;
     private APIGateway gateway;
     private AtomicInteger instances;    
 
-    public Handler(Socket socket, APIGateway gateway, AtomicInteger instances) {
+    public HandlerTCP(Socket socket, APIGateway gateway, AtomicInteger instances) {
         this.gateway = gateway;
         this.socket = socket;
         this.instances = instances;        
@@ -68,7 +68,7 @@ public class Handler implements Runnable {
                 IdempotencyStore.save(entry.getWalEntry());                                             
                 // Tentar redirecionar a requisição até obter uma resposta positiva
                 while (true) {
-                    reply = gateway.redirectRequest(newMsg);
+                    reply = gateway.redirectRequestTCP(newMsg);
                     if (reply.contains("operação realizada")) {
                         entry.setStatus(RequestStatus.PROCESSED);
                         break;

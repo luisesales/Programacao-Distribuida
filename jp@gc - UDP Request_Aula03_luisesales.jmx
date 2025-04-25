@@ -5,9 +5,11 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="ThreadGroupPersonalClientUDP" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="ThreadGroupPersonalClientUDP">
         <intProp name="ThreadGroup.num_threads">500</intProp>
         <intProp name="ThreadGroup.ramp_time">5</intProp>
         <longProp name="ThreadGroup.duration">30</longProp>
@@ -21,7 +23,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <kg.apc.jmeter.samplers.UDPSampler guiclass="kg.apc.jmeter.samplers.UDPSamplerGui" testclass="kg.apc.jmeter.samplers.UDPSampler" testname="jp@gc - UDP Request - Criar">
+        <kg.apc.jmeter.samplers.UDPSampler guiclass="kg.apc.jmeter.samplers.UDPSamplerGui" testclass="kg.apc.jmeter.samplers.UDPSampler" testname="jp@gc - UDP Request - Criar" enabled="true">
           <stringProp name="hostname">localhost</stringProp>
           <stringProp name="port">9004</stringProp>
           <boolProp name="waitresponse">true</boolProp>
@@ -33,7 +35,7 @@
           <stringProp name="bind_port"></stringProp>
         </kg.apc.jmeter.samplers.UDPSampler>
         <hashTree/>
-        <kg.apc.jmeter.samplers.UDPSampler guiclass="kg.apc.jmeter.samplers.UDPSamplerGui" testclass="kg.apc.jmeter.samplers.UDPSampler" testname="jp@gc - UDP Request - Depositar">
+        <kg.apc.jmeter.samplers.UDPSampler guiclass="kg.apc.jmeter.samplers.UDPSamplerGui" testclass="kg.apc.jmeter.samplers.UDPSampler" testname="jp@gc - UDP Request - Depositar" enabled="true">
           <stringProp name="hostname">localhost</stringProp>
           <stringProp name="port">9004</stringProp>
           <boolProp name="waitresponse">true</boolProp>
@@ -45,7 +47,7 @@
           <stringProp name="bind_port"></stringProp>
         </kg.apc.jmeter.samplers.UDPSampler>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">true</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -82,7 +84,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -127,7 +129,7 @@
           <boolProp name="exclude_checkbox_state">false</boolProp>
         </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -173,8 +175,8 @@
         </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="ThreadGroupPersonalClientTCP" enabled="true">
-        <intProp name="ThreadGroup.num_threads">250</intProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="ThreadGroupPersonalClientTCP">
+        <intProp name="ThreadGroup.num_threads">10</intProp>
         <intProp name="ThreadGroup.ramp_time">5</intProp>
         <longProp name="ThreadGroup.duration">30</longProp>
         <longProp name="ThreadGroup.delay">0</longProp>
@@ -194,14 +196,14 @@
           <stringProp name="TCPSampler.port">8080</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
           <stringProp name="TCPSampler.timeout"></stringProp>
-          <stringProp name="TCPSampler.request">criar;1;500
+          <stringProp name="TCPSampler.request">REQUEST;127.0.0.1;8080;create;1;500
 </stringProp>
           <boolProp name="TCPSampler.closeConnection">false</boolProp>
           <stringProp name="ConfigTestElement.username"></stringProp>
           <stringProp name="ConfigTestElement.password"></stringProp>
         </TCPSampler>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -238,7 +240,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -283,7 +285,7 @@
           <boolProp name="exclude_checkbox_state">false</boolProp>
         </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -329,7 +331,7 @@
         </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
         <hashTree/>
       </hashTree>
-      <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate ThreadGroupPersonalClientTCP">
+      <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate ThreadGroupPersonalClientTCP" enabled="true">
         <collectionProp name="ultimatethreadgroupdata">
           <collectionProp name="-346977874">
             <stringProp name="100">100</stringProp>
@@ -346,7 +348,7 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
       </kg.apc.jmeter.threads.UltimateThreadGroup>
       <hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="TCP Sampler">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="TCP Sampler" enabled="true">
           <stringProp name="TCPSampler.classname">TCPClientImpl</stringProp>
           <stringProp name="TCPSampler.server">localhost</stringProp>
           <boolProp name="TCPSampler.reUseConnection">false</boolProp>
@@ -360,7 +362,7 @@
           <stringProp name="ConfigTestElement.password"></stringProp>
         </TCPSampler>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -397,7 +399,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Transactions per Second" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -442,7 +444,7 @@
           <boolProp name="exclude_checkbox_state">false</boolProp>
         </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
         <hashTree/>
-        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time">
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
