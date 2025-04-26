@@ -22,7 +22,7 @@ public class UDPServer {
 		try {
 			serverSocket = new DatagramSocket(PORT);			
 			InetAddress inetAddress = InetAddress.getByName("localhost");
-			String request = "INIT_SERVER;"+serverSocket.getInetAddress().getHostAddress()+";"+PORT;
+			String request = "INIT_SERVER;";
 			byte[] sendMessage;
 			sendMessage = request.getBytes();
 			sendPacket = new DatagramPacket(
@@ -50,8 +50,7 @@ public class UDPServer {
 		int valor = 0;
 		System.out.println("UDP Server Bank started");
 		try {
-			DatagramSocket serversocket = new DatagramSocket(PORT);
-			String opResult;
+			DatagramSocket serversocket = new DatagramSocket(PORT);			
 			while (true) {
 				byte[] receivemessage = new byte[1024];
 				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);

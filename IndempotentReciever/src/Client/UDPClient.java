@@ -20,7 +20,7 @@ class UDPClient {
 			byte[] receivemessage = new byte[1024];
 						
 			//Enviar solicitação para abrir conta
-			String message = "REQUEST;"+ clientSocket.getInetAddress().getHostAddress()+";"+clientSocket.getPort()+";create;1;1000";
+			String message = "REQUEST;create;1;1000";
 			sendMessage = message.getBytes();
 			sendPacket = new DatagramPacket(
 						sendMessage, sendMessage.length,
@@ -34,7 +34,7 @@ class UDPClient {
 			System.out.println(message);
 			
 			//Enviar solicitação para depositar
-			message = "REQUEST;"+ clientSocket.getInetAddress().getHostAddress()+";"+clientSocket.getPort()+"deposit;1;1000";
+			message = "REQUEST;deposit;1;1000";
 			sendMessage = message.getBytes();
 			sendPacket = new DatagramPacket(
 							sendMessage, sendMessage.length,
@@ -49,7 +49,7 @@ class UDPClient {
 			System.out.println(message);
 			
 			//Enviar solicitação para obter saldo
-			message = "REQUEST;"+ clientSocket.getInetAddress().getHostAddress()+";"+clientSocket.getPort()+"balance;1;0";
+			message = "REQUEST;balance;1;0";
 			sendMessage = message.getBytes();
 			sendPacket = new DatagramPacket(
 							sendMessage, sendMessage.length,

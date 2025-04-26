@@ -50,6 +50,25 @@ public class APIGateway {
         return null;
     }
 
+    public String redirectRequestUDP(String body){
+        Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));  
+        byte[] sendMessage = body.getBytes();     
+        byte[] receivemessage = new byte[1024];         
+        try {
+            DatagramPacket forwardPacket = new DatagramPacket(sendMessage,sendMessage.length,selected_server.getInetAddress(), selected_server.getPort());
+            DatagramSocket clientSocket = new DatagramSocket();
+            clientSocket.send(forwardPacket);
+
+            DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
+			clientSocket.receive(receivepacket);
+            // Envia a resposta de volta ao cliente
+			return new String(receivepacket.getData());                                              
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public APIGateway(){
         AliveServers = new ArrayList<Server>();        
     }
@@ -74,10 +93,33 @@ public class APIGateway {
         e2.printStackTrace();
         }       
     }
+    private void RunGatewayUDP(APIGateway gateway){           
+        try (DatagramSocket serversocket = new DatagramSocket(8080)) {
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+            try{
+                System.out.println("Gateway Listening to Requests");
+                Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
+                new Thread(monitor).start();
+                while(true){                    
+                    byte[] receivemessage = new byte[1024];
+				    DatagramPacket remote = new DatagramPacket(receivemessage, receivemessage.length);
+                    serversocket.receive(remote);
+                    executor.execute(new HandlerUDP(remote,this,instances));                                        
+                }
+            }finally {
+                executor.shutdown();
+                serversocket.close();
+                System.out.println("Gateway terminating");
+            }
+        }catch (IOException e2) {
+        e2.printStackTrace();
+        }       
+    }
     
     
     public static void main(String[] args) {
         APIGateway gateway = new APIGateway();
-        gateway.RunGatewayTCP(gateway);        
+        //gateway.RunGatewayTCP(gateway);        
+        gateway.RunGatewayUDP(gateway);
     }
 }

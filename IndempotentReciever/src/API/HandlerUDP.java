@@ -4,42 +4,41 @@ import Classes.IdempotencyStore;
 import Classes.RequestStatus;
 import Classes.WalEntry;
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HandlerTCP implements Runnable {
+public class HandlerUDP implements Runnable {
 
-    private final Socket socket;
+    private final DatagramPacket datagramPacket;
     private APIGateway gateway;
     private AtomicInteger instances;    
 
-    public HandlerTCP(Socket socket, APIGateway gateway, AtomicInteger instances) {
+    public HandlerUDP(DatagramPacket packet, APIGateway gateway, AtomicInteger instances) {
         this.gateway = gateway;
-        this.socket = socket;
+        datagramPacket = packet;
         this.instances = instances;        
     }
 
     @Override
     public void run() {
-        System.out.println("\nHandler Started for " + this.socket);
-        handleRequest(this.socket);
-        System.out.println("Handler Terminated for " + this.socket + "\n");
+        System.out.println("\nHandler Started for " + this.datagramPacket);
+        handleRequest(this.datagramPacket);
+        System.out.println("Handler Terminated for " + this.datagramPacket + "\n");
     }
 
-    public void handleRequest(Socket socket) {
+    public void handleRequest(DatagramPacket packet) {
         ObjectOutputStream output = null;
         ObjectInputStream input = null;
         WalEntry entry = null;
         String reply = new String();
         try {
             // Leitura do cabeçalho
-            System.out.println("Lidando com a requisição");
-            input = new ObjectInputStream(socket.getInputStream());
-            output = new ObjectOutputStream(socket.getOutputStream());
-            String msg = (String) input.readObject();
-
+            System.out.println("Lidando com a requisição");                        
+            String msg = new String(packet.getData());		
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
@@ -49,9 +48,9 @@ public class HandlerTCP implements Runnable {
             String[] request = msg.split(";");
             // Tomar ações com base no cabeçalho
             if (request[0].equals("INIT_SERVER")) {
-                System.out.println("Iniciando a adição de servidor: " + socket);
+                System.out.println("Iniciando a adição de servidor: " + datagramPacket);
                 String name = "Instance " + instances.getAndIncrement();
-                gateway.addServer(request[1], Integer.parseInt(request[2]), name);
+                gateway.addServer(packet.getAddress().getHostAddress(), packet.getPort(), name);
                 reply = "Servidor adicionado: " + name;
             } else if (request[0].equals("REQUEST")) {
                 String requestId = UUID.randomUUID().toString();                
@@ -72,7 +71,7 @@ public class HandlerTCP implements Runnable {
                 // Tentar redirecionar a requisição até obter uma resposta positiva
                 int count = 0;
                 while (count < 10) {
-                    reply = gateway.redirectRequestTCP(newMsg);
+                    reply = gateway.redirectRequestUDP(newMsg);
                     if (reply.contains("operação realizada")) {
                         entry.setStatus(RequestStatus.PROCESSED);
                         break;
