@@ -20,6 +20,7 @@ public class UDPServer {
 		DatagramSocket serverSocket = null;
 		DatagramPacket sendPacket;
 		try {
+			System.out.println("Iniciando Servidor");
 			serverSocket = new DatagramSocket(PORT);			
 			InetAddress inetAddress = InetAddress.getByName("localhost");
 			String request = "INIT_SERVER;";
@@ -29,10 +30,11 @@ public class UDPServer {
 						sendMessage, sendMessage.length,
 						inetAddress, 8080);
 			serverSocket.send(sendPacket);
+			System.out.println("Enviei o Pacote");
 			byte[] receivemessage = new byte[1024];
 			DatagramPacket receivePacket = new DatagramPacket(receivemessage, receivemessage.length);
 			serverSocket.receive(receivePacket);
-			String message = new String(receivePacket.getData());
+			String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
 			String reply = payload.processData(message);
 			System.out.println("Gateway response: " + reply);
 			serverSocket.close();				
@@ -55,7 +57,7 @@ public class UDPServer {
 				byte[] receivemessage = new byte[1024];
 				DatagramPacket receivepacket = new DatagramPacket(receivemessage, receivemessage.length);
 				serversocket.receive(receivepacket);
-				String msg = new String(receivepacket.getData());				
+				String msg = new String(receivepacket.getData(), 0, receivepacket.getLength());			
 				String reply = new String();
 				System.out.println("Operação recebida:"+msg);
 				if(msg.equals("HEARTBEAT")){										

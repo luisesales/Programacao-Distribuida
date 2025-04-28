@@ -93,33 +93,43 @@ public class APIGateway {
         e2.printStackTrace();
         }       
     }
-    private void RunGatewayUDP(APIGateway gateway){           
+    private void RunGatewayUDP(APIGateway gateway) {           
         try (DatagramSocket serversocket = new DatagramSocket(8080)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-            try{
+            try {
                 System.out.println("Gateway Listening to Requests");
-                Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
+                Heartbeat monitor = new Heartbeat(gateway, ALIVE_TIMEOUT);
                 new Thread(monitor).start();
-                while(true){                    
+                
+                while (true) {                    
                     byte[] receivemessage = new byte[1024];
-				    DatagramPacket remote = new DatagramPacket(receivemessage, receivemessage.length);
+                    DatagramPacket remote = new DatagramPacket(receivemessage, receivemessage.length);
                     serversocket.receive(remote);
-                    executor.execute(new HandlerUDP(remote,this,instances));                                        
+                    
+                    System.out.println(new String(remote.getData(), 0, remote.getLength()));
+                        
+                    Future<String> futureReply = executor.submit(new HandlerUDP(remote, this, instances));
+                    String reply = futureReply.get(); 
+                                    
+                    byte[] replymsg = reply.getBytes();
+                    DatagramPacket sendPacket = new DatagramPacket(replymsg, replymsg.length,
+                            remote.getAddress(), remote.getPort());
+                    serversocket.send(sendPacket);
                 }
-            }finally {
+            } finally {
                 executor.shutdown();
                 serversocket.close();
                 System.out.println("Gateway terminating");
             }
-        }catch (IOException e2) {
-        e2.printStackTrace();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }       
     }
     
     
     public static void main(String[] args) {
         APIGateway gateway = new APIGateway();
-        //gateway.RunGatewayTCP(gateway);        
-        gateway.RunGatewayUDP(gateway);
+        gateway.RunGatewayTCP(gateway);        
+        //gateway.RunGatewayUDP(gateway);
     }
 }

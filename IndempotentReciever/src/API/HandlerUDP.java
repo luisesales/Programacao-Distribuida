@@ -30,15 +30,13 @@ public class HandlerUDP implements Runnable {
         System.out.println("Handler Terminated for " + this.datagramPacket + "\n");
     }
 
-    public void handleRequest(DatagramPacket packet) {
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;
+    public String handleRequest(DatagramPacket packet) {
         WalEntry entry = null;
         String reply = new String();
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");                        
-            String msg = new String(packet.getData());		
+            String msg = new String(packet.getData(), 0, packet.getLength());
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
@@ -46,6 +44,7 @@ public class HandlerUDP implements Runnable {
             }
             
             String[] request = msg.split(";");
+            System.out.println(request[0]);
             // Tomar ações com base no cabeçalho
             if (request[0].equals("INIT_SERVER")) {
                 System.out.println("Iniciando a adição de servidor: " + datagramPacket);
@@ -56,8 +55,8 @@ public class HandlerUDP implements Runnable {
                 String requestId = UUID.randomUUID().toString();                
                 entry = new WalEntry(requestId, msg);                
                 if (IdempotencyStore.isDuplicate(msg)) {
-                    System.out.println("Requisição duplicada ignorada: " + msg);
-                    return;
+                    System.out.println("ERROR;Requisição duplicada ignorada: " + msg);
+                    return "ERROR;Requisição duplicada ignorada:  + msg";
                 }
                 System.out.println("Processando requisição...");
                 String newMsg;
@@ -67,8 +66,7 @@ public class HandlerUDP implements Runnable {
                 // Adiciona a requisição ao WAL   
                 System.out.println("Irei Salvar o Entry")       ;
                 IdempotencyStore.save(entry.getWalEntry());  
-                System.out.println("Salvei o Entry")                                           ;
-                // Tentar redirecionar a requisição até obter uma resposta positiva
+                System.out.println("Salvei o Entry")                                           ;                
                 int count = 0;
                 while (count < 10) {
                     reply = gateway.redirectRequestUDP(newMsg);
@@ -79,7 +77,7 @@ public class HandlerUDP implements Runnable {
                         System.out.println("Falha ao processar requisição. Tentando novamente...");
                         entry.setStatus(RequestStatus.FAILED);                        
                         count++;
-                        Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
+                        Thread.sleep(2000); // Aguarda 2 segundos antes de tentar novamente
                         
                     }
                 }
@@ -90,9 +88,7 @@ public class HandlerUDP implements Runnable {
                 reply = "ERROR;Método desconhecido: " + msg;
             }
 
-            System.out.println(reply);
-            output.writeObject(reply); // Envia a resposta ao cliente
-            output.flush();
+            return reply;           
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -104,9 +100,7 @@ public class HandlerUDP implements Runnable {
             e.printStackTrace();
         } finally {
             try {
-                if (input != null) input.close();
-                if (output != null) output.close();
-                socket.close();
+               
                 if(entry != null) {
                     System.out.println(entry.getWalEntry());
                     IdempotencyStore.save(entry.getWalEntry());
