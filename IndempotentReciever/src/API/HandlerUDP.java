@@ -1,4 +1,4 @@
-package API;
+/*package API;
 
 import Classes.IdempotencyStore;
 import Classes.RequestStatus;
@@ -40,7 +40,7 @@ public class HandlerUDP implements Runnable {
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
-                return;
+                return "";
             }
             
             String[] request = msg.split(";");
@@ -111,4 +111,4 @@ public class HandlerUDP implements Runnable {
             }
         }
     }
-}
+}*/

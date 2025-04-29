@@ -58,6 +58,7 @@ public class HandlerTCP implements Runnable {
                 entry = new WalEntry(requestId, msg);                
                 if (IdempotencyStore.isDuplicate(msg)) {
                     System.out.println("Requisição duplicada ignorada: " + msg);
+                    reply = "Requisição duplicada ignorada: " + msg;
                     return;
                 }
                 System.out.println("Processando requisição...");
@@ -70,21 +71,21 @@ public class HandlerTCP implements Runnable {
                 IdempotencyStore.save(entry.getWalEntry());  
                 System.out.println("Salvei o Entry")                                           ;
                 // Tentar redirecionar a requisição até obter uma resposta positiva
-                int count = 0;
-                while (count < 10) {
+                int retries = 0;
+                while (retries < 10) {
                     reply = gateway.redirectRequestTCP(newMsg);
                     if (reply.contains("operação realizada")) {
                         entry.setStatus(RequestStatus.PROCESSED);
                         break;
                     } else {
                         System.out.println("Falha ao processar requisição. Tentando novamente...");
-                        entry.setStatus(RequestStatus.FAILED);                        
-                        count++;
+                        entry.setStatus(RequestStatus.FAILED);
+                        retries++;
                         Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
                         
                     }
                 }
-                if(count == 10){
+                if(retries == 10){
                     reply = "ERROR;Falha ao processar após 10 tentativas" + msg;
                 }
             } else {

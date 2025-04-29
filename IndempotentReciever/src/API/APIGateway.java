@@ -50,7 +50,7 @@ public class APIGateway {
         return null;
     }
 
-    public String redirectRequestUDP(String body){
+    /*public String redirectRequestUDP(String body){
         Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));  
         byte[] sendMessage = body.getBytes();     
         byte[] receivemessage = new byte[1024];         
@@ -67,7 +67,7 @@ public class APIGateway {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 
     public APIGateway(){
         AliveServers = new ArrayList<Server>();        
@@ -93,7 +93,7 @@ public class APIGateway {
         e2.printStackTrace();
         }       
     }
-    private void RunGatewayUDP(APIGateway gateway) {           
+   /* private void RunGatewayUDP(APIGateway gateway) {
         try (DatagramSocket serversocket = new DatagramSocket(8080)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try {
@@ -124,7 +124,7 @@ public class APIGateway {
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }       
-    }
+    }*/
     
     
     public static void main(String[] args) {

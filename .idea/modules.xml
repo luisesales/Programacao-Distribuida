@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HTTPJava/HTTPJava.iml" filepath="$PROJECT_DIR$/HTTPJava/HTTPJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Programacao-Distribuida.iml" filepath="$PROJECT_DIR$/Programacao-Distribuida.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Programacao-Distribuida2.iml" filepath="$PROJECT_DIR$/Programacao-Distribuida2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UDPJava/UDPJava.iml" filepath="$PROJECT_DIR$/UDPJava/UDPJava.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Programacao-Distribuida">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/apache-jmeter-5.6.3.zip!/" />
+      <root url="jar://$PROJECT_DIR$/CodigoUDPAula.zip!/" />
+      <root url="jar://$PROJECT_DIR$/ServidorHTTP.zip!/" />
+      <root url="jar://$PROJECT_DIR$/ProtocoloTCP.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class IdempotencyStore {
     private static final String WAL_FILE = "wal.log";
-    private static final Set<String> processedRequests = ConcurrentHashMap.newKeySet();
+    private static final Set<String> pendingRequests = ConcurrentHashMap.newKeySet();
     static{      
         // Carrega WAL ao iniciar
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
@@ -17,20 +17,23 @@ public class IdempotencyStore {
                     break;          
                 WalEntry entry = WalEntry.getWalEntry(line);                             
                 if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
-                    processedRequests.add(entry.getWalEntry());
+                    pendingRequests.add(entry.getWalEntry());
                 }                                
             }
         } catch (IOException e) {
             System.out.println("Nenhum WAL existente, iniciando novo.");
+
         }
     }
 
     public static boolean isDuplicate(String request) {
-        return processedRequests.contains(request);
+        return pendingRequests.contains(request);
     }
 
+
+
     public static void save(String request) {
-        if (processedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
+        if (pendingRequests.add(WalEntry.getWalEntry(request).getPayload())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
                 writer.newLine();                
@@ -38,8 +41,8 @@ public class IdempotencyStore {
                 e.printStackTrace();
             }
         }
-        else {      
-            processedRequests.remove(WalEntry.getWalEntry(request).getPayload());
+        else {
+            pendingRequests.remove(WalEntry.getWalEntry(request).getPayload());
             try {
                 File inputFile = new File(WAL_FILE);
                 File tempFile = new File("temp_" + WAL_FILE);
