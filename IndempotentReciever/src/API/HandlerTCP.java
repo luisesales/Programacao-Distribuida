@@ -1,6 +1,5 @@
 package API;
 
-import Classes.IdempotencyStore;
 import Classes.RequestStatus;
 import Classes.WalEntry;
 import java.io.*;
@@ -27,6 +26,36 @@ public class HandlerTCP implements Runnable {
         System.out.println("\nHandler Started for " + this.socket);
         handleRequest(this.socket);
         System.out.println("Handler Terminated for " + this.socket + "\n");
+    }
+
+    private String walRequest(String msg){
+        Socket socket = null;
+        ObjectOutputStream output = null;
+        ObjectInputStream input = null;
+        String reply = new String();
+        try{
+            socket = new Socket("localhost", 8081);
+            output = new ObjectOutputStream(socket.getOutputStream());
+            output.writeObject(msg);
+            output.flush();
+            input = new ObjectInputStream(socket.getInputStream());
+            reply = (String) input.readObject();
+        }catch (IOException e) {
+            e.printStackTrace();
+            reply = "ERROR;Falha na conexão com WAL";
+        }catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            reply = "ERROR;Resposta do WAL inválida";
+        } finally{
+            try{
+                input.close();
+                output.close();
+                socket.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return reply;
     }
 
     private String processRequest(String msg, String[] request, WalEntry entry)
@@ -90,15 +119,21 @@ public class HandlerTCP implements Runnable {
                     gateway.addServer(request[1], Integer.parseInt(request[2]), name);
                     reply = "Servidor adicionado: " + name;
 
+                }else if(request[0].equals(WAL_ID)){
+                    System.out.println("Processando Requisição não finalizada");
+                    msg = msg.replace(request[0]+";", "");
+                    reply = processRequest(msg, request, entry);
+
                 } else if (request[0].equals("REQUEST")) {
-                    String requestId = UUID.randomUUID().toString();                
+                    String requestId = UUID.randomUUID().toString();                                    
                     entry = new WalEntry(requestId, msg);                
-                    if (IdempotencyStore.isDuplicate(msg)) {
-                        System.out.println("Requisição duplicada ignorada: " + msg);
-                        reply = "Requisição duplicada ignorada: " + msg;                    
+                    String[] walReply = walRequest(msg).split(";");
+                    if (walReply[0].equals("SUCCESS")) {
+                        reply = processRequest(msg, request, entry);                                            
                     }
                     else{
-                        reply = processRequest(msg, request, entry);   
+                        System.out.println("Requisição duplicada ignorada: " + msg);
+                        reply = "Requisição duplicada ignorada: " + msg;
                     }                                             
                 }
                 else {
@@ -120,8 +155,7 @@ public class HandlerTCP implements Runnable {
                 if (output != null) output.close();
                 socket.close();
                 if(entry != null) {
-                    System.out.println(entry.getWalEntry());
-                    IdempotencyStore.save(entry.getWalEntry());
+                    System.out.println(entry.getWalEntry());                    
                 }
                 
             } catch (IOException e) {
