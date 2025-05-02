@@ -13,7 +13,8 @@ public class HandlerTCP implements Runnable {
 
     private final Socket socket;
     private APIGateway gateway;
-    private AtomicInteger instances;    
+    private AtomicInteger instances;   
+    private final String WAL_ID = "ba23a570-d27e-4e66-ad2d-d682d096ce7b"; 
 
     public HandlerTCP(Socket socket, APIGateway gateway, AtomicInteger instances) {
         this.gateway = gateway;
@@ -28,7 +29,42 @@ public class HandlerTCP implements Runnable {
         System.out.println("Handler Terminated for " + this.socket + "\n");
     }
 
-    public void handleRequest(Socket socket) {
+    private String processRequest(String msg, String[] request, WalEntry entry)
+    {
+        String reply = new String();
+        try{        
+        System.out.println("Processando requisição...");
+        String newMsg;
+        String removeTarget = request[1] + ";" + request[2] + ";";
+        newMsg = msg.replace(removeTarget, "");
+        newMsg = newMsg.trim();                                                                
+        // Tentar redirecionar a requisição até obter uma resposta positiva
+        int retries = 0;
+        while (retries < 10) {
+            reply = gateway.redirectRequestTCP(newMsg);
+            if (reply.contains("operação realizada")) {
+                entry.setStatus(RequestStatus.PROCESSED);
+                break;
+            } else {
+                System.out.println("Falha ao processar requisição. Tentando novamente...");
+                entry.setStatus(RequestStatus.FAILED);
+                retries++;
+                Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
+                
+            }
+        }
+        if(retries == 10){
+            reply = "ERROR;Falha ao processar após 10 tentativas" + msg;
+        }
+        
+        }catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+        return reply;
+    }
+
+    private void handleRequest(Socket socket) {
         ObjectOutputStream output = null;
         ObjectInputStream input = null;
         WalEntry entry = null;
@@ -43,55 +79,32 @@ public class HandlerTCP implements Runnable {
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
-                return;
+                reply = "ERROR;Requisição inválida recebida";         
             }
-            
-            String[] request = msg.split(";");
-            // Tomar ações com base no cabeçalho
-            if (request[0].equals("INIT_SERVER")) {
-                System.out.println("Iniciando a adição de servidor: " + socket);
-                String name = "Instance " + instances.getAndIncrement();
-                gateway.addServer(request[1], Integer.parseInt(request[2]), name);
-                reply = "Servidor adicionado: " + name;
-            } else if (request[0].equals("REQUEST")) {
-                String requestId = UUID.randomUUID().toString();                
-                entry = new WalEntry(requestId, msg);                
-                if (IdempotencyStore.isDuplicate(msg)) {
-                    System.out.println("Requisição duplicada ignorada: " + msg);
-                    reply = "Requisição duplicada ignorada: " + msg;
-                    return;
-                }
-                System.out.println("Processando requisição...");
-                String newMsg;
-                String removeTarget = request[1] + ";" + request[2] + ";";
-                newMsg = msg.replace(removeTarget, "");
-                newMsg = newMsg.trim();              
-                // Adiciona a requisição ao WAL   
-                System.out.println("Irei Salvar o Entry")       ;
-                IdempotencyStore.save(entry.getWalEntry());  
-                System.out.println("Salvei o Entry")                                           ;
-                // Tentar redirecionar a requisição até obter uma resposta positiva
-                int retries = 0;
-                while (retries < 10) {
-                    reply = gateway.redirectRequestTCP(newMsg);
-                    if (reply.contains("operação realizada")) {
-                        entry.setStatus(RequestStatus.PROCESSED);
-                        break;
-                    } else {
-                        System.out.println("Falha ao processar requisição. Tentando novamente...");
-                        entry.setStatus(RequestStatus.FAILED);
-                        retries++;
-                        Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
-                        
-                    }
-                }
-                if(retries == 10){
-                    reply = "ERROR;Falha ao processar após 10 tentativas" + msg;
-                }
-            } else {
-                reply = "ERROR;Método desconhecido: " + msg;
-            }
+            else{            
+                String[] request = msg.split(";");
+                // Tomar ações com base no cabeçalho
+                if (request[0].equals("INIT_SERVER")) {
+                    System.out.println("Iniciando a adição de servidor: " + socket);
+                    String name = "Instance " + instances.getAndIncrement();
+                    gateway.addServer(request[1], Integer.parseInt(request[2]), name);
+                    reply = "Servidor adicionado: " + name;
 
+                } else if (request[0].equals("REQUEST")) {
+                    String requestId = UUID.randomUUID().toString();                
+                    entry = new WalEntry(requestId, msg);                
+                    if (IdempotencyStore.isDuplicate(msg)) {
+                        System.out.println("Requisição duplicada ignorada: " + msg);
+                        reply = "Requisição duplicada ignorada: " + msg;                    
+                    }
+                    else{
+                        reply = processRequest(msg, request, entry);   
+                    }                                             
+                }
+                else {
+                    reply = "ERROR;Método desconhecido: " + msg;
+                }
+            }
             System.out.println(reply);
             output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
@@ -100,9 +113,6 @@ public class HandlerTCP implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
             e.printStackTrace();
         } finally {
             try {

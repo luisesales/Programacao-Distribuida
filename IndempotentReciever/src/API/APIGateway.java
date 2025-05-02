@@ -15,7 +15,8 @@ public class APIGateway {
     private int MAX_CONNECTIONS = 50;
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
-    private AtomicInteger instances = new AtomicInteger(0);
+    private AtomicInteger instances = new AtomicInteger(0);    
+
     //private static IdempotencyStore idempotency = new IdempotencyStore();
     public void addServer(String ip, int port, String name){
         AliveServers.add(new Server(ip,port,name));
@@ -76,7 +77,7 @@ public class APIGateway {
     private void RunGatewayTCP(APIGateway gateway){           
         try (ServerSocket server = new ServerSocket(8080, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-            try{
+            try{                                
                 System.out.println("Gateway Listening to Requests");
                 Heartbeat monitor = new Heartbeat(gateway,ALIVE_TIMEOUT);
                 new Thread(monitor).start();

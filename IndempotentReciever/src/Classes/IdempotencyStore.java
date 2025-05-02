@@ -1,13 +1,37 @@
 package Classes;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class IdempotencyStore {
+    private static final String CACHE_FILE = "cache.log";
     private static final String WAL_FILE = "wal.log";
     private static final Set<String> pendingRequests = ConcurrentHashMap.newKeySet();
     static{      
+        // Carrega WAL ao iniciar
+        try (BufferedReader reader = new BufferedReader(new FileReader(CACHE_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();      
+                pendingRequests.add(line);                           
+            }
+        } catch (IOException e) {
+            System.out.println("Nenhum WAL existente, iniciando novo.");
+
+        }
+    }
+
+    public static boolean isDuplicate(String request) {
+        return pendingRequests.contains(request);
+    }
+
+    public static ArrayList<String> getCache(){
+        return new ArrayList<String>(pendingRequests.keySet());
+    }
+
+    public static void load(){
         // Carrega WAL ao iniciar
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
@@ -26,11 +50,24 @@ public class IdempotencyStore {
         }
     }
 
-    public static boolean isDuplicate(String request) {
-        return pendingRequests.contains(request);
+    public static void add(String request){
+        if (pendingRequests.add(WalEntry.getWalEntry(request).getPayload())) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(CACHE_FILE, true))) {
+                writer.write(request);
+                writer.newLine();                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-
+    public static void clear(){
+        pendingRequests.clear();
+        try (FileWriter writer = new FileWriter(CACHE_FILE, false)) {            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void save(String request) {
         if (pendingRequests.add(WalEntry.getWalEntry(request).getPayload())) {
