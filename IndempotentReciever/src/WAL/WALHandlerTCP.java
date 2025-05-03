@@ -78,6 +78,7 @@ public class WALHandlerTCP implements Runnable {
                 if (output != null) output.close();
                 socket.close();
                 if(entry != null) {
+                    if(entry.getStatus() == RequestStatus.PROCESSED)                        
                     System.out.println(entry.getWalEntry());
                     IdempotencyStore.save(entry.getWalEntry());
                 }

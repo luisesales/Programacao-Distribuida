@@ -28,11 +28,12 @@ public class HandlerTCP implements Runnable {
         System.out.println("Handler Terminated for " + this.socket + "\n");
     }
 
-    private String walRequest(String msg){
+    private String walRequest(String msg, WalEntry entry){
         Socket socket = null;
         ObjectOutputStream output = null;
         ObjectInputStream input = null;
         String reply = new String();
+        msg = "WAL;"+entry.getStatus().getCode()+";"+msg;
         try{
             socket = new Socket("localhost", 8081);
             output = new ObjectOutputStream(socket.getOutputStream());
@@ -92,14 +93,13 @@ public class HandlerTCP implements Runnable {
         ObjectOutputStream output = null;
         ObjectInputStream input = null;
         WalEntry entry = null;
-        String reply = new String();
+        String reply = new String();        
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
             String msg = (String) input.readObject();
-
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
@@ -122,7 +122,7 @@ public class HandlerTCP implements Runnable {
                 } else if (request[0].equals("REQUEST")) {
                     String requestId = UUID.randomUUID().toString();                                    
                     entry = new WalEntry(requestId, msg);                
-                    String[] walReply = walRequest(msg).split(";");
+                    String[] walReply = walRequest(msg,entry).split(";");
                     if (walReply[0].equals("SUCCESS")) {
                         reply = processRequest(msg, request, entry);                                            
                     }
@@ -138,6 +138,7 @@ public class HandlerTCP implements Runnable {
             System.out.println(reply);
             output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
+            walRequest(msg,entry);  
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -148,11 +149,7 @@ public class HandlerTCP implements Runnable {
             try {
                 if (input != null) input.close();
                 if (output != null) output.close();
-                socket.close();
-                if(entry != null) {
-                    System.out.println(entry.getWalEntry());                    
-                }
-                
+                socket.close();                                
             } catch (IOException e) {
                 e.printStackTrace();
             }
