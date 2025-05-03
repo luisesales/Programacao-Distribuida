@@ -1,15 +1,10 @@
 package WAL;
 
 import Classes.IdempotencyStore;
-import Classes.Server;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class WALServer {    
     private int MAX_CONNECTIONS = 50; 
@@ -29,7 +24,7 @@ public class WALServer {
                 output.flush();
                 input = new ObjectInputStream(connection.getInputStream());
                 String msg = (String) input.readObject();
-                System.out.println("Retorno do Servidor:"+msg);                
+                System.out.println("Retorno do Gateway:"+msg);                
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -49,7 +44,7 @@ public class WALServer {
             System.out.println("Request: "+ request + " has been sent");
         }        
         if(successProccess){
-            IdempotencyStore.clear();
+            IdempotencyStore.clearCache();
         }        
     }
 
@@ -62,12 +57,12 @@ public class WALServer {
                 System.out.println("WAL Listening to Requests");                
                 while(true){                    
                     Socket remote = server.accept();
-                    executor.execute(new WALHandlerTCP());                                        
+                    executor.execute(new WALHandlerTCP(remote));                                        
                 }
             }finally {
                 executor.shutdown();
                 server.close();
-                IdempotencyStore.clear();
+                IdempotencyStore.clearCache();
                 System.out.println("WAL terminating");
             }
         }catch (IOException e2) {

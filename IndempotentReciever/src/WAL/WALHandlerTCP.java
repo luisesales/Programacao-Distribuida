@@ -7,18 +7,13 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class WALHandlerTCP implements Runnable {
 
-    private final Socket socket;
-    private WALServer gateway;
-    private AtomicInteger instances;    
+    private final Socket socket;        
 
-    public WALHandlerTCP(Socket socket, WALServer gateway, AtomicInteger instances) {
-        this.gateway = gateway;
-        this.socket = socket;
-        this.instances = instances;        
+    public WALHandlerTCP(Socket socket) {        
+        this.socket = socket;              
     }
 
     @Override
@@ -48,13 +43,16 @@ public class WALHandlerTCP implements Runnable {
             else if (msg.equals("CLEAR")) {
                 IdempotencyStore.clear();
                 reply = "SUCCESS;Cache Limpa";
-            }            
-            else if(msgSplit[0].equals("WAL")){
-               msg = msg.replace("WAL;"+msgSplit[1]+";", "");                                
+            }
+            else if (msgSplit[0].equals("WAL")){               
                String requestId = UUID.randomUUID().toString();                               
                RequestStatus status = RequestStatus.fromCode(Integer.parseInt(msgSplit[1]));
+               System.out.println("Status = "+ status.getLabel());
+               msg = msg.replace("WAL;"+msgSplit[1]+";", "").trim();
+               System.out.println("\nmsg replaced: " + msg);                               
                entry = new WalEntry(requestId, msg, status);          
-               IdempotencyStore.add(msg);
+               System.out.println("Criei o Entry");
+               IdempotencyStore.add(entry);
                reply = "SUCCESS;Messagem Salva: " + msg; 
             } else {
                 reply = "ERROR;Método desconhecido: " + msg;
@@ -78,9 +76,10 @@ public class WALHandlerTCP implements Runnable {
                 if (output != null) output.close();
                 socket.close();
                 if(entry != null) {
-                    if(entry.getStatus() == RequestStatus.PROCESSED)                        
-                    System.out.println(entry.getWalEntry());
-                    IdempotencyStore.save(entry.getWalEntry());
+                    if(entry.getStatus() == RequestStatus.PROCESSED){                        
+                        System.out.println(entry.getWalEntry());
+                        IdempotencyStore.save(entry.getWalEntry());
+                    }
                 }
                 
             } catch (IOException e) {

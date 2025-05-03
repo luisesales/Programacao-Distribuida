@@ -9,6 +9,7 @@ public class IdempotencyStore {
     private static final String CACHE_FILE = "cache.log";
     private static final String WAL_FILE = "wal.log";
     private static final Set<String> pendingRequests = ConcurrentHashMap.newKeySet();
+    private static final Set<String> finishedRequests = ConcurrentHashMap.newKeySet();
     static{      
         // Carrega WAL ao iniciar
         try (BufferedReader reader = new BufferedReader(new FileReader(CACHE_FILE))) {
@@ -28,7 +29,7 @@ public class IdempotencyStore {
     }
 
     public static ArrayList<String> getCache(){
-        return new ArrayList<String>(pendingRequests.keySet());
+        return new ArrayList<>(pendingRequests);
     }
 
     public static void load(){
@@ -41,7 +42,7 @@ public class IdempotencyStore {
                     break;          
                 WalEntry entry = WalEntry.getWalEntry(line);                             
                 if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
-                    pendingRequests.add(entry.getWalEntry());
+                    pendingRequests.add(entry.getPayload());
                 }                                
             }
         } catch (IOException e) {
@@ -50,10 +51,10 @@ public class IdempotencyStore {
         }
     }
 
-    public static void add(String request){
-        if (pendingRequests.add(WalEntry.getWalEntry(request).getPayload())) {
+    public static void add(String payload){
+        if (pendingRequests.add(payload)) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(CACHE_FILE, true))) {
-                writer.write(request);
+                writer.write(payload);
                 writer.newLine();                
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,8 +73,9 @@ public class IdempotencyStore {
         }
     }
 
-    public static void remove(String request){
-        if (pendingRequests.remove(WalEntry.getWalEntry(request).getPayload())) {
+    public static void remove(String payload){
+        System.out.println("vou remover do pendingRequests set");
+        if (pendingRequests.remove(payload)) {
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -86,7 +88,7 @@ public class IdempotencyStore {
                     while ((line = reader.readLine()) != null) {
                         if(line.isBlank()) break;
                         String existingPayload = WalEntry.getWalEntry(line).getPayload();
-                        if (existingPayload.equals(WalEntry.getWalEntry(request).getPayload())) {
+                        if (existingPayload.equals(payload)) {
                             writer.write(""); // Substitui linha
                         } else {
                             writer.write(line); // Mantém linha original
@@ -94,7 +96,7 @@ public class IdempotencyStore {
                         writer.newLine();
                     }
                 }
-
+                System.out.println("removi do pendingRequests set");
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {
                     throw new IOException("Não foi possível deletar o arquivo original.");
@@ -102,7 +104,7 @@ public class IdempotencyStore {
                 if (!tempFile.renameTo(inputFile)) {
                     throw new IOException("Não foi possível renomear o arquivo temporário.");
                 }
-
+                System.out.println("deletei o arquivo temp");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -110,7 +112,8 @@ public class IdempotencyStore {
     }
 
     public static void remove(WalEntry entry){
-        if (pendingRequests.remove(entry.getPayload())) {
+        System.out.println("vou remover do pendingRequests set");
+        if (pendingRequests.remove(entry.getPayload())) {            
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -131,7 +134,7 @@ public class IdempotencyStore {
                         writer.newLine();
                     }
                 }
-
+                System.out.println("removi do pendingRequests set");
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {
                     throw new IOException("Não foi possível deletar o arquivo original.");
@@ -139,6 +142,7 @@ public class IdempotencyStore {
                 if (!tempFile.renameTo(inputFile)) {
                     throw new IOException("Não foi possível renomear o arquivo temporário.");
                 }
+                System.out.println("deletei o arquivo temp");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -147,7 +151,7 @@ public class IdempotencyStore {
     }
 
 
-    public static void clear(){
+    public static void clearCache(){
         pendingRequests.clear();
         try (FileWriter writer = new FileWriter(CACHE_FILE, false)) {            
         } catch (IOException e) {
@@ -155,8 +159,21 @@ public class IdempotencyStore {
         }
     }
 
+    public static void clearRequests(){
+        finishedRequests.clear();
+        try (FileWriter writer = new FileWriter(WAL_FILE, false)) {            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clear(){
+        clearCache();
+        clearRequests();
+    }
+
     public static void save(String request) {
-        if (pendingRequests.add(WalEntry.getWalEntry(request).getPayload())) {
+        if (finishedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
                 writer.newLine();                
@@ -201,14 +218,18 @@ public class IdempotencyStore {
         }
     }
     public static void save(WalEntry entry) {
-        if (pendingRequests.add(entry.getPayload())) {
+        if (finishedRequests.add(entry.getPayload())) {
+            System.out.println("Adicionei no finishedRequests set");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
+                System.out.println("Vou Escrever");
                 writer.write(entry.getWalEntry());
+                System.out.println("Escrevi");
                 writer.newLine();                
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("Escrevi no WAL FILE");
         else {
             remove(entry);
             try {

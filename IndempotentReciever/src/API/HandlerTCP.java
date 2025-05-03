@@ -100,44 +100,43 @@ public class HandlerTCP implements Runnable {
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
             String msg = (String) input.readObject();
+            String[] request = msg.split(";");
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
                 reply = "ERROR;Requisição inválida recebida";         
             }
-            else{            
-                String[] request = msg.split(";");
-                // Tomar ações com base no cabeçalho
-                if (request[0].equals("INIT_SERVER")) {
-                    System.out.println("Iniciando a adição de servidor: " + socket);
-                    String name = "Instance " + instances.getAndIncrement();
-                    gateway.addServer(request[1], Integer.parseInt(request[2]), name);
-                    reply = "Servidor adicionado: " + name;
+            // Tomar ações com base no cabeçalho
+            else if (request[0].equals("INIT_SERVER")) {
+                System.out.println("Iniciando a adição de servidor: " + socket);
+                String name = "Instance " + instances.getAndIncrement();
+                gateway.addServer(request[1], Integer.parseInt(request[2]), name);
+                reply = "Servidor adicionado: " + name;
 
-                }else if(request[0].equals(WAL_ID)){
-                    System.out.println("Processando Requisição não finalizada");
-                    msg = msg.replace(request[0]+";", "");
-                    reply = processRequest(msg, request, entry);
+            }else if(request[0].equals(WAL_ID)){
+                System.out.println("Processando Requisição não finalizada");
+                msg = msg.replace(request[0]+";", "").trim();
+                reply = processRequest(msg, request, entry);
 
-                } else if (request[0].equals("REQUEST")) {
-                    String requestId = UUID.randomUUID().toString();                                    
-                    entry = new WalEntry(requestId, msg);                
-                    String[] walReply = walRequest(msg,entry).split(";");
-                    if (walReply[0].equals("SUCCESS")) {
-                        reply = processRequest(msg, request, entry);                                            
-                    }
-                    else{
-                        System.out.println("Requisição duplicada ignorada: " + msg);
-                        reply = "Requisição duplicada ignorada: " + msg;
-                    }                                             
+            } else if (request[0].equals("REQUEST")) {
+                String requestId = UUID.randomUUID().toString();                                    
+                entry = new WalEntry(requestId, msg);                
+                String[] walReply = walRequest(msg,entry).split(";");
+                if (walReply[0].equals("SUCCESS")) {
+                    reply = processRequest(msg, request, entry);                                            
                 }
-                else {
-                    reply = "ERROR;Método desconhecido: " + msg;
-                }
+                else{
+                    System.out.println("Requisição duplicada ignorada: " + msg);
+                    reply = "Requisição duplicada ignorada: " + msg;
+                }                                             
             }
+            else {
+                reply = "ERROR;Método desconhecido: " + msg;
+            }            
             System.out.println(reply);
             output.writeObject(reply); // Envia a resposta ao cliente
             output.flush();
+            if(entry != null)
             walRequest(msg,entry);  
         } catch (UnknownHostException e) {
             e.printStackTrace();
