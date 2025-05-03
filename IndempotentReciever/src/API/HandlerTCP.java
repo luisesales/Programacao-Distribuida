@@ -40,20 +40,15 @@ public class HandlerTCP implements Runnable {
             output.flush();
             input = new ObjectInputStream(socket.getInputStream());
             reply = (String) input.readObject();
+            input.close();
+            output.close();
+            socket.close();
         }catch (IOException e) {
             e.printStackTrace();
             reply = "ERROR;Falha na conexão com WAL";
         }catch (ClassNotFoundException e) {
             e.printStackTrace();
-            reply = "ERROR;Resposta do WAL inválida";
-        } finally{
-            try{
-                input.close();
-                output.close();
-                socket.close();
-            }catch (IOException e) {
-                e.printStackTrace();
-            }
+            reply = "ERROR;Resposta do WAL inválida";        
         }
         return reply;
     }

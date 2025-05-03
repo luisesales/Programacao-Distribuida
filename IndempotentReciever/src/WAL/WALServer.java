@@ -67,6 +67,7 @@ public class WALServer {
             }finally {
                 executor.shutdown();
                 server.close();
+                IdempotencyStore.clear();
                 System.out.println("WAL terminating");
             }
         }catch (IOException e2) {

@@ -61,6 +61,92 @@ public class IdempotencyStore {
         }
     }
 
+    public static void add(WalEntry entry){
+        if (pendingRequests.add(entry.getPayload())) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(CACHE_FILE, true))) {
+                writer.write(entry.getPayload());
+                writer.newLine();                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void remove(String request){
+        if (pendingRequests.remove(WalEntry.getWalEntry(request).getPayload())) {
+            try {
+                File inputFile = new File(CACHE_FILE);
+                File tempFile = new File("temp_" + CACHE_FILE);
+
+                try (
+                    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+                ) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if(line.isBlank()) break;
+                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
+                        if (existingPayload.equals(WalEntry.getWalEntry(request).getPayload())) {
+                            writer.write(""); // Substitui linha
+                        } else {
+                            writer.write(line); // Mantém linha original
+                        }
+                        writer.newLine();
+                    }
+                }
+
+                // Substitui o arquivo antigo pelo novo
+                if (!inputFile.delete()) {
+                    throw new IOException("Não foi possível deletar o arquivo original.");
+                }
+                if (!tempFile.renameTo(inputFile)) {
+                    throw new IOException("Não foi possível renomear o arquivo temporário.");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void remove(WalEntry entry){
+        if (pendingRequests.remove(entry.getPayload())) {
+            try {
+                File inputFile = new File(CACHE_FILE);
+                File tempFile = new File("temp_" + CACHE_FILE);
+
+                try (
+                    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+                ) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if(line.isBlank()) break;
+                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
+                        if (existingPayload.equals(WalEntry.getWalEntry(entry.getWalEntry()).getPayload())) {
+                            writer.write(""); // Substitui linha
+                        } else {
+                            writer.write(line); // Mantém linha original
+                        }
+                        writer.newLine();
+                    }
+                }
+
+                // Substitui o arquivo antigo pelo novo
+                if (!inputFile.delete()) {
+                    throw new IOException("Não foi possível deletar o arquivo original.");
+                }
+                if (!tempFile.renameTo(inputFile)) {
+                    throw new IOException("Não foi possível renomear o arquivo temporário.");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public static void clear(){
         pendingRequests.clear();
         try (FileWriter writer = new FileWriter(CACHE_FILE, false)) {            
@@ -79,7 +165,7 @@ public class IdempotencyStore {
             }
         }
         else {
-            pendingRequests.remove(WalEntry.getWalEntry(request).getPayload());
+            remove(WalEntry.getWalEntry(request).getPayload());
             try {
                 File inputFile = new File(WAL_FILE);
                 File tempFile = new File("temp_" + WAL_FILE);
@@ -94,6 +180,51 @@ public class IdempotencyStore {
                         String existingPayload = WalEntry.getWalEntry(line).getPayload();
                         if (existingPayload.equals(WalEntry.getWalEntry(request).getPayload())) {
                             writer.write(request); // Substitui linha
+                        } else {
+                            writer.write(line); // Mantém linha original
+                        }
+                        writer.newLine();
+                    }
+                }
+
+                // Substitui o arquivo antigo pelo novo
+                if (!inputFile.delete()) {
+                    throw new IOException("Não foi possível deletar o arquivo original.");
+                }
+                if (!tempFile.renameTo(inputFile)) {
+                    throw new IOException("Não foi possível renomear o arquivo temporário.");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void save(WalEntry entry) {
+        if (pendingRequests.add(entry.getPayload())) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
+                writer.write(entry.getWalEntry());
+                writer.newLine();                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            remove(entry);
+            try {
+                File inputFile = new File(WAL_FILE);
+                File tempFile = new File("temp_" + WAL_FILE);
+
+                try (
+                    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+                ) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if(line.isBlank()) break;
+                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
+                        if (existingPayload.equals(WalEntry.getWalEntry(entry.getWalEntry()).getPayload())) {
+                            writer.write(entry.getWalEntry()); // Substitui linha
                         } else {
                             writer.write(line); // Mantém linha original
                         }

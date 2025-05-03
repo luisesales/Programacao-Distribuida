@@ -2,7 +2,6 @@ package WAL;
 
 import Classes.IdempotencyStore;
 import Classes.RequestStatus;
-import Classes.RequestValidator;
 import Classes.WalEntry;
 import java.io.*;
 import java.net.Socket;
@@ -40,7 +39,7 @@ public class WALHandlerTCP implements Runnable {
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
             String msg = (String) input.readObject();
-
+            String[] msgSplit = msg.split(";");
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
                 System.out.println("Requisição inválida recebida.");
@@ -50,9 +49,11 @@ public class WALHandlerTCP implements Runnable {
                 IdempotencyStore.clear();
                 reply = "SUCCESS;Cache Limpa";
             }            
-            else if(IdempotencyStore.isDuplicate(msg)){
-               String requestId = UUID.randomUUID().toString();                
-               entry = new WalEntry(requestId, msg);          
+            else if(msgSplit[0].equals("WAL")){
+               msg = msg.replace("WAL;"+msgSplit[1]+";", "");                                
+               String requestId = UUID.randomUUID().toString();                               
+               RequestStatus status = RequestStatus.fromCode(Integer.parseInt(msgSplit[1]));
+               entry = new WalEntry(requestId, msg, status);          
                IdempotencyStore.add(msg);
                reply = "SUCCESS;Messagem Salva: " + msg; 
             } else {
@@ -68,7 +69,7 @@ public class WALHandlerTCP implements Runnable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (NumberFormatException e) {
             Thread.currentThread().interrupt();
             e.printStackTrace();
         } finally {
