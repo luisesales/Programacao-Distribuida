@@ -76,6 +76,7 @@ public class IdempotencyStore {
     public static void remove(String payload){
         System.out.println("vou remover do pendingRequests set");
         if (pendingRequests.remove(payload)) {
+            System.out.println("removi do pendingRequests set");
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -86,9 +87,8 @@ public class IdempotencyStore {
                 ) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        if(line.isBlank()) break;
-                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
-                        if (existingPayload.equals(payload)) {
+                        if(line.isBlank()) break;                        
+                        if (line.equals(payload)) {
                             writer.write(""); // Substitui linha
                         } else {
                             writer.write(line); // Mantém linha original
@@ -96,7 +96,7 @@ public class IdempotencyStore {
                         writer.newLine();
                     }
                 }
-                System.out.println("removi do pendingRequests set");
+                System.out.println("removi do cache.log");
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {
                     throw new IOException("Não foi possível deletar o arquivo original.");
@@ -114,6 +114,7 @@ public class IdempotencyStore {
     public static void remove(WalEntry entry){
         System.out.println("vou remover do pendingRequests set");
         if (pendingRequests.remove(entry.getPayload())) {            
+            System.out.println("removi do pendingRequests set");
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -124,9 +125,8 @@ public class IdempotencyStore {
                 ) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        if(line.isBlank()) break;
-                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
-                        if (existingPayload.equals(WalEntry.getWalEntry(entry.getWalEntry()).getPayload())) {
+                        if(line.isBlank()) break;                        
+                        if (line.equals(entry.getPayload())) {
                             writer.write(""); // Substitui linha
                         } else {
                             writer.write(line); // Mantém linha original
@@ -134,7 +134,8 @@ public class IdempotencyStore {
                         writer.newLine();
                     }
                 }
-                System.out.println("removi do pendingRequests set");
+                System.out.println("removi do cache.log");
+                
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {
                     throw new IOException("Não foi possível deletar o arquivo original.");
@@ -173,7 +174,7 @@ public class IdempotencyStore {
     }
 
     public static void save(String request) {
-        if (finishedRequests.add(WalEntry.getWalEntry(request).getPayload())) {
+        if (finishedRequests.add(WalEntry.getWalEntry(request).getWalEntry())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
                 writer.newLine();                
@@ -218,7 +219,7 @@ public class IdempotencyStore {
         }
     }
     public static void save(WalEntry entry) {
-        if (finishedRequests.add(entry.getPayload())) {
+        if (finishedRequests.add(entry.getWalEntry())) {
             System.out.println("Adicionei no finishedRequests set");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 System.out.println("Vou Escrever");
