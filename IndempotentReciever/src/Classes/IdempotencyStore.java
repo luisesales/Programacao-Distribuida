@@ -32,8 +32,9 @@ public class IdempotencyStore {
         return new ArrayList<>(pendingRequests);
     }
 
-    public static void load(){
+    public static ArrayList<WalEntry> load(){
         // Carrega WAL ao iniciar
+        ArrayList<WalEntry> pendingEntries = new ArrayList<WalEntry>();
         try (BufferedReader reader = new BufferedReader(new FileReader(WAL_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -43,12 +44,14 @@ public class IdempotencyStore {
                 WalEntry entry = WalEntry.getWalEntry(line);                             
                 if (entry.getStatus() == RequestStatus.PENDING || entry.getStatus() == RequestStatus.FAILED) { 
                     pendingRequests.add(entry.getPayload());
+                    pendingEntries.add(entry);
                 }                                
             }
         } catch (IOException e) {
             System.out.println("Nenhum WAL existente, iniciando novo.");
 
         }
+        return pendingEntries;
     }
 
     public static void add(String payload){

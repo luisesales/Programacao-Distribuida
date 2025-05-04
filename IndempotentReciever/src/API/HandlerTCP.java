@@ -115,7 +115,10 @@ public class HandlerTCP implements Runnable {
 
             }else if(request[0].equals(WAL_ID)){
                 System.out.println("Processando Requisição não finalizada");
-                msg = msg.replace(request[0]+";", "").trim();
+                String requestId = request[1];                                    
+                msg = msg.replace(request[0]+";"+request[1]+";", "").trim();                
+                entry = new WalEntry(requestId, msg);    
+                request = msg.split(";");
                 reply = processRequest(msg, request, entry);
 
             } else if (request[0].equals("REQUEST")) {

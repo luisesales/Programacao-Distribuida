@@ -1,6 +1,7 @@
 package WAL;
 
 import Classes.IdempotencyStore;
+import Classes.WalEntry;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -10,16 +11,16 @@ public class WALServer {
     private int MAX_CONNECTIONS = 50; 
     private final String WAL_ID = "ba23a570-d27e-4e66-ad2d-d682d096ce7b";       
 
-    public void RunRequests(ArrayList<String> requests){        
+    public void RunRequests(ArrayList<WalEntry> requests){        
         Boolean successProccess = true;
         Socket connection = null;
         ObjectOutputStream output = null;
         ObjectInputStream input = null;         
-        for(String request : requests ){
+        for(WalEntry request : requests ){
             try {                
                 connection = new Socket("localhost", 8080);
                 output = new ObjectOutputStream(connection.getOutputStream());
-                String inputMsg = WAL_ID +";"+ request;                
+                String inputMsg = WAL_ID +";"+ request.getId()+";"+request.getPayload();                
                 output.writeObject(inputMsg);
                 output.flush();
                 input = new ObjectInputStream(connection.getInputStream());
@@ -51,9 +52,8 @@ public class WALServer {
     private void RunWALTCP(WALServer wal){           
         try (ServerSocket server = new ServerSocket(8081, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-            try{
-                IdempotencyStore.load();
-                RunRequests(IdempotencyStore.getCache());
+            try{                
+                RunRequests(IdempotencyStore.load());
                 System.out.println("WAL Listening to Requests");                
                 while(true){                    
                     Socket remote = server.accept();
