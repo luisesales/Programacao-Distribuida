@@ -225,8 +225,7 @@ public class IdempotencyStore {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        System.out.println("Escrevi no WAL FILE");
+        }        
         else {
             remove(entry);
             try {
