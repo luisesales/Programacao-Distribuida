@@ -91,6 +91,7 @@ public class HandlerTCP implements Runnable {
         BufferedReader input = null;
         WalEntry entry = null;
         String reply = new String();        
+        String walMsg;
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");
@@ -110,26 +111,28 @@ public class HandlerTCP implements Runnable {
                 gateway.addServer(request[1], Integer.parseInt(request[2]), name);
                 reply = "Servidor adicionado: " + name;
 
-            }else if(request[0].equals(WAL_ID)){
-                System.out.println("Processando Requisição não finalizada");
-                String requestId = request[1];                                    
-                msg = msg.replace(request[0]+";"+request[1]+";", "").trim();                
-                entry = new WalEntry(requestId, msg);    
-                request = msg.split(";");
-                reply = processRequest(msg, request, entry);
-
-            } else if (request[0].equals("REQUEST")) {
+            }else if (request[0].equals("REQUEST")) {
                 String requestId = UUID.randomUUID().toString();                                    
-                entry = new WalEntry(requestId, msg);                
-                String[] walReply = walRequest(msg,entry).split(";");
+                entry = new WalEntry(requestId, msg);    
+                reply = walRequest(msg,entry);            
+                String[] walReply = reply.split(";");
                 if (walReply[0].equals("SUCCESS")) {
                     reply = processRequest(msg, request, entry);                                            
                 }
                 else{
-                    System.out.println("Requisição duplicada ignorada: " + msg);
-                    reply = "Requisição duplicada ignorada: " + msg;
+                    System.out.println("Requisição duplicada ignorada: " + msg);                    
                 }                                             
             }
+            else if(request[0].equals(WAL_ID)){
+                System.out.println("Processando Requisição não finalizada");
+                String requestId = request[1];                       
+                walMsg = msg.replace(request[0]+";", "").trim();                                        
+                msg = msg.replace(request[0]+";"+request[1]+";", "").trim();                                
+                entry = new WalEntry(requestId, msg);    
+                request = msg.split(";");
+                reply = processRequest(msg, request, entry);
+                msg = walMsg;
+            } 
             else {
                 reply = "ERROR;Método desconhecido: " + msg;
             }            
@@ -137,7 +140,7 @@ public class HandlerTCP implements Runnable {
             output.println(reply); // Envia a resposta ao cliente
             output.flush();
             if(entry != null)
-            walRequest(msg,entry);  
+                walRequest(msg,entry);  
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {

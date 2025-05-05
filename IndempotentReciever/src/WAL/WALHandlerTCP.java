@@ -10,18 +10,25 @@ import java.util.UUID;
 
 public class WALHandlerTCP implements Runnable {
 
-    private final Socket socket;        
+    private final Socket socket;
+    private final WALServer server;        
 
-    public WALHandlerTCP(Socket socket) {        
+    public WALHandlerTCP(Socket socket, WALServer server) {        
         this.socket = socket;              
+        this.server = server;
     }
 
     @Override
     public void run() {
         System.out.println("\nHandler Started for " + this.socket);
+        if(server.preparation.get() == true){
+            server.RunRequests(IdempotencyStore.load());
+        }
         handleRequest(this.socket);
         System.out.println("Handler Terminated for " + this.socket + "\n");
     }
+
+    
 
     public void handleRequest(Socket socket) {
         PrintWriter output = null;
@@ -44,16 +51,33 @@ public class WALHandlerTCP implements Runnable {
                 IdempotencyStore.clear();
                 reply = "SUCCESS;Cache Limpa";
             }
-            else if (msgSplit[0].equals("WAL")){               
-               String requestId = UUID.randomUUID().toString();                               
+            else if (msgSplit[0].equals("WAL")){    
                RequestStatus status = RequestStatus.fromCode(Integer.parseInt(msgSplit[1]));
+               String requestId;     
+               boolean checkDup = true;      
+               System.out.println("Request recebido:"+msg);
+               if(msgSplit[2].equals("REQUEST")){ 
+                    requestId = UUID.randomUUID().toString();
+                    msg = msg.replace("WAL;"+msgSplit[1]+";", "").trim();
+                    if(IdempotencyStore.isDuplicate(msg)){
+                        reply = "ERROR;Messagem Duplicata: " + msg;                         
+                        checkDup = false;
+                   }                             
+               }
+               else{
+                    System.out.println("Mensagem de Idempotencia detectada: "+msg );
+                    requestId = msgSplit[2];
+                    msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";", "").trim();                                        
+               }               
                System.out.println("Status = "+ status.getLabel());
-               msg = msg.replace("WAL;"+msgSplit[1]+";", "").trim();
-               System.out.println("\nmsg replaced: " + msg);                               
-               entry = new WalEntry(requestId, msg, status);          
-               System.out.println("Criei o Entry");
-               IdempotencyStore.add(entry);
-               reply = "SUCCESS;Messagem Salva: " + msg; 
+               
+               System.out.println("\nmsg replaced: " + msg);  
+               if(checkDup){
+                    entry = new WalEntry(requestId, msg, status);          
+                    System.out.println("Criei o Entry");
+                    IdempotencyStore.add(entry);
+                    reply = "SUCCESS;Messagem Salva: " + msg; 
+               }
             } else {
                 reply = "ERROR;Método desconhecido: " + msg;
             }
@@ -61,6 +85,9 @@ public class WALHandlerTCP implements Runnable {
             System.out.println(reply);
             output.println(reply); // Envia a resposta ao cliente
             output.flush();
+            input.close();
+            output.close();
+            socket.close();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -68,21 +95,11 @@ public class WALHandlerTCP implements Runnable {
         } catch (NumberFormatException e) {
             Thread.currentThread().interrupt();
             e.printStackTrace();
-        } finally {
-            try {
-                if (input != null) input.close();
-                if (output != null) output.close();
-                socket.close();
-                if(entry != null) {
-                    if(entry.getStatus() == RequestStatus.PROCESSED){                        
-                        System.out.println(entry.getWalEntry());
-                        IdempotencyStore.save(entry.getWalEntry());
-                    }
-                }
-                
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } finally {                    
+            if(entry != null) {                                        
+                System.out.println(entry.getWalEntry());
+                IdempotencyStore.save(entry.getWalEntry());                    
+            }       
         }
     }
 }
