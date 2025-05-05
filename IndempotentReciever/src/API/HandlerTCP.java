@@ -30,26 +30,23 @@ public class HandlerTCP implements Runnable {
 
     private String walRequest(String msg, WalEntry entry){
         Socket socket = null;
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;
+        PrintWriter output = null;
+		BufferedReader input = null;
         String reply = new String();
         msg = "WAL;"+entry.getStatus().getCode()+";"+msg;
         try{
             socket = new Socket("localhost", 8081);
-            output = new ObjectOutputStream(socket.getOutputStream());
-            output.writeObject(msg);
+            output = new PrintWriter(socket.getOutputStream(),true);
+            output.println(msg);
             output.flush();
-            input = new ObjectInputStream(socket.getInputStream());
-            reply = (String) input.readObject();
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            reply = input.readLine();
             input.close();
             output.close();
             socket.close();
         }catch (IOException e) {
             e.printStackTrace();
             reply = "ERROR;Falha na conexão com WAL";
-        }catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            reply = "ERROR;Resposta do WAL inválida";        
         }
         return reply;
     }
@@ -71,14 +68,14 @@ public class HandlerTCP implements Runnable {
                 entry.setStatus(RequestStatus.PROCESSED);
                 break;
             } else {
-                System.out.println("Falha ao processar requisição. Tentando novamente...");
-                entry.setStatus(RequestStatus.FAILED);
+                System.out.println("Falha ao processar requisição. Tentando novamente...");                
                 retries++;
                 Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
                 
             }
         }
         if(retries == 10){
+            entry.setStatus(RequestStatus.FAILED);
             reply = "ERROR;Falha ao processar após 10 tentativas" + msg;
         }
         
@@ -90,16 +87,16 @@ public class HandlerTCP implements Runnable {
     }
 
     private void handleRequest(Socket socket) {
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;
+        PrintWriter output = null;
+        BufferedReader input = null;
         WalEntry entry = null;
         String reply = new String();        
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");
-            input = new ObjectInputStream(socket.getInputStream());
-            output = new ObjectOutputStream(socket.getOutputStream());
-            String msg = (String) input.readObject();
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            output = new PrintWriter(socket.getOutputStream());
+            String msg = input.readLine();
             String[] request = msg.split(";");
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
@@ -137,15 +134,13 @@ public class HandlerTCP implements Runnable {
                 reply = "ERROR;Método desconhecido: " + msg;
             }            
             System.out.println(reply);
-            output.writeObject(reply); // Envia a resposta ao cliente
+            output.println(reply); // Envia a resposta ao cliente
             output.flush();
             if(entry != null)
             walRequest(msg,entry);  
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {

@@ -76,10 +76,8 @@ public class IdempotencyStore {
         }
     }
 
-    public static void remove(String payload){
-        System.out.println("vou remover do pendingRequests set");
-        if (pendingRequests.remove(payload)) {
-            System.out.println("removi do pendingRequests set");
+    public static void remove(String payload){        
+        if (pendingRequests.remove(payload)) {            
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -98,26 +96,22 @@ public class IdempotencyStore {
                         }
                         writer.newLine();
                     }
-                }
-                System.out.println("removi do cache.log");
+                }                
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {
                     throw new IOException("Não foi possível deletar o arquivo original.");
                 }
                 if (!tempFile.renameTo(inputFile)) {
                     throw new IOException("Não foi possível renomear o arquivo temporário.");
-                }
-                System.out.println("deletei o arquivo temp");
+                }                
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void remove(WalEntry entry){
-        System.out.println("vou remover do pendingRequests set");
-        if (pendingRequests.remove(entry.getPayload())) {            
-            System.out.println("removi do pendingRequests set");
+    public static void remove(WalEntry entry){        
+        if (pendingRequests.remove(entry.getPayload())) {                        
             try {
                 File inputFile = new File(CACHE_FILE);
                 File tempFile = new File("temp_" + CACHE_FILE);
@@ -136,8 +130,7 @@ public class IdempotencyStore {
                         }
                         writer.newLine();
                     }
-                }
-                System.out.println("removi do cache.log");
+                }                
                 
                 // Substitui o arquivo antigo pelo novo
                 if (!inputFile.delete()) {

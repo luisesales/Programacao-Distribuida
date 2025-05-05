@@ -14,24 +14,22 @@ public class WALServer {
     public void RunRequests(ArrayList<WalEntry> requests){        
         Boolean successProccess = true;
         Socket connection = null;
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;         
+        PrintWriter output = null;
+        BufferedReader input = null;  
         for(WalEntry request : requests ){
             try {                
                 connection = new Socket("localhost", 8080);
-                output = new ObjectOutputStream(connection.getOutputStream());
+                output = new PrintWriter(connection.getOutputStream(),true);
                 String inputMsg = WAL_ID +";"+ request.getId()+";"+request.getPayload();                
-                output.writeObject(inputMsg);
+                output.println(inputMsg);
                 output.flush();
-                input = new ObjectInputStream(connection.getInputStream());
-                String msg = (String) input.readObject();
+                input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String msg = (String) input.readLine();
                 System.out.println("Retorno do Gateway:"+msg);                
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 successProccess = false;
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
                 try {

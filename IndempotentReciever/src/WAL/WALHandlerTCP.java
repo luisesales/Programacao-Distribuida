@@ -24,16 +24,16 @@ public class WALHandlerTCP implements Runnable {
     }
 
     public void handleRequest(Socket socket) {
-        ObjectOutputStream output = null;
-        ObjectInputStream input = null;   
+        PrintWriter output = null;
+		BufferedReader input = null;
         WalEntry entry = null;     
         String reply = new String();
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");
-            input = new ObjectInputStream(socket.getInputStream());
-            output = new ObjectOutputStream(socket.getOutputStream());
-            String msg = (String) input.readObject();
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            output = new PrintWriter(socket.getOutputStream());
+            String msg = input.readLine();
             String[] msgSplit = msg.split(";");
             System.out.println("\nmsg: " + msg);
             if (msg == null || msg.isEmpty()) {
@@ -59,13 +59,11 @@ public class WALHandlerTCP implements Runnable {
             }
 
             System.out.println(reply);
-            output.writeObject(reply); // Envia a resposta ao cliente
+            output.println(reply); // Envia a resposta ao cliente
             output.flush();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (NumberFormatException e) {
             Thread.currentThread().interrupt();

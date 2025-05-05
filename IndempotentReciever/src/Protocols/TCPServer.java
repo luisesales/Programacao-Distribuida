@@ -17,7 +17,7 @@ public class TCPServer {
 		PORT = port;
 	}
 	public void RunServer(){			
-		ObjectOutputStream output = null;
+		PrintWriter output = null;
 		BufferedReader input = null;
 		System.out.println("TCP Server Bank Started");
 		ServerSocket server = null;		
@@ -28,7 +28,7 @@ public class TCPServer {
 			while (true) {
 				try {				
 					Socket connection = server.accept();
-					output = new ObjectOutputStream(connection.getOutputStream());
+					output = new PrintWriter(connection.getOutputStream(),true);
 					input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					String msg = input.readLine();					
 					String reply = new String();
@@ -43,7 +43,7 @@ public class TCPServer {
 					else{
 						reply = "ERROR;Requisição Inválida";
 					}											
-					output.writeObject(reply);
+					output.println(reply);
 					output.flush();				
 							
 				} catch (IOException e) {
@@ -71,17 +71,17 @@ public class TCPServer {
 
 	public void InitServer(){
 		Socket connection = null;
-		ObjectOutputStream output = null;
-		ObjectInputStream input = null;
+		PrintWriter output = null;
+		BufferedReader input = null;
 		try {
 			System.out.println("TCP Server Instance Started");
 			connection = new Socket("localhost", 8080);
-			output = new ObjectOutputStream(connection.getOutputStream());
+			output = new PrintWriter(connection.getOutputStream(),true);
 			String request = "INIT_SERVER;"+connection.getInetAddress().getHostAddress()+";"+PORT;			
-			output.writeObject(request);
+			output.println(request);
 			output.flush();
-			input = new ObjectInputStream(connection.getInputStream());
-			String reply = (String) input.readObject();
+			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String reply = input.readLine();
 			System.out.println("Gateway response: " + reply);	
 			input.close();
 			output.close();
@@ -91,8 +91,6 @@ public class TCPServer {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}				
+		}			
 	}
 }
