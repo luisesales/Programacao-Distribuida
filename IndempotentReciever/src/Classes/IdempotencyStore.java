@@ -3,7 +3,9 @@ package Classes;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.nio.file.*;
 
 public class IdempotencyStore {
     private static final String CACHE_FILE = "cache.log";
@@ -22,6 +24,16 @@ public class IdempotencyStore {
             System.out.println("Nenhum WAL existente, iniciando novo.");
 
         }
+    }
+
+    public static String getId(String request){
+        for(String finishedrequest : finishedRequests){            
+            WalEntry entry = WalEntry.getWalEntry(finishedrequest);              
+            if(entry.getPayload().equals(request)  && entry.getStatus() == RequestStatus.PENDING){
+                return entry.getId();
+            }
+        }
+        return UUID.randomUUID().toString();
     }
 
     public static boolean isDuplicate(String request) {
@@ -170,6 +182,11 @@ public class IdempotencyStore {
     }
 
     public static void save(String request) {
+        if (WalEntry.getWalEntry(request).getStatus() != RequestStatus.PENDING) {
+            remove(WalEntry.getWalEntry(request).getPayload());
+        }
+                
+
         if (finishedRequests.add(WalEntry.getWalEntry(request).getWalEntry())) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
                 writer.write(request);
@@ -179,11 +196,13 @@ public class IdempotencyStore {
             }
         }
         else {
-            remove(WalEntry.getWalEntry(request).getPayload());
+            
             try {
                 File inputFile = new File(WAL_FILE);
                 File tempFile = new File("temp_" + WAL_FILE);
-
+                if (!inputFile.exists()) {
+                    inputFile.createNewFile();
+                }                
                 try (
                     BufferedReader reader = new BufferedReader(new FileReader(inputFile));
                     BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
@@ -206,60 +225,112 @@ public class IdempotencyStore {
                     throw new IOException("Não foi possível deletar o arquivo original.");
                 }
                 if (!tempFile.renameTo(inputFile)) {
-                    throw new IOException("Não foi possível renomear o arquivo temporário.");
+                    System.err.println("Falha ao renomear o arquivo temporário. Tentando forçar a substituição...");
+                    
+                    // Tentativa forçada: cópia de conteúdo
+                    try (
+                        BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
+                        BufferedWriter originalWriter = new BufferedWriter(new FileWriter(inputFile))
+                    ) {
+                        String line;
+                        while ((line = tempReader.readLine()) != null) {
+                            originalWriter.write(line);
+                            originalWriter.newLine();
+                        }
+                    } catch (IOException ex) {
+                        System.err.println("Falha ao copiar conteúdo manualmente.");
+                        ex.printStackTrace();
+                    }
+                
+                    // Limpa temporário
+                    tempFile.delete();
                 }
+                
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-    public static void save(WalEntry entry) {
-        if (finishedRequests.add(entry.getWalEntry())) {
-            System.out.println("Adicionei no finishedRequests set");
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILE, true))) {
-                System.out.println("Vou Escrever");
-                writer.write(entry.getWalEntry());
-                System.out.println("Escrevi");
-                writer.newLine();                
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }        
-        else {
+    public static synchronized void save(WalEntry entry) {
+        // Se não for mais pendente, remova da cache
+        if (entry.getStatus() != RequestStatus.PENDING) {
             remove(entry);
-            try {
-                File inputFile = new File(WAL_FILE);
-                File tempFile = new File("temp_" + WAL_FILE);
-
+        }
+    
+        boolean replaced = false;
+    
+        File inputFile = new File(WAL_FILE);
+        File tempFile = new File("temp_" + WAL_FILE);
+    
+        try (
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+        ) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) continue;
+    
+                WalEntry existingEntry = WalEntry.getWalEntry(line);
+    
+                if (existingEntry.getId().equals(entry.getId())) {
+                    // Substitui linha
+                    writer.write(entry.getWalEntry());
+                    replaced = true;
+                } else {
+                    writer.write(line);
+                }
+                writer.newLine();
+            }
+    
+            // Se não encontrou para substituir, adiciona ao final
+            if (!replaced) {
+                writer.write(entry.getWalEntry());
+                writer.newLine();
+            }
+    
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        // Substitui o arquivo original
+        try {
+            if (!inputFile.exists()) {
+                inputFile.createNewFile();
+            }      
+            if (!inputFile.delete()) {
+                throw new IOException("Não foi possível deletar o arquivo original.");
+            }
+            if (!tempFile.renameTo(inputFile)) {
+                System.err.println("Falha ao renomear o arquivo temporário. Tentando forçar a substituição...");
+                
+                // Tentativa forçada: cópia de conteúdo
                 try (
-                    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
+                    BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
+                    BufferedWriter originalWriter = new BufferedWriter(new FileWriter(inputFile))
                 ) {
                     String line;
-                    while ((line = reader.readLine()) != null) {
-                        if(line.isBlank()) break;
-                        String existingPayload = WalEntry.getWalEntry(line).getPayload();
-                        if (existingPayload.equals(WalEntry.getWalEntry(entry.getWalEntry()).getPayload())) {
-                            writer.write(entry.getWalEntry()); // Substitui linha
-                        } else {
-                            writer.write(line); // Mantém linha original
-                        }
-                        writer.newLine();
+                    while ((line = tempReader.readLine()) != null) {
+                        originalWriter.write(line);
+                        originalWriter.newLine();
                     }
+                } catch (IOException ex) {
+                    System.err.println("Falha ao copiar conteúdo manualmente.");
+                    ex.printStackTrace();
                 }
-
-                // Substitui o arquivo antigo pelo novo
-                if (!inputFile.delete()) {
-                    throw new IOException("Não foi possível deletar o arquivo original.");
-                }
-                if (!tempFile.renameTo(inputFile)) {
-                    throw new IOException("Não foi possível renomear o arquivo temporário.");
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+            
+                // Limpa temporário
+                tempFile.delete();
             }
+                
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    
+        // Atualiza o Set (reconstrói com base no ID)
+        finishedRequests.removeIf(s -> WalEntry.getWalEntry(s).getId().equals(entry.getId()));
+        finishedRequests.add(entry.getWalEntry());
     }
+    
+    
 }    

@@ -117,7 +117,8 @@ public class HandlerTCP implements Runnable {
                 reply = walRequest(msg,entry);            
                 String[] walReply = reply.split(";");
                 if (walReply[0].equals("SUCCESS")) {
-                    reply = processRequest(msg, request, entry);                                            
+                    reply = processRequest(msg, request, entry); 
+                    System.out.println(entry.getWalEntry());                                           
                 }
                 else{
                     System.out.println("Requisição duplicada ignorada: " + msg);                    
@@ -131,6 +132,7 @@ public class HandlerTCP implements Runnable {
                 entry = new WalEntry(requestId, msg);    
                 request = msg.split(";");
                 reply = processRequest(msg, request, entry);
+                System.out.println(entry.getWalEntry());
                 msg = walMsg;
             } 
             else {
