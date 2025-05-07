@@ -32,7 +32,7 @@ public class APIGateway {
 
     public int selectServer(){       
        selectedServer.set(selectedServer.get()%AliveServers.size());
-       return selectedServer.getAndIncrement(1);       
+       return selectedServer.getAndIncrement();       
     }
 
     public String redirectRequestTCP(String body){        

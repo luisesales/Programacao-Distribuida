@@ -63,7 +63,7 @@ public class HandlerTCP implements Runnable {
         // Tentar redirecionar a requisição até obter uma resposta positiva
         int retries = 0;
         while (retries < 10) {
-            reply = gateway.redirectRequestTCP(newMsg,selectedServer,server);
+            reply = gateway.redirectRequestTCP(newMsg,server);
             if (reply.contains("operação realizada")) {
                 entry.setStatus(RequestStatus.PROCESSED);
                 break;
@@ -131,7 +131,7 @@ public class HandlerTCP implements Runnable {
                 msg = msg.replace(request[0]+";"+request[1]+";", "").trim();                                
                 entry = new WalEntry(requestId, msg);    
                 request = msg.split(";");
-                reply = processRequest(msg, request, entry);
+                reply = processRequest(msg, request, entry,selectedServer);
                 System.out.println(entry.getWalEntry());
                 msg = walMsg;
             } 
@@ -147,7 +147,7 @@ public class HandlerTCP implements Runnable {
             if(entry != null)
                 walRequest(msg,entry,selectedServer);
                 if(entry.getStatus() == RequestStatus.FAILED || entry.getStatus() == RequestStatus.PENDING){
-                    IdempotentRequestTCP(msg);
+                    new IdempotentRequestTCP(msg);
                 }  
              
         } catch (UnknownHostException e) {
