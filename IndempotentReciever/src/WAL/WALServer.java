@@ -1,4 +1,4 @@
-package WAL;
+        package WAL;
 
 import Classes.IdempotencyStore;
 import Classes.WalEntry;

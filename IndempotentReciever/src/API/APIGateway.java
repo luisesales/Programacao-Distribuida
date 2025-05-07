@@ -1,17 +1,14 @@
 package API;
 
-import Classes.IdempotencyStore;
 import Classes.Server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class APIGateway {
-    private Random rand = new Random();
+public class APIGateway {    
     private int MAX_CONNECTIONS = 50;
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
@@ -30,8 +27,11 @@ public class APIGateway {
         return new ArrayList<Server>(AliveServers);
     }
 
-    public int selectServer(){       
-       selectedServer.set(selectedServer.get()%AliveServers.size());
+    public int selectServer(){         
+        int size = AliveServers.size();
+        if(size == 0)
+            return -1;      
+       selectedServer.set(selectedServer.get()%size);
        return selectedServer.getAndIncrement();       
     }
 
@@ -82,7 +82,7 @@ public class APIGateway {
     }*/
 
     public APIGateway(){
-        AliveServers = new ArrayList<Server>();        
+        AliveServers = new ArrayList<Server>();
     }
 
     private void RunGatewayTCP(APIGateway gateway){           

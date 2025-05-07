@@ -53,11 +53,12 @@
                 }
                 else if (msgSplit[0].equals("WAL")){    
                     RequestStatus status = RequestStatus.fromCode(Integer.parseInt(msgSplit[1]));
+                    selectedServer = Integer.parseInt(msgSplit[2]);
                     String requestId;     
                     boolean checkDup = true;      
                     System.out.println("Request recebido:"+msg);
-                    if(msgSplit[2].equals("REQUEST")){                             
-                            msg = msg.replace("WAL;"+msgSplit[1]+";", "").trim();
+                    if(msgSplit[3].equals("REQUEST")){                             
+                            msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";", "").trim();
                             requestId = IdempotencyStore.getId(msg);
                             if(IdempotencyStore.isDuplicate(msg) && status == RequestStatus.PENDING){
                                 reply = "ERROR;Messagem Duplicata: " + msg;                                                
@@ -66,8 +67,8 @@
                     }                                                 
                     else{
                             System.out.println("Mensagem de Idempotencia detectada: "+msg );
-                            requestId = msgSplit[2];
-                            msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";", "").trim();                                        
+                            requestId = msgSplit[3];
+                            msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";"+msgSplit[3]+";", "").trim();                                        
                     }               
                     System.out.println("Status = "+ status.getLabel());
                     

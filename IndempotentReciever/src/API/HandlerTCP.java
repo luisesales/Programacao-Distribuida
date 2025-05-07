@@ -146,7 +146,7 @@ public class HandlerTCP implements Runnable {
             socket.close();                               
             if(entry != null)
                 walRequest(msg,entry,selectedServer);
-                if(entry.getStatus() == RequestStatus.FAILED || entry.getStatus() == RequestStatus.PENDING){
+                if(entry.getStatus() == RequestStatus.FAILED){
                     new IdempotentRequestTCP(msg);
                 }  
              
