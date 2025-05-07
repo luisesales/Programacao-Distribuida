@@ -14,7 +14,7 @@ public class IdempotentRequestTCP {
             PrintWriter output = null;
             BufferedReader input = null;
             try {
-                System.out.println("TCP Client Bank Started");
+                System.out.println("TCP Idempotent Request Started");
                 connection = new Socket("localhost", 8080);
                 output = new PrintWriter(connection.getOutputStream(),true);               
                 output.println(msg);
