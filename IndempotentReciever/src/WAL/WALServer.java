@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class WALServer {    
+public class WALServer {            
     private int MAX_CONNECTIONS = 50; 
     private final String WAL_ID = "ba23a570-d27e-4e66-ad2d-d682d096ce7b";   
     public AtomicBoolean preparation = new AtomicBoolean(true);  

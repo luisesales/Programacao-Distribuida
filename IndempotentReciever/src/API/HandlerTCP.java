@@ -28,12 +28,12 @@ public class HandlerTCP implements Runnable {
         System.out.println("Handler Terminated for " + this.socket + "\n");
     }
 
-    private String walRequest(String msg, WalEntry entry){
+    private String walRequest(String msg, WalEntry entry, int server){
         Socket socket = null;
         PrintWriter output = null;
 		BufferedReader input = null;
         String reply = new String();
-        msg = "WAL;"+entry.getStatus().getCode()+";"+msg;
+        msg = "WAL;"+entry.getStatus().getCode()+";"+server+";"+msg;
         try{
             socket = new Socket("localhost", 8081);
             output = new PrintWriter(socket.getOutputStream(),true);
@@ -92,6 +92,7 @@ public class HandlerTCP implements Runnable {
         WalEntry entry = null;
         String reply = new String();        
         String walMsg;
+        int selectedServer = gateway.selectServer();
         try {
             // Leitura do cabeçalho
             System.out.println("Lidando com a requisição");
@@ -114,7 +115,7 @@ public class HandlerTCP implements Runnable {
             }else if (request[0].equals("REQUEST")) {
                 String requestId = UUID.randomUUID().toString();                                    
                 entry = new WalEntry(requestId, msg);    
-                reply = walRequest(msg,entry);            
+                reply = walRequest(msg,entry,selectedServer);            
                 String[] walReply = reply.split(";");
                 if (walReply[0].equals("SUCCESS")) {
                     reply = processRequest(msg, request, entry); 
@@ -142,7 +143,7 @@ public class HandlerTCP implements Runnable {
             output.println(reply); // Envia a resposta ao cliente
             output.flush();
             if(entry != null)
-                walRequest(msg,entry);  
+                walRequest(msg,entry,selectedServer);  
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {

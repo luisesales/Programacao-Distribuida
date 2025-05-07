@@ -15,7 +15,7 @@ public class APIGateway {
     private int MAX_CONNECTIONS = 50;
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
-    private AtomicInteger instances = new AtomicInteger(0);    
+    private AtomicInteger instances = new AtomicInteger(0);        
 
     //private static IdempotencyStore idempotency = new IdempotencyStore();
     public void addServer(String ip, int port, String name){
@@ -28,8 +28,16 @@ public class APIGateway {
         return new ArrayList<Server>(AliveServers);
     }
 
-    public String redirectRequestTCP(String body){
-        Server selected_server = AliveServers.get(rand.nextInt(AliveServers.size()));        
+    public int selectServer(){
+       return rand.nextInt(AliveServers.size());
+    }
+
+    public String redirectRequestTCP(String body){        
+        return redirectRequestTCP(body,selectServer());
+    }
+
+    public String redirectRequestTCP(String body, int server){
+        Server selected_server = AliveServers.get(server);        
         try (Socket forwardSocket = new Socket(selected_server.getInetAddress(), selected_server.getPort())) {
             PrintWriter forwardOutput = new PrintWriter(forwardSocket.getOutputStream(), true);
             forwardOutput.println(body);                 

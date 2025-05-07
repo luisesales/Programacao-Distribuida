@@ -34,6 +34,7 @@
             BufferedReader input = null;
             WalEntry entry = null;     
             String reply = new String();
+            int selectedServer = 0;
             try {
                 // Leitura do cabeçalho
                 System.out.println("Lidando com a requisição");
@@ -89,7 +90,7 @@
                 socket.close();                                
                 if(entry != null) {                                        
                     System.out.println(entry.getWalEntry());
-                    IdempotencyStore.save(entry);                    
+                    IdempotencyStore.save(entry,selectedServer);                    
                 } 
             } catch (UnknownHostException e) {
                 e.printStackTrace();
