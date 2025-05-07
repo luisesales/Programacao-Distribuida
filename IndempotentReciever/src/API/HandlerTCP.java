@@ -51,7 +51,7 @@ public class HandlerTCP implements Runnable {
         return reply;
     }
 
-    private String processRequest(String msg, String[] request, WalEntry entry)
+    private String processRequest(String msg, String[] request, WalEntry entry, int server)
     {
         String reply = new String();
         try{        
@@ -63,15 +63,14 @@ public class HandlerTCP implements Runnable {
         // Tentar redirecionar a requisição até obter uma resposta positiva
         int retries = 0;
         while (retries < 10) {
-            reply = gateway.redirectRequestTCP(newMsg);
+            reply = gateway.redirectRequestTCP(newMsg,selectedServer,server);
             if (reply.contains("operação realizada")) {
                 entry.setStatus(RequestStatus.PROCESSED);
                 break;
             } else {
                 System.out.println("Falha ao processar requisição. Tentando novamente...");                
                 retries++;
-                Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente
-                
+                Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente                
             }
         }
         if(retries == 10){
@@ -118,7 +117,7 @@ public class HandlerTCP implements Runnable {
                 reply = walRequest(msg,entry,selectedServer);            
                 String[] walReply = reply.split(";");
                 if (walReply[0].equals("SUCCESS")) {
-                    reply = processRequest(msg, request, entry); 
+                    reply = processRequest(msg, request, entry,selectedServer); 
                     System.out.println(entry.getWalEntry());                                           
                 }
                 else{
@@ -142,20 +141,19 @@ public class HandlerTCP implements Runnable {
             System.out.println(reply);
             output.println(reply); // Envia a resposta ao cliente
             output.flush();
+            input.close();
+            output.close();
+            socket.close();                               
             if(entry != null)
-                walRequest(msg,entry,selectedServer);  
+                walRequest(msg,entry,selectedServer);
+                if(entry.getStatus() == RequestStatus.FAILED || entry.getStatus() == RequestStatus.PENDING){
+                    IdempotentRequestTCP(msg);
+                }  
+             
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (input != null) input.close();
-                if (output != null) output.close();
-                socket.close();                                
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
