@@ -2,7 +2,8 @@
 
     import java.io.*;
     import java.util.ArrayList;
-    import java.util.Map;
+import java.util.HashMap;
+import java.util.Map;
     import java.util.Set;
     import java.util.UUID;
     import java.util.concurrent.ConcurrentHashMap;
@@ -17,15 +18,20 @@
             2, "wal2.log",
             3, "wal3.log"
         );
-        private static final String WAL0_FILE = "wal0.log";
-        private static final String WAL1_FILE = "wal1.log";
-        private static final String WAL2_FILE = "wal2.log";
-        private static final String WAL3_FILE = "wal3.log";
 
         private static final Set<String> pendingRequests = ConcurrentHashMap.newKeySet();
         private static final Set<String> finishedRequests = ConcurrentHashMap.newKeySet();
-        private static final Semaphore semaphore = new Semaphore(1);
-        static{      
+
+        private static final Map<Integer,ConcurrentHashMap<String,WalEntry>> WAL_REQUESTS_SERVERS;    
+        private static final Semaphore semaphore = new Semaphore(1,true);
+        static{                      
+            Map<Integer, ConcurrentHashMap<String, WalEntry>> tempMap = new HashMap<>();
+            tempMap.put(0, new ConcurrentHashMap<>());
+            tempMap.put(1, new ConcurrentHashMap<>());
+            tempMap.put(2, new ConcurrentHashMap<>());
+            tempMap.put(3, new ConcurrentHashMap<>());
+            
+            WAL_REQUESTS_SERVERS = Map.copyOf(tempMap); 
             // Carrega WAL ao iniciar
             try (BufferedReader reader = new BufferedReader(new FileReader(CACHE_FILE))) {
                 String line;
@@ -80,6 +86,10 @@
             return pendingEntries;
         }
 
+        public static void simpleAdd(WalEntry entry){
+            pendingRequests.add(entry.getPayload());
+        }
+
         public static void add(String payload){
             if (pendingRequests.add(payload)) {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(CACHE_FILE, true))) {
@@ -101,6 +111,7 @@
                 }
             }
         }
+        
 
         public static void simpleRemove(WalEntry entry){        
            pendingRequests.remove(entry.getPayload());
@@ -110,7 +121,7 @@
             pendingRequests.remove(payload);
          }
 
-        public static void remove(String payload){        
+        public static void remove(String payload){                
             if (pendingRequests.remove(payload)) {            
                 try {
                     File inputFile = new File(CACHE_FILE);
@@ -199,14 +210,20 @@
                 }
         }
 
+        public static void clearFile(int file){                        
+                try (FileWriter writer = new FileWriter(WAL_FILES.get(file), false)) {            
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
         public static void clear(){
             clearCache();
             clearRequests();
         }
 
         public static  void save(WalEntry entry,int file) {
-            try {                    
-                
+            try {                                    
                 if (entry.getStatus() != RequestStatus.PENDING) {
                     simpleRemove(entry); // Supondo que remove também está sincronizado ou é seguro
                 }                
@@ -223,10 +240,26 @@
                 semaphore.release(); // Saindo da seção crítica
             }
         }
+
+        public static void simpleSave(WalEntry entry,int file){
+            if(finishedRequestsNoFile.containsKey(entry.getId())){
+                finishedRequestsNoFile.replace(entry.getId(), entry);
+            }
+            else{
+                finishedRequestsNoFile.put(entry.getId(), entry);
+                simpleRemove(entry);
+            }
+            try{
+            semaphore.acquire();
+            simpleAppendToWAL(file);
+            semaphore.release();
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
     
         public static  void save(String request,int file) {
-            try {                    
-                
+            try {                                    
                 WalEntry entry = WalEntry.getWalEntry(request);
                 if (entry.getStatus() != RequestStatus.PENDING) {
                     simpleRemove(entry);
@@ -242,6 +275,17 @@
                 Thread.currentThread().interrupt();
             } finally {
                 semaphore.release(); // Saindo da seção crítica
+            }
+        }
+        private static synchronized void simpleAppendToWAL(int file) { 
+            clearFile(file);                  
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILES.get(file), true))) {
+                for(WalEntry entry : finishedRequestsNoFile.values()){
+                    writer.write(entry.getWalEntry());
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     

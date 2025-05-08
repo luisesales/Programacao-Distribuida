@@ -76,7 +76,8 @@
                     if(checkDup){
                             entry = new WalEntry(requestId, msg, status);          
                             System.out.println("Criei o Entry");
-                            IdempotencyStore.add(entry);
+                            //IdempotencyStore.add(entry);
+                            IdempotencyStore.simpleAdd(entry);
                             reply = "SUCCESS;Messagem Salva: " + msg; 
                     }
                 } else {
@@ -91,7 +92,8 @@
                 socket.close();                                
                 if(entry != null) {                                        
                     System.out.println(entry.getWalEntry());
-                    IdempotencyStore.save(entry,selectedServer);                    
+                    //IdempotencyStore.save(entry,selectedServer);
+                    IdempotencyStore.simpleSave(entry,selectedServer);                    
                 } 
             } catch (UnknownHostException e) {
                 e.printStackTrace();
@@ -99,7 +101,7 @@
                 e.printStackTrace();
             } catch (NumberFormatException e) {
                 Thread.currentThread().interrupt();
-                e.printStackTrace();
+                e.printStackTrace();    
             }       
             
         }
