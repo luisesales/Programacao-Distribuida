@@ -102,6 +102,14 @@
             }
         }
 
+        public static void simpleRemove(WalEntry entry){        
+           pendingRequests.remove(entry.getPayload());
+        }
+
+        public static void simpleRemove(String payload){        
+            pendingRequests.remove(payload);
+         }
+
         public static void remove(String payload){        
             if (pendingRequests.remove(payload)) {            
                 try {
@@ -196,18 +204,17 @@
             clearRequests();
         }
 
-        public static void save(WalEntry entry,int file) {
-            try {
-                semaphore.acquire(); // Entrando na seção crítica
-    
+        public static  void save(WalEntry entry,int file) {
+            try {                    
+                
                 if (entry.getStatus() != RequestStatus.PENDING) {
-                    remove(entry); // Supondo que remove também está sincronizado ou é seguro
-                }
-    
+                    simpleRemove(entry); // Supondo que remove também está sincronizado ou é seguro
+                }                
+                semaphore.acquire(); // Entrando na seção crítica
                 if (finishedRequests.add(entry.getWalEntry())) {
                     appendToWAL(entry.getWalEntry(),file);
                 } else {
-                    replaceInFile(entry.getPayload(), entry.getWalEntry(),file);
+                    replaceInFile(entry.getId(), entry.getWalEntry(),file);
                 }
     
             } catch (InterruptedException e) {
@@ -217,19 +224,18 @@
             }
         }
     
-        public static void save(String request,int file) {
-            try {
-                semaphore.acquire(); // Entrando na seção crítica
-    
+        public static  void save(String request,int file) {
+            try {                    
+                
                 WalEntry entry = WalEntry.getWalEntry(request);
                 if (entry.getStatus() != RequestStatus.PENDING) {
-                    remove(entry);
-                }
-    
+                    simpleRemove(entry);
+                }                
+                semaphore.acquire(); // Entrando na seção crítica
                 if (finishedRequests.add(entry.getWalEntry())) {
                     appendToWAL(entry.getWalEntry(),file);
                 } else {
-                    replaceInFile(entry.getPayload(), entry.getWalEntry(),file);
+                    replaceInFile(entry.getId(), entry.getWalEntry(),file);
                 }
     
             } catch (InterruptedException e) {
@@ -248,34 +254,44 @@
             }
         }
     
-        private static void replaceInFile(String targetPayload, String newEntry, int file) {
+        private static void replaceInFile(String targetRequestId, String newEntry, int file) {
             String selectedFile = WAL_FILES.get(file);
             File inputFile = new File(selectedFile);
             File tempFile = new File("temp_" + selectedFile);
-    
+        
             try (
                 BufferedReader reader = new BufferedReader(new FileReader(inputFile));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))
             ) {
                 String line;
+                boolean replaced = false;
+        
                 while ((line = reader.readLine()) != null) {
                     if (line.isBlank()) continue;
-    
-                    String existingPayload = WalEntry.getWalEntry(line).getPayload();
-                    if (existingPayload.equals(targetPayload)) {
-                        writer.write(newEntry); // Substituição
+        
+                    WalEntry existing = WalEntry.getWalEntry(line);
+        
+                    if (existing.getId().equals(targetRequestId)) {
+                        writer.write(newEntry); // Substitui entrada
+                        replaced = true;
                     } else {
-                        writer.write(line);
+                        writer.write(line); // Mantém as outras
                     }
                     writer.newLine();
                 }
-    
+        
+                // Se não encontrou o ID, adiciona no final (opcional)
+                if (!replaced) {
+                    writer.write(newEntry);
+                    writer.newLine();
+                }
+        
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
-    
-            // Essas operações também estão dentro da seção crítica protegida
+        
+            // Substitui o arquivo original
             try {
                 if (!inputFile.delete()) {
                     throw new IOException("Erro ao deletar arquivo original.");
@@ -286,5 +302,6 @@
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }                    
+        }
+                
     }    
