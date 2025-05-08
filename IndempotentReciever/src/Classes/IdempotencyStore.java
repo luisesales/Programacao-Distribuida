@@ -11,6 +11,13 @@ import java.util.Map;
 
 
     public class IdempotencyStore {
+        private static final int WAL_THRESHOLD = 5;
+        private Map<Integer,AtomicInteger> WAL_REQUESTS_COUNT = Map.of(
+            0, new AtomicInteger(0), 
+            1, new AtomicInteger(0),
+            2, new AtomicInteger(0),
+            3, new AtomicInteger(0)
+        );
         private static final String CACHE_FILE = "cache.log";
         private static final Map<Integer,String> WAL_FILES = Map.of(
             0, "wal0.log", 
@@ -23,7 +30,7 @@ import java.util.Map;
         private static final Set<String> finishedRequests = ConcurrentHashMap.newKeySet();
 
         private static final Map<Integer,ConcurrentHashMap<String,WalEntry>> WAL_REQUESTS_SERVERS;    
-        private static final Semaphore semaphore = new Semaphore(1,true);
+        private static final Semaphore semaphore = new Semaphore(1);
         static{                      
             Map<Integer, ConcurrentHashMap<String, WalEntry>> tempMap = new HashMap<>();
             tempMap.put(0, new ConcurrentHashMap<>());
@@ -242,23 +249,28 @@ import java.util.Map;
         }
 
         public static void simpleSave(WalEntry entry,int file){
-            if(finishedRequestsNoFile.containsKey(entry.getId())){
-                finishedRequestsNoFile.replace(entry.getId(), entry);
+            final static ConcurrentHashMap<String,WalEntry> selectedLog = WAL_REQUESTS_SERVERS.get(file);
+            final static AtomicInteger selectedCount = WAL_REQUESTS_COUNT.get(file);
+            if(selectedLog.containsKey(entry.getId())){
+                selectedLog.replace(entry.getId(), entry);
             }
             else{
-                finishedRequestsNoFile.put(entry.getId(), entry);
+                selectedLog.put(entry.getId(), entry);
                 simpleRemove(entry);
             }
-            try{
-            semaphore.acquire();
-            simpleAppendToWAL(file);
-            semaphore.release();
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
+            if(selectedCount.get() == WAL_THRESHOLD){
+                try{
+                semaphore.acquire();
+                simpleAppendToWAL(file);
+                semaphore.release();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }            
+            selectedCount.set(selectedCount.IncrementAndGet()%WAL_THRESHOLD);            
         }
     
-        public static  void save(String request,int file) {
+        public static void save(String request,int file) {
             try {                                    
                 WalEntry entry = WalEntry.getWalEntry(request);
                 if (entry.getStatus() != RequestStatus.PENDING) {
@@ -277,7 +289,7 @@ import java.util.Map;
                 semaphore.release(); // Saindo da seção crítica
             }
         }
-        private static synchronized void simpleAppendToWAL(int file) { 
+        private static void simpleAppendToWAL(int file) { 
             clearFile(file);                  
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(WAL_FILES.get(file), true))) {
                 for(WalEntry entry : finishedRequestsNoFile.values()){
