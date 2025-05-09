@@ -61,8 +61,8 @@ import java.util.concurrent.atomic.AtomicInteger;
             return UUID.randomUUID().toString();
         }
 
-        public boolean isDuplicate(int file,String id) {
-            return WAL_REQUESTS_SERVERS.get(file).containsKey(id);
+        public boolean isDuplicate(int file,String id, RequestStatus status) {
+            return WAL_REQUESTS_SERVERS.get(file).containsKey(id) && status == RequestStatus.PENDING;
         }
 
         public ArrayList<String> getCache(){
@@ -255,8 +255,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 final ConcurrentHashMap<String,WalEntry> selectedLog = WAL_REQUESTS_SERVERS.get(file);
                 AtomicInteger selectedCount = WAL_REQUESTS_COUNT.get(file);
                 if(selectedLog.containsKey(entry.getId())){                    
-                    selectedLog.replace(entry.getId(), entry);
-                    simpleRemove(entry);
+                    selectedLog.replace(entry.getId(), entry);                    
                 }
                 else{
                     selectedLog.put(entry.getId(), entry);                

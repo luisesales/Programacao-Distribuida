@@ -62,18 +62,17 @@
                     if(msgSplit[3].equals("REQUEST")){                             
                             msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";", "").trim();
                             requestId = store.getId(msg,selectedServer);
-                            if(store.isDuplicate(selectedServer,requestId) && status == RequestStatus.PENDING){
+                            if(store.isDuplicate(selectedServer,requestId,status)){
                                 reply = "ERROR;Messagem Duplicata: " + msg;                                                
                                 checkDup = false; 
                             }                                                            
                     }                                                 
                     else{
                             System.out.println("Mensagem de Idempotencia detectada: "+msg );
-                            requestId = msgSplit[3];
+                            requestId = msgSplit[3].trim();
                             msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";"+msgSplit[3]+";", "").trim();                                        
                     }               
-                    System.out.println("Status = "+ status.getLabel());
-                    
+                    System.out.println("Status = "+ status.getLabel());                    
                     System.out.println("\nmsg replaced: " + msg);  
                     if(checkDup){
                             entry = new WalEntry(requestId, msg, status);          

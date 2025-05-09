@@ -70,7 +70,7 @@ public class HandlerTCP implements Runnable {
             } else {
                 System.out.println("Falha ao processar requisição. Tentando novamente...");                
                 retries++;
-                Thread.sleep(2000); // Aguarda 1 segundo antes de tentar novamente                
+                Thread.sleep(1000); // Aguarda 1 segundo antes de tentar novamente                
             }
         }
         if(retries == 10){

@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class APIGateway {    
-    private final int MAX_CONNECTIONS = 50;
+    private final int MAX_CONNECTIONS = 150;
     private static int ALIVE_TIMEOUT = 5000;
     private ArrayList<Server> AliveServers;
     private AtomicInteger instances = new AtomicInteger(0);  
