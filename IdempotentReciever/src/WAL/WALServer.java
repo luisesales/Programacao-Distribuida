@@ -9,9 +9,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WALServer {            
-    private int MAX_CONNECTIONS = 50; 
+    private int MAX_CONNECTIONS = 250; 
     private final String WAL_ID = "ba23a570-d27e-4e66-ad2d-d682d096ce7b";   
     public AtomicBoolean preparation = new AtomicBoolean(true);  
+    private IdempotencyStore store;
+
+    public WALServer(){
+        store = new IdempotencyStore();
+    }
     
     public void RunRequests(ArrayList<WalEntry> requests){ 
         synchronized(this){       
@@ -43,11 +48,11 @@ public class WALServer {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
+                }   
                 System.out.println("Request: "+ request + " has been sent");
             }        
             if(successProccess){
-                IdempotencyStore.clearCache();
+                store.clearCache();
             }   
         }     
     }
@@ -56,16 +61,16 @@ public class WALServer {
         try (ServerSocket server = new ServerSocket(8081, MAX_CONNECTIONS)) {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try{           
-                IdempotencyStore.clearCache();                       
+                store.clearCache();                       
                 System.out.println("WAL Listening to Requests");                
                 while(true){                    
                     Socket remote = server.accept();
-                    executor.execute(new WALHandlerTCP(remote,this));                                        
+                    executor.execute(new WALHandlerTCP(remote,this,store));                                        
                 }
             }finally {
                 executor.shutdown();
                 server.close();
-                IdempotencyStore.clearCache();
+                store.clearCache();
                 System.out.println("WAL terminating");
             }
         }catch (IOException e2) {

@@ -10,18 +10,20 @@
     public class WALHandlerTCP implements Runnable {
 
         private final Socket socket;
-        private final WALServer server;        
+        private final WALServer server;   
+        private final IdempotencyStore store;     
 
-        public WALHandlerTCP(Socket socket, WALServer server) {        
+        public WALHandlerTCP(Socket socket, WALServer server, IdempotencyStore store) {        
             this.socket = socket;              
             this.server = server;
+            this.store = store;
         }
 
         @Override
         public void run() {
             System.out.println("\nHandler Started for " + this.socket);
             if(server.preparation.get() == true){
-                server.RunRequests(IdempotencyStore.load());
+                server.RunRequests(store.load());
             }
             handleRequest(this.socket);
             System.out.println("Handler Terminated for " + this.socket + "\n");
@@ -48,7 +50,7 @@
                     return;
                 }
                 else if (msg.equals("CLEAR")) {
-                    IdempotencyStore.clear();
+                    store.clear();
                     reply = "SUCCESS;Cache Limpa";
                 }
                 else if (msgSplit[0].equals("WAL")){    
@@ -59,8 +61,8 @@
                     System.out.println("Request recebido:"+msg);
                     if(msgSplit[3].equals("REQUEST")){                             
                             msg = msg.replace("WAL;"+msgSplit[1]+";"+msgSplit[2]+";", "").trim();
-                            requestId = IdempotencyStore.getId(msg);
-                            if(IdempotencyStore.isDuplicate(msg) && status == RequestStatus.PENDING){
+                            requestId = store.getId(msg,selectedServer);
+                            if(store.isDuplicate(selectedServer,requestId) && status == RequestStatus.PENDING){
                                 reply = "ERROR;Messagem Duplicata: " + msg;                                                
                                 checkDup = false; 
                             }                                                            
@@ -76,8 +78,8 @@
                     if(checkDup){
                             entry = new WalEntry(requestId, msg, status);          
                             System.out.println("Criei o Entry");
-                            //IdempotencyStore.add(entry);
-                            IdempotencyStore.simpleAdd(entry);
+                            //store.add(entry);
+                            store.save(entry,selectedServer);
                             reply = "SUCCESS;Messagem Salva: " + msg; 
                     }
                 } else {
@@ -91,9 +93,8 @@
                 output.close();
                 socket.close();                                
                 if(entry != null) {                                        
-                    System.out.println(entry.getWalEntry());
-                    //IdempotencyStore.save(entry,selectedServer);
-                    IdempotencyStore.simpleSave(entry,selectedServer);                    
+                    System.out.println(entry.getWalEntry());                    
+                    //store.simpleSave(entry,selectedServer);                    
                 } 
             } catch (UnknownHostException e) {
                 e.printStackTrace();
