@@ -14,8 +14,6 @@ import java.lang.reflect.Method;
 public class Invoker {
     private Marshaller marshaller;
     
-    private final LifecycleManager lifecycleManager;
-    
     private final LookupService lookupService;
     
     

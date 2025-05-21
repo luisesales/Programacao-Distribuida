@@ -1,4 +1,4 @@
-package Routes.Methods;
+package Annotations.methods;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Get {
-    String router();
+    String value() default "";
 }

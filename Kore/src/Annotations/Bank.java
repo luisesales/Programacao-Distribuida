@@ -22,7 +22,7 @@ public class Bank {
         accounts.put(accountnumber, 0.0f);
     }    
 
-    @Post(router = "depositar")
+    @Post(router = "deposit")
     public void depositar(int accountnumber, float value) {
         float current = accounts.getOrDefault(accountnumber, 0.0f);
         accounts.put(accountnumber, current + value);

@@ -1,4 +1,4 @@
-﻿package handler.tcp;
+﻿package Handler.tcp;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import handler.interfaces.IServerRequestHandler;
 import invoker.Invoker;
 
-public class TCP_ServerRequestHandler implements IServerRequestHandler {
+public class TCPServerRequestHandler implements ServerRequestHandler {
     private ServerSocket serverSocket;
 
     private final ExecutorService executorService;
