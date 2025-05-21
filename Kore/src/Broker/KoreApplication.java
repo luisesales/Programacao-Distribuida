@@ -30,16 +30,8 @@ public class KoreApplication {
 
     public MiddlewareApplication(String basePackage) {
         this.basePackage = basePackage;
-        this.lookupService = new LookupService();
-        SecurityInterceptor securityInterceptor = new SecurityInterceptor();
-
-        ExtensionService extensionService = new ExtensionService();
-        extensionService.registerExtension(new LoggingInterceptor());
-        extensionService.registerExtension(securityInterceptor);
-        token = securityInterceptor.getToken();
-        LifecycleManager lifecycleManager = new LifecycleManager();
-
-        this.invoker = new Invoker(lookupService, extensionService, lifecycleManager);
+        this.lookupService = new LookupService();        
+        this.invoker = new Invoker(lookupService);
     }
 
     private void start() {

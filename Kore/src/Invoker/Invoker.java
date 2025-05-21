@@ -10,6 +10,7 @@ import message.HTTPMessage;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.net.http.HttpRequest;
 
 public class Invoker {
     private Marshaller marshaller;
@@ -17,12 +18,11 @@ public class Invoker {
     private final LookupService lookupService;
     
     
-    public Invoker() {
-        lifecycleManager = new LifecycleManager();
+    public Invoker() {        
         lookupService = new LookupService();
     }
     
-    public HTTPMessage invoke(HTTPMessage request){
+    public HttpResponse invoke(HttpRequest request){
         String route = request.resource();
         String httpMethod = request.httpMethod();
         
@@ -35,7 +35,7 @@ public class Invoker {
             assert targetMethod != null;
             var result = (JSONObject) targetMethod.invoke(servant, request.body());
 
-            return new HTTPMessage(request.httpMethod(), request.resource(), result);
+            return new HttpResponse(request.httpMethod(), request.resource(), result);
 
         } catch (Exception e) {
             e.printStackTrace();
