@@ -20,7 +20,7 @@ class TCPRequestHandler implements Runnable {
 
     private final HttpMarshaller marshaller;
 
-    TCP_RequestHandler(Socket clientSocket, Invoker invoker) {
+    TCPRequestHandler(Socket clientSocket, Invoker invoker) {
         this.clientSocket = clientSocket;
         this.invoker = invoker;
         this.marshaller = new HttpMarshaller();

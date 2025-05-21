@@ -14,7 +14,7 @@ public class TCPServerRequestHandler implements ServerRequestHandler {
 
     private final ExecutorService executorService;
     
-    public TCP_ServerRequestHandler(int port, Invoker invoker){
+    public TCPServerRequestHandler(int port, Invoker invoker){
         start(port);
 
         this.executorService = Executors.newCachedThreadPool();
