@@ -1,13 +1,12 @@
 package application;
 
+import Annotation.KoreApplication;
 
-import Annotation.MiddlewareApplication;
-
-@MiddlewareApplication
+@KoreApplication
 public class Main {
 
     public static void main(String[] args) {    
 
-        broker.MiddlewareApplication.run(Main.class, args);
+        broker.KoreApplication.run(Main.class, args);
     }
 }

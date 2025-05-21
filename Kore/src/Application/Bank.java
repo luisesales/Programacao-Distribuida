@@ -1,10 +1,13 @@
-package Routes;
+package Application;
 
 import java.util.HashMap;
 
-import Routes.Methods.*;
+import Annotations.methods.*;
 
-@RequestMap(router = "/bank")
+@RequestMapping("/bank")
+@Scope(ScopeType.STATIC_INSTANCE)
+@CreationStrategy(CreationStrategyType.LAZY_ACQUISITION)
+@Component
 public class Bank {
 
     private HashMap<Integer, Float> accounts = new HashMap<>();
@@ -22,13 +25,13 @@ public class Bank {
         accounts.put(accountnumber, 0.0f);
     }    
 
-    @Post(router = "deposit")
+    @Post("/deposit")
     public void depositar(int accountnumber, float value) {
         float current = accounts.getOrDefault(accountnumber, 0.0f);
         accounts.put(accountnumber, current + value);
     }
 
-    @Get(router = "balance")
+    @Get("/balance")
     public float saldo(int accountnumber) {
         return accounts.getOrDefault(accountnumber, 0.0f);
     }
