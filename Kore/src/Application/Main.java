@@ -1,8 +1,8 @@
-package application;
+package Application;
 
-import Annotation.KoreApplication;
+import Annotations.MiddlewareApplication;
 
-@KoreApplication
+@MiddlewareApplication
 public class Main {
 
     public static void main(String[] args) {    

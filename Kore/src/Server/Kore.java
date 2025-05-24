@@ -22,7 +22,7 @@ public class Kore {
 
 					Socket remote = server.accept();
 					
-					executor.execute(new ClientHandler(remote));
+					executor.execute(new Handler(remote));
 
 				}
 			}finally {

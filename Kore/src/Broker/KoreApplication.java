@@ -1,7 +1,7 @@
 package Broker;
 
 import Annotations.Component;
-import broker.configuration.Configuration;
+import Broker.configuration.Configuration;
 import Handler.tcp.TCPServerRequestHandler;
 import Handler.udp.UDPServerRequestHandler;
 import Invoker.Invoker;
