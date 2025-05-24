@@ -1,4 +1,4 @@
-package HttpMessage;
+package httpmessage;
 
 import java.util.HashMap;
 import java.util.Map;

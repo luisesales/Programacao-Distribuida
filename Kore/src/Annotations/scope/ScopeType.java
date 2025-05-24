@@ -1,4 +1,4 @@
-package Annotations.scope;
+package annotations.scope;
 
 public enum ScopeType {
     STATIC_INSTANCE,

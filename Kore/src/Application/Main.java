@@ -1,6 +1,6 @@
-package Application;
+package application;
 
-import Annotations.MiddlewareApplication;
+import annotations.MiddlewareApplication;
 
 @MiddlewareApplication
 public class Main {

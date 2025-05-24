@@ -1,4 +1,4 @@
-package message;
+package httpmessage;
 
 import java.util.Map;
 

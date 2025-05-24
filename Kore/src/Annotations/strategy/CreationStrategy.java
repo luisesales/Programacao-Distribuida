@@ -1,4 +1,4 @@
-package Annotations.strategy;
+package annotations.strategy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

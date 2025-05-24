@@ -1,4 +1,4 @@
-﻿package Handler.udp;
+﻿package handler.udp;
 
 class UDPRequestHandler {
 }

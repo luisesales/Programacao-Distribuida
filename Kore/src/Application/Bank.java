@@ -1,10 +1,12 @@
-package Application;
+package application;
 
+import annotations.Component;
+import annotations.methods.*;
+import annotations.scope.*;
+import annotations.strategy.*;
 import java.util.HashMap;
 
-import Annotations.methods.*;
-
-@RequestMapping("/bank")
+@RequestMap("/bank")
 @Scope(ScopeType.STATIC_INSTANCE)
 @CreationStrategy(CreationStrategyType.LAZY_ACQUISITION)
 @Component

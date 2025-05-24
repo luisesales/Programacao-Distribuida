@@ -1,11 +1,10 @@
-﻿package Handler.tcp;
+﻿package handler.tcp;
 
 import exceptions.ServerRequestHandlerException;
-import Invoker.Invoker;
+import marshaller.HttpMarshaller;
+import invoker.Invoker;
 import exceptions.BadConstructorException;
-import Marshaller.HttpMarshaller;
-import HttpMessage.HttpRequest;
-import HttpMessage.HttpResponse;
+import exceptions.BadConstructorException;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

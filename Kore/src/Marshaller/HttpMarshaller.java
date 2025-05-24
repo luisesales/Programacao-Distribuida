@@ -1,4 +1,4 @@
-package Marshaller;
+package marshaller;
 
 import message.HTTPMessage;
 import message.HttpRequest;

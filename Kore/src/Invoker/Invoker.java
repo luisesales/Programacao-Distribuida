@@ -1,10 +1,13 @@
-﻿package Invoker;
+﻿package invoker;
 
-import Annotations.web.Delete;
-import Annotations.web.Get;
-import Annotations.web.Post;
-import Annotations.web.Put;
-import HttpMessage.*;
+import HttpMessage.HttpRequest;
+import HttpMessage.HttpResonse;
+import annotations.methods.Delete;
+import annotations.methods.Get;
+import annotations.methods.Post;
+import annotations.methods.Put;
+
+
 import org.json.JSONObject;
 import java.lang.reflect.Method;
 import java.net.http.HttpRequest;

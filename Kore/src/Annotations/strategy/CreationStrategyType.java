@@ -1,4 +1,4 @@
-package Annotations.strategy;
+package annotations.strategy;
 
 public enum CreationStrategyType {
     LAZY_ACQUISITION,

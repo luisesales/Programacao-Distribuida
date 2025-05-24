@@ -1,4 +1,4 @@
-package Annotations.parameters;
+package annotations.parameters;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
