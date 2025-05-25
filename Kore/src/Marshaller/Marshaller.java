@@ -1,8 +1,8 @@
 package marshaller;
 
 
-import httpmessage.HttpRequest;
-import httpmessage.HttpResponse;
+import httpmessage.HttpRequestModel;
+import httpmessage.HttpResponseModel;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -10,7 +10,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public interface Marshaller {
-    HttpRequest deserialize(String httpString) throws IOException;
+    HttpRequestModel deserialize(String httpString) throws IOException;
 
-    String serialize(HttpResponse response) throws IOException;
+    String serialize(HttpResponseModel response) throws IOException;
 }

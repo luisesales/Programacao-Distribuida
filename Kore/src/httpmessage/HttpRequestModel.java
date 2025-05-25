@@ -3,14 +3,14 @@ package httpmessage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequest {
+public class HttpRequestModel {
     private String method;
     private String url;
     private Map<String,String> headers;
     private String body;
     
     
-    public HttpRequest(String method, String url, Map<String, String> headers,String body) {
+    public HttpRequestModel(String method, String url, Map<String, String> headers,String body) {
         this.method = method;
         this.url = url;
         this.body = body;
@@ -18,7 +18,7 @@ public class HttpRequest {
         
     }
 
-    public HttpRequest() {
+    public HttpRequestModel() {
         this.headers = new HashMap<>();
     }
     

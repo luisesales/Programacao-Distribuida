@@ -32,13 +32,13 @@ class TCPRequestHandler implements Runnable {
 
     @Override
     public void handle() {
-        HttpRequest request = readRequest();
+        HttpRequestModel request = readRequest();
         if (request == null) {
             sendResponse(null);
             return;
         }
 
-        HttpResponse response;
+        HttpResponseModel response;
         try {
             response = invoker.invoke(request);
         } catch (InvocationTargetException | IllegalAccessException |
@@ -49,10 +49,10 @@ class TCPRequestHandler implements Runnable {
         sendResponse(response);
     }
 
-    private void sendResponse(HttpResponse response) {
+    private void sendResponse(HttpResponseModel response) {
         try {
             if(response == null) {
-                response = new HttpResponse();
+                response = new HttpResponseModel();
                 response.setStatusCode(500);
                 response.setStatusMessage("Internal Server Error");
             }
@@ -73,7 +73,7 @@ class TCPRequestHandler implements Runnable {
         }
     }
 
-    private HttpRequest readRequest() {
+    private HttpRequestModel readRequest() {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
             StringBuilder requestBuilder = new StringBuilder();
