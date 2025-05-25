@@ -2,19 +2,19 @@ package httpmessage;
 
 import java.util.Map;
 
-public class HttpResponse{
+public class HttpResponseModel{
     int statusCode;
     String statusMessage;
     Map<String,String> headers;
     String body;
-    public HttpResponse(int statusCode, String statusMessage, Map<String,String> headers, String body){
+    public HttpResponseModel(int statusCode, String statusMessage, Map<String,String> headers, String body){
         this.statusCode = statusCode;
         this.statusMessage = statusMessage;
         this.headers = headers;
         this.body = body;
     }
 
-    public HttpResponse() {}
+    public HttpResponseModel() {}
 
     public int getStatusCode() {
         return statusCode;

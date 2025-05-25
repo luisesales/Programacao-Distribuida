@@ -1,6 +1,7 @@
 package broker;
 
 import broker.configuration.Configuration;
+import handler.interfaces.IServerRequestHandler;
 import handler.tcp.TCPServerRequestHandler;
 import handler.udp.UDPServerRequestHandler;
 import invoker.Invoker;

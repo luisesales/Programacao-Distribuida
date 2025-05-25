@@ -1,8 +1,7 @@
 package marshaller;
 
-import message.HTTPMessage;
-import message.HttpRequest;
-import message.HttpResponse;
+import httpmessage.HttpRequestModel;
+import httpmessage.HttpResponseModel;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -14,8 +13,8 @@ import java.util.Map;
 public class HttpMarshaller implements Marshaller {
 
     @Override
-    public HttpRequest deserialize(String httpString) throws IOException {
-        HttpRequest httpRequest = new HttpRequest();
+    public HttpRequestModel deserialize(String httpString) throws IOException {
+        HttpRequestModel httpRequest = new HttpRequestModel();
         httpRequest.setHeaders(new HashMap<>());
 
         String[] lines = httpString.split("\r\n");
@@ -48,7 +47,7 @@ public class HttpMarshaller implements Marshaller {
     }
 
     @Override
-    public String serialize(HttpResponse response) throws IOException {
+    public String serialize(HttpResponseModel response) throws IOException {
         StringBuilder responseBuilder = new StringBuilder();
 
         responseBuilder.append("HTTP/1.1 ")

@@ -1,8 +1,8 @@
 package marshaller;
 
-import message.HTTPMessage;
-import message.HttpRequest;
-import message.HttpResponse;
+
+import httpmessage.HttpRequest;
+import httpmessage.HttpResponse;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

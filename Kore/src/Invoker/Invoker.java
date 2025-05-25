@@ -1,80 +1,127 @@
 ﻿package invoker;
 
-import HttpMessage.HttpRequest;
-import HttpMessage.HttpResonse;
-import annotations.methods.Delete;
-import annotations.methods.Get;
-import annotations.methods.Post;
-import annotations.methods.Put;
+import annotations.parameters.*;
+import annotations.methods.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import exceptions.InvokerException;
+import exceptions.LookupException;
+import exceptions.MarshallerException;
 
+import exceptions.BadConstructorException;
+import marshaller.Marshaller;
+import httpmessage.HttpRequest;
+import httpmessage.HttpResponse;
 
-import org.json.JSONObject;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.http.HttpRequest;
+import java.lang.reflect.Parameter;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class Invoker {
     private Marshaller marshaller;
-    
-    private final LookupService lookupService;
-    
-    
-    public Invoker() {        
-        lookupService = new LookupService();
+    private RouteResolver routeResolver;
+    private ParamConverter paramConverter;
+
+    public Invoker(LookupService lookupService, ExtensionService extensionService, LifecycleManager lifecycleManager) {
+        this.lifecycleManager = lifecycleManager;
+        this.extensionService = extensionService;
+        this.lookupService = lookupService;
+        this.routeResolver = new RouteResolver();
+        this.paramConverter = new ParamConverter();
     }
-    
-    public HttpResponse invoke(HttpRequest request){
-        String route = request.resource();
-        String httpMethod = request.httpMethod();
-        
-        Class<?> clazz = lookupService.getRoute(route);
 
-        Method targetMethod = findAnnotatedMethod(clazz, httpMethod, route);
-
-        Object servant = lifecycleManager.getInstance(clazz);
+    public HttpResponse invoke(HttpRequest request) throws BadConstructorException, InvocationTargetException, IllegalAccessException {
+        var response = new HttpResponse();
+        String fullRoute = request.getUrl();
+        String httpMethod = request.getMethod();
+        Object servant = null;
         try {
-            assert targetMethod != null;
-            var result = (JSONObject) targetMethod.invoke(servant, request.body());
+            extensionService.invokeBefore(request, response);
 
-            return new HttpResponse(request.httpMethod(), request.resource(), result);
+            if (response.getStatusCode() == 401 || response.getStatusCode() == 403)
+                return response;
 
+            Class<?> clazz = lookupService.getRoute(fullRoute);
+            Method targetMethod = routeResolver.findAnnotatedMethod(clazz, httpMethod, fullRoute);
+            servant  = lifecycleManager.getRemoteObject(clazz);
+
+            Object[] params = targetMethod.getParameterCount() != 0
+                    ? resolveParams(targetMethod, clazz, request)
+                    : null;
+
+            Object result = (params == null)
+                    ? targetMethod.invoke(servant)
+                    : targetMethod.invoke(servant, params);
+
+            if (result != null)
+                response.mountResponse(200, "OK", result.toString());
+            else
+                response.mountResponse(500, "Internal Server Error", "Internal Server Error");
+
+            extensionService.invokeAfter(request, response);
+
+        } catch (LookupException  | NullPointerException e) {
+            response.mountResponse(404, "Not Found", "Endpoint não encontrado: " + fullRoute);
+        } catch (MarshallerException e) {
+            response.mountResponse(400, "Bad Request", e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            response.mountResponse(500, "Internal Server Error",  "Internal Server Error: " + e.getMessage());
+        } finally {
+            if (servant != null)
+                lifecycleManager.releaseRemoteObject(servant);
         }
-        return null;
+        return response;
     }
 
-    private Method findAnnotatedMethod(Class<?> clazz, String httpMethod, String methodRoute) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (matchesAnnotation(method, httpMethod, methodRoute)) {
-                return method;
+    private Object[] resolveParams(Method targetMethod, Class<?> clazz,HttpRequest request) {
+        List<Object> params = new ArrayList<>();
+
+        String routeTemplate = getRouteTemplate(clazz,targetMethod);
+        Map<String,String> pathVariables = ParamResolver.extractPathVariables(routeTemplate,request.getUrl());
+        Map<String,String> queryParams = ParamResolver.extractQueryParams(request.getUrl());
+
+        for (Parameter parameter : targetMethod.getParameters()) {
+            if (parameter.isAnnotationPresent(PathVariable.class)) {
+                String pathVariableName = parameter.getAnnotation(PathVariable.class).value();
+                String pathVariableValue = pathVariables.get(pathVariableName);
+                params.add(paramConverter.convertToType(pathVariableValue, parameter.getType()));
+
+            } else if (parameter.isAnnotationPresent(RequestParam.class)) {
+                String requestParamName = parameter.getAnnotation(RequestParam.class).value();
+                String requestParamValue = queryParams.get(requestParamName);
+                params.add(paramConverter.convertToType(requestParamValue, parameter.getType()));
+
+            } else if (parameter.isAnnotationPresent(RequestBody.class)) {
+                String requestBody = request.getBody();
+                params.add(paramConverter.convertToType(requestBody, parameter.getType()));
             }
         }
-        return null;
+        return params.toArray();
     }
 
-    private boolean matchesAnnotation(Method method, String httpMethod, String methodRoute) {
-        switch (httpMethod) {
-            case "GET":
-                if (method.isAnnotationPresent(Get.class)) {
-                    return method.getAnnotation(Get.class).value().equals(methodRoute);
-                }
-                break;
-            case "POST":
-                if (method.isAnnotationPresent(Post.class)) {
-                    return method.getAnnotation(Post.class).value().equals(methodRoute);
-                }
-                break;
-            case "PUT":
-                if (method.isAnnotationPresent(Put.class)) {
-                    return method.getAnnotation(Put.class).value().equals(methodRoute);
-                }
-                break;
-            case "DELETE":
-                if (method.isAnnotationPresent(Delete.class)) {
-                    return method.getAnnotation(Delete.class).value().equals(methodRoute);
-                }
-                break;
+    private String getRouteTemplate(Class<?> clazz, Method targetMethod) {
+        String classTemplate = clazz.getAnnotation(RequestMapping.class).value();
+
+        String methodTemplate = getMethodTemplate(targetMethod);
+
+        return classTemplate + methodTemplate;
+    }
+
+    public String getMethodTemplate(Method targetMethod) {
+        var annotations = targetMethod.getAnnotations();
+        if (annotations.length != 1) {
+            throw new InvokerException("O método deve ter exatamente uma anotação HTTP!");
         }
-        return false;
+
+        var annotation = annotations[0];
+        return switch (annotation) {
+            case Get get -> get.value();
+            case Post post -> post.value();
+            case Put put -> put.value();
+            case Delete delete -> delete.value();
+            default -> throw new InvokerException("Anotação HTTP desconhecida: " + annotation);
+        };
     }
 }
