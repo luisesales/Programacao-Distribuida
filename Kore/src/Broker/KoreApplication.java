@@ -1,9 +1,9 @@
 package broker;
 
-import broker.configuration.Configuration;
-import handler.interfaces.IServerRequestHandler;
-import handler.tcp.TCPServerRequestHandler;
-import handler.udp.UDPServerRequestHandler;
+import broker.Configuration;
+import handler.interfaces.ServerRequestHandlerInterface;
+import handler.tcp.*;
+import handler.udp.*;
 import invoker.Invoker;
 import annotations.Component;
 
@@ -25,7 +25,7 @@ public class KoreApplication {
     private final String token;
     private final String basePackage;
 
-    public IServerRequestHandler requestHandler;
+    public ServerRequestHandlerInterface requestHandler;
 
     private final Invoker invoker;
 

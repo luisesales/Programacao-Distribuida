@@ -1,5 +1,5 @@
 ﻿package handler.interfaces;
 
-public interface IServerRequestHandler {
+public interface ServerRequestHandlerInterface {
     void start(int port);
 }

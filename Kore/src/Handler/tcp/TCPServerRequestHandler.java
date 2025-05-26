@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import handler.interfaces.IServerRequestHandler;
+import handler.interfaces.ServerRequestHandlerInterface;
 import invoker.Invoker;
 
-public class TCPServerRequestHandler implements ServerRequestHandler {
+public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
     private ServerSocket serverSocket;
 
     private final ExecutorService executorService;
@@ -27,6 +27,8 @@ public class TCPServerRequestHandler implements ServerRequestHandler {
                 if (serverSocket.isClosed()) {
                     break;
                 }
+            }finally{
+                serverSocket.close();
             }
         }
     }
@@ -37,5 +39,6 @@ public class TCPServerRequestHandler implements ServerRequestHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
     }
 }
