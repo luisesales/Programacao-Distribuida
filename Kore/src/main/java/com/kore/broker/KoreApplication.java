@@ -8,8 +8,6 @@ import com.kore.invoker.Invoker;
 import com.kore.annotations.Component;
 import com.kore.lifecycle.LookupService;
 
-
-
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -17,7 +15,7 @@ import java.util.Set;
 
 public class KoreApplication {
     public static void run(Class<?> appClass, String[] args) {
-        if (appClass.isAnnotationPresent(KoreApplication.MiddlewareApplication.class)) {
+        if (appClass.isAnnotationPresent(annotations.KoreApplication.class)) {
             String basePackage = appClass.getPackageName();
             KoreApplication application = new KoreApplication(basePackage);//args
             application.start();
@@ -33,7 +31,7 @@ public class KoreApplication {
     private final LookupService lookupService;
 
 
-    public MiddlewareApplication(String basePackage) {
+    public KoreApplication(String basePackage) {
         this.basePackage = basePackage;
         this.lookupService = new LookupService();        
         this.invoker = new Invoker(lookupService);

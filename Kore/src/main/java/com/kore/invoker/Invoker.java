@@ -1,29 +1,38 @@
 package com.kore.invoker;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import com.kore.annotations.parameters.*;
-import com.kore.annotations.methods.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kore.annotations.methods.Delete;
+import com.kore.annotations.methods.Get;
+import com.kore.annotations.methods.Post;
+import com.kore.annotations.methods.Put;
+import com.kore.annotations.methods.RequestMap;
+import com.kore.annotations.parameters.PathVariable;
+import com.kore.annotations.parameters.RequestBody;
+import com.kore.annotations.parameters.RequestParam;
+import com.kore.exceptions.BadConstructorException;
 import com.kore.exceptions.InvokerException;
 import com.kore.exceptions.LookupException;
 import com.kore.exceptions.MarshallerException;
-import com.kore.exceptions.BadConstructorException;
+import com.kore.httpmessage.HttpRequestModel;
+import com.kore.httpmessage.HttpResponseModel;
+import com.kore.lifecycle.LookupService;
 import com.kore.marshaller.Marshaller;
-import com.kore.httpmessage.*;
 
 
 public class Invoker {
     private Marshaller marshaller;
     private RouteResolver routeResolver;
     private ParamConverter paramConverter;
+    private LookupService lookupService;
 
-    public Invoker() {
+    public Invoker(LookupService lookupService) {
+        this.lookupService = lookupService;
         this.routeResolver = new RouteResolver();
         this.paramConverter = new ParamConverter();
     }
