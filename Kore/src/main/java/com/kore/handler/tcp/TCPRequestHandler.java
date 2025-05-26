@@ -70,7 +70,7 @@ class TCPRequestHandler implements Runnable {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            throw new ServerRequestHandlerException("Erro ao enviar a resposta HTTP: " + e.getMessage());
+            throw new ServerRequestHandlerException("Error sending HTTP response: " + e.getMessage());
         }
     }
 
