@@ -14,7 +14,6 @@ import org.reflections.scanners.Scanners;
 import java.util.Set;
 
 public class KoreApplication {
-    private final String token;
     private final String basePackage;
 
     public ServerRequestHandlerInterface requestHandler;
@@ -24,7 +23,6 @@ public class KoreApplication {
     private final LookupService lookupService;
 
     public KoreApplication(String basePackage) {
-        this.token = "";
         this.basePackage = basePackage;
         this.lookupService = new LookupService();        
         this.invoker = new Invoker(lookupService);
@@ -46,13 +44,11 @@ public class KoreApplication {
     public void launchRequestHandler(int port, String networkProtocol) {
         switch (networkProtocol) {
             case "tcp":
-                System.out.println("Starting TCP Server on port " + port);
-                System.out.println("Token: " + token);
+                System.out.println("Starting TCP Server on port " + port);                
                 this.requestHandler = new TCPServerRequestHandler(port, invoker);
                 break;
             case "udp":
-                System.out.println("Starting UDP Server on port " + port);
-                System.out.println("Token: " + token);
+                System.out.println("Starting UDP Server on port " + port);                
                 this.requestHandler = new UDPServerRequestHandler(port, invoker);
                 break;
         }
