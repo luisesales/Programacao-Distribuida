@@ -6,6 +6,7 @@ import com.kore.handler.tcp.*;
 import com.kore.handler.udp.*;
 import com.kore.invoker.Invoker;
 import com.kore.annotations.Component;
+import com.kore.lifecycle.LookupService;
 
 
 
@@ -16,9 +17,9 @@ import java.util.Set;
 
 public class KoreApplication {
     public static void run(Class<?> appClass, String[] args) {
-        if (appClass.isAnnotationPresent(annotation.MiddlewareApplication.class)) {
+        if (appClass.isAnnotationPresent(KoreApplication.MiddlewareApplication.class)) {
             String basePackage = appClass.getPackageName();
-            MiddlewareApplication application = new MiddlewareApplication(basePackage);//args
+            KoreApplication application = new KoreApplication(basePackage);//args
             application.start();
         }
     }
@@ -50,12 +51,12 @@ public class KoreApplication {
             case "tcp":
                 System.out.println("Starting TCP Server on port " + port);
                 System.out.println("Token: " + token);
-                this.requestHandler = new TCP_ServerRequestHandler(port, invoker);
+                this.requestHandler = new TCPServerRequestHandler(port, invoker);
                 break;
             case "udp":
                 System.out.println("Starting UDP Server on port " + port);
                 System.out.println("Token: " + token);
-                this.requestHandler = new UDP_ServerRequestHandler(port, invoker);
+                this.requestHandler = new UDPServerRequestHandler(port, invoker);
                 break;
         }
     }

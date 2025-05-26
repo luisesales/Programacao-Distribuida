@@ -21,15 +21,11 @@ public class Handler implements Runnable {
 
 	public void run() {
 
-		System.out.println("\nKoreHandler Started for " +
-
-				this.socket);
+		System.out.println("\nKore Handler Started for " + this.socket);
 
 		handleRequest(this.socket);
 
-		System.out.println("KoreHandler Terminated for "
-
-				+ this.socket + "\n");
+		System.out.println("Kore Handler Terminated for "+ this.socket + "\n");
 
 	}
 

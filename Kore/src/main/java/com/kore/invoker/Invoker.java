@@ -1,16 +1,4 @@
-﻿package com.kore.invoker;
-
-import com.kore.annotations.parameters.*;
-import com.kore.annotations.methods.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kore.exceptions.InvokerException;
-import com.kore.exceptions.LookupException;
-import com.kore.exceptions.MarshallerException;
-
-import com.kore.exceptions.BadConstructorException;
-import com.kore.marshaller.Marshaller;
-import com.kore.httpmessage.HttpRequest;
-import com.kore.httpmessage.HttpResponse;
+package com.kore.invoker;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -19,33 +7,38 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.kore.annotations.parameters.*;
+import com.kore.annotations.methods.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kore.exceptions.InvokerException;
+import com.kore.exceptions.LookupException;
+import com.kore.exceptions.MarshallerException;
+import com.kore.exceptions.BadConstructorException;
+import com.kore.marshaller.Marshaller;
+import com.kore.httpmessage.*;
+
+
 public class Invoker {
     private Marshaller marshaller;
     private RouteResolver routeResolver;
     private ParamConverter paramConverter;
 
-    public Invoker(LookupService lookupService, ExtensionService extensionService, LifecycleManager lifecycleManager) {
-        this.lifecycleManager = lifecycleManager;
-        this.extensionService = extensionService;
-        this.lookupService = lookupService;
+    public Invoker() {
         this.routeResolver = new RouteResolver();
         this.paramConverter = new ParamConverter();
     }
 
-    public HttpResponse invoke(HttpRequest request) throws BadConstructorException, InvocationTargetException, IllegalAccessException {
-        var response = new HttpResponse();
+    public HttpResponseModel invoke(HttpRequestModel request) throws BadConstructorException, InvocationTargetException, IllegalAccessException {
+        var response = new HttpResponseModel();
         String fullRoute = request.getUrl();
         String httpMethod = request.getMethod();
         Object servant = null;
         try {
-            extensionService.invokeBefore(request, response);
-
             if (response.getStatusCode() == 401 || response.getStatusCode() == 403)
                 return response;
 
             Class<?> clazz = lookupService.getRoute(fullRoute);
             Method targetMethod = routeResolver.findAnnotatedMethod(clazz, httpMethod, fullRoute);
-            servant  = lifecycleManager.getRemoteObject(clazz);
 
             Object[] params = targetMethod.getParameterCount() != 0
                     ? resolveParams(targetMethod, clazz, request)
@@ -60,7 +53,7 @@ public class Invoker {
             else
                 response.mountResponse(500, "Internal Server Error", "Internal Server Error");
 
-            extensionService.invokeAfter(request, response);
+            
 
         } catch (LookupException  | NullPointerException e) {
             response.mountResponse(404, "Not Found", "Endpoint não encontrado: " + fullRoute);
@@ -68,14 +61,11 @@ public class Invoker {
             response.mountResponse(400, "Bad Request", e.getMessage());
         } catch (Exception e) {
             response.mountResponse(500, "Internal Server Error",  "Internal Server Error: " + e.getMessage());
-        } finally {
-            if (servant != null)
-                lifecycleManager.releaseRemoteObject(servant);
         }
         return response;
     }
 
-    private Object[] resolveParams(Method targetMethod, Class<?> clazz,HttpRequest request) {
+    private Object[] resolveParams(Method targetMethod, Class<?> clazz,HttpRequestModel request) {
         List<Object> params = new ArrayList<>();
 
         String routeTemplate = getRouteTemplate(clazz,targetMethod);
@@ -102,7 +92,7 @@ public class Invoker {
     }
 
     private String getRouteTemplate(Class<?> clazz, Method targetMethod) {
-        String classTemplate = clazz.getAnnotation(RequestMapping.class).value();
+        String classTemplate = clazz.getAnnotation(RequestMap.class).value();
 
         String methodTemplate = getMethodTemplate(targetMethod);
 

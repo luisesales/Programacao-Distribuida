@@ -1,10 +1,9 @@
 package com.kore.lifecycle;
 
+import java.util.HashMap;
+
 import com.kore.annotations.methods.RequestMap;
 import com.kore.exceptions.LookupException;
-
-import java.util.HashMap;
-import java.util.Set;
 
 public class LookupService {
     public HashMap<String, Class<?>> routes;
@@ -15,8 +14,8 @@ public class LookupService {
 
     public void registerRoute(Class<?> clazz){
 
-        if(clazz.isAnnotationPresent(RequestMapping.class)){
-            RequestMapping annotation = clazz.getAnnotation(RequestMapping.class);
+        if(clazz.isAnnotationPresent(RequestMap.class)){
+            RequestMap annotation = clazz.getAnnotation(RequestMap.class);
             String route = annotation.value();
             routes.put(route, clazz);
         }

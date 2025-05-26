@@ -1,4 +1,4 @@
-﻿package com.kore.handler.tcp;
+package com.kore.handler.tcp;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -22,13 +22,11 @@ public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                executorService.execute(new TCP_RequestHandler(clientSocket, invoker));
+                executorService.execute(new TCPRequestHandler(clientSocket, invoker));
             } catch (IOException e) {
                 if (serverSocket.isClosed()) {
                     break;
                 }
-            }finally{
-                serverSocket.close();
             }
         }
     }
