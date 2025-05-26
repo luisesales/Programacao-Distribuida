@@ -9,19 +9,22 @@ import com.kore.httpmessage.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
 class UDPRequestHandler implements Runnable {
     private final DatagramPacket clientPacket;
+    private final DatagramSocket serverSocket;
 
     private final Invoker invoker;
 
     private final HttpMarshaller marshaller;
 
-    UDPRequestHandler(DatagramPacket clientPacket, Invoker invoker) {
+    UDPRequestHandler(DatagramPacket clientPacket, DatagramSocket serverSocket, Invoker invoker) {
         this.clientPacket = clientPacket;
+        this.serverSocket = serverSocket;
         this.invoker = invoker;
         this.marshaller = new HttpMarshaller();
     }
@@ -51,60 +54,45 @@ class UDPRequestHandler implements Runnable {
     }
 
     private void sendResponse(HttpResponseModel response) {
-        try {
-            if(response == null) {
-                response = new HttpResponseModel();
-                response.setStatusCode(500);
-                response.setStatusMessage("Internal Server Error");
-            }
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Content-Type", "application/json");
-            headers.put("Content-Length", String.valueOf(
-                    response.getBody() != null ? response.getBody().getBytes().length : 0));
-            response.setHeaders(headers);
-            
-            
-            String httpResponse = marshaller.serialize(response);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
-            writer.write(httpResponse);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            throw new ServerRequestHandlerException("Error sending HTTP response: " + e.getMessage());
+    try {
+        if (response == null) {
+            response = new HttpResponseModel();
+            response.setStatusCode(500);
+            response.setStatusMessage("Internal Server Error");
         }
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Content-Length", String.valueOf(
+                response.getBody() != null ? response.getBody().getBytes().length : 0));
+        response.setHeaders(headers);
+
+        String httpResponse = marshaller.serialize(response);
+        byte[] responseBytes = httpResponse.getBytes();
+
+        DatagramPacket responsePacket = new DatagramPacket(
+            responseBytes,
+            responseBytes.length,
+            clientPacket.getAddress(),
+            clientPacket.getPort()
+        );        
+        
+        serverSocket.send(responsePacket);
+        serverSocket.close();
+
+    } catch (IOException e) {
+        throw new ServerRequestHandlerException("Error sending HTTP response over UDP: " + e.getMessage());
     }
+}
+
 
     private HttpRequestModel readRequest() {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-            StringBuilder requestBuilder = new StringBuilder();
-            String inputLine = reader.readLine();
-
-            if (inputLine == null || inputLine.isEmpty()) {
-                return null;
-            }
-
-            requestBuilder.append(inputLine).append("\r\n");
-            
-            int contentLength = 0;
-            String line;
-            while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                requestBuilder.append(line).append("\r\n");
-                if (line.toLowerCase().startsWith("content-length:")) {
-                    contentLength = Integer.parseInt(line.split(":")[1].trim());
-                }
-            }
-            
-            if (contentLength > 0) {
-                char[] body = new char[contentLength];
-                reader.read(body, 0, contentLength);
-                requestBuilder.append(body);
-            }
-
-            String httpRequest = requestBuilder.toString();
-            return marshaller.deserialize(httpRequest);
-        } catch (IOException e) {
-            throw new ServerRequestHandlerException("Error reading HTTP request" + e.getMessage());
-        }
+    try {
+        String httpRequest = new String(clientPacket.getData(), 0, clientPacket.getLength());
+        return marshaller.deserialize(httpRequest);
+    } catch (Exception e) {
+        throw new ServerRequestHandlerException("Error reading HTTP request from UDP packet: " + e.getMessage());
     }
+}
+
 }

@@ -33,7 +33,7 @@ public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
             try {
                 byte[] receiveMessage = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
-                executorService.execute(new UDPRequestHandler(receivePacket, invoker));
+                executorService.execute(new UDPRequestHandler(receivePacket,serverSocket, invoker));
             } catch (IOException e) {
                 if (serverSocket.isClosed()) {
                     break;
