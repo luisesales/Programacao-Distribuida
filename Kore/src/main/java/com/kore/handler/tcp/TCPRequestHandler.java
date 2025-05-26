@@ -4,7 +4,6 @@ import com.kore.exceptions.ServerRequestHandlerException;
 import com.kore.marshaller.HttpMarshaller;
 import com.kore.invoker.Invoker;
 import com.kore.exceptions.BadConstructorException;
-import com.kore.exceptions.BadConstructorException;
 import com.kore.httpmessage.*;
 
 import java.io.*;
