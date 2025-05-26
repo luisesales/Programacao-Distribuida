@@ -1,8 +1,8 @@
 package com.kore.application;
 
-import com.kore.annotations.MiddlewareApplication;
+import com.kore.annotations.KoreApplication;
 
-@MiddlewareApplication
+@KoreApplication
 public class Main {
 
     public static void main(String[] args) {    
