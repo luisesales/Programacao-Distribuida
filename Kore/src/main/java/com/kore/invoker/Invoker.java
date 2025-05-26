@@ -7,20 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.kore.annotations.methods.Delete;
-import com.kore.annotations.methods.Get;
-import com.kore.annotations.methods.Post;
-import com.kore.annotations.methods.Put;
-import com.kore.annotations.methods.RequestMap;
-import com.kore.annotations.parameters.PathVariable;
-import com.kore.annotations.parameters.RequestBody;
-import com.kore.annotations.parameters.RequestParam;
+import com.kore.annotations.methods.*;
+import com.kore.annotations.parameters.*;
 import com.kore.exceptions.BadConstructorException;
 import com.kore.exceptions.InvokerException;
 import com.kore.exceptions.LookupException;
 import com.kore.exceptions.MarshallerException;
-import com.kore.httpmessage.HttpRequestModel;
-import com.kore.httpmessage.HttpResponseModel;
+import com.kore.httpmessage.*;
 import com.kore.lifecycle.LookupService;
 import com.kore.marshaller.Marshaller;
 
@@ -65,7 +58,7 @@ public class Invoker {
             
 
         } catch (LookupException  | NullPointerException e) {
-            response.mountResponse(404, "Not Found", "Endpoint não encontrado: " + fullRoute);
+            response.mountResponse(404, "Not Found", "Endpoint not found: " + fullRoute);
         } catch (MarshallerException e) {
             response.mountResponse(400, "Bad Request", e.getMessage());
         } catch (Exception e) {
@@ -111,7 +104,7 @@ public class Invoker {
     public String getMethodTemplate(Method targetMethod) {
         var annotations = targetMethod.getAnnotations();
         if (annotations.length != 1) {
-            throw new InvokerException("O método deve ter exatamente uma anotação HTTP!");
+            throw new InvokerException("The method must have only one HTTP annotation!");
         }
 
         var annotation = annotations[0];
@@ -120,7 +113,7 @@ public class Invoker {
             case Post post -> post.value();
             case Put put -> put.value();
             case Delete delete -> delete.value();
-            default -> throw new InvokerException("Anotação HTTP desconhecida: " + annotation);
+            default -> throw new InvokerException("Unknown HTTP annotation: " + annotation);
         };
     }
 }

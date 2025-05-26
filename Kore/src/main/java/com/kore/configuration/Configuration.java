@@ -16,8 +16,7 @@ public class Configuration {
             }
             properties.load(input);
         } catch (IOException ex) {
-            throw new ConfigurationException("Read attempt on configuration file " +
-                                                     "failed");
+            throw new ConfigurationException("Read attempt on configuration file failed");
         }
     }
 

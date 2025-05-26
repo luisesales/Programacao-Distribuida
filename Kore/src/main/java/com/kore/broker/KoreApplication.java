@@ -14,13 +14,6 @@ import org.reflections.scanners.Scanners;
 import java.util.Set;
 
 public class KoreApplication {
-    public static void run(Class<?> appClass, String[] args) {
-        if (appClass.isAnnotationPresent(annotations.KoreApplication.class)) {
-            String basePackage = appClass.getPackageName();
-            KoreApplication application = new KoreApplication(basePackage);//args
-            application.start();
-        }
-    }
     private final String token;
     private final String basePackage;
 
@@ -30,18 +23,24 @@ public class KoreApplication {
 
     private final LookupService lookupService;
 
-
     public KoreApplication(String basePackage) {
+        this.token = "";
         this.basePackage = basePackage;
         this.lookupService = new LookupService();        
         this.invoker = new Invoker(lookupService);
     }
 
-    private void start() {
-        scanAndRegisterComponents();
-        int port = Integer.parseInt(Configuration.getProperty("server.port"));
-        String networkProtocol = Configuration.getProperty("server.network.protocol");
-        launchRequestHandler(port,networkProtocol);
+    public void addComponent(Class<?> component) {
+        lookupService.registerRoute(component);
+    }
+
+    private void scanAndRegisterComponents() {
+        Reflections reflections = new Reflections(basePackage, Scanners.TypesAnnotated);
+        Set<Class<?>> components = reflections.getTypesAnnotatedWith(Component.class);
+
+        for (Class<?> clazz : components) {
+            addComponent(clazz);
+        }
     }
 
     public void launchRequestHandler(int port, String networkProtocol) {
@@ -59,15 +58,24 @@ public class KoreApplication {
         }
     }
 
-    private void scanAndRegisterComponents() {
-        Reflections reflections = new Reflections(basePackage, Scanners.TypesAnnotated);
-        Set<Class<?>> components = reflections.getTypesAnnotatedWith(Component.class);
+    private void start() {
+        scanAndRegisterComponents();
+        int port = Integer.parseInt(Configuration.getProperty("server.port"));
+        String networkProtocol = Configuration.getProperty("server.network.protocol");
+        launchRequestHandler(port,networkProtocol);
+    }
 
-        for (Class<?> clazz : components) {
-            addComponent(clazz);
+    public static void run(Class<?> appClass, String[] args) {
+        if (appClass.isAnnotationPresent(annotations.KoreApplication.class)) {
+            String basePackage = appClass.getPackageName();
+            KoreApplication application = new KoreApplication(basePackage);//args
+            application.start();
         }
     }
-    public void addComponent(Class<?> component) {
-        lookupService.registerRoute(component);
-    }
+   
+   
+
+    
+
+    
 }

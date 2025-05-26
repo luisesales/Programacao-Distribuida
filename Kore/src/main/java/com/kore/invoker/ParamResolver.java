@@ -10,8 +10,7 @@ import java.util.regex.Pattern;
 public class ParamResolver {
     public static Map<String, String> extractQueryParams(String url) {
         Map<String, String> queryParams = new HashMap<>();
-
-        // Verifica se a URL contem query params
+    
         if (url.contains("?")) {
             String queryString = url.split("\\?")[1];
             String[] pairs = queryString.split("&");
