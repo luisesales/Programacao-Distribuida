@@ -1,9 +1,9 @@
 package com.kore.utils;
 
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
-import java.io.IOException;
 
 public class JsonUtil {
 

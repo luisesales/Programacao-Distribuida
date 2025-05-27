@@ -1,7 +1,7 @@
 package com.kore.broker;
 
 import com.kore.configuration.Configuration;
-import com.kore.handler.interfaces.ServerRequestHandlerInterface;
+import com.kore.handler.interfaces.*;
 import com.kore.handler.tcp.*;
 import com.kore.handler.udp.*;
 import com.kore.invoker.Invoker;
@@ -41,7 +41,7 @@ public class KoreApplication {
         }
     }
 
-    public void launchRequestHandler(int port, String networkProtocol) {
+    public void selectRequestHandler(int port, String networkProtocol) {
         switch (networkProtocol) {
             case "tcp":
                 System.out.println("Starting TCP Server on port " + port);                
@@ -58,7 +58,7 @@ public class KoreApplication {
         scanAndRegisterComponents();
         int port = Integer.parseInt(Configuration.getProperty("server.port"));
         String networkProtocol = Configuration.getProperty("server.network.protocol");
-        launchRequestHandler(port,networkProtocol);
+        selectRequestHandler(port,networkProtocol);
     }
 
     public static void run(Class<?> appClass, String[] args) {

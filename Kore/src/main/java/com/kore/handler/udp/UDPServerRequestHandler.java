@@ -1,16 +1,14 @@
-﻿package com.kore.handler.udp;
+package com.kore.handler.udp;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 import com.kore.invoker.Invoker;
 
-public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
+public class UDPServerRequestHandler {
     private DatagramSocket serverSocket;
 
     private final ExecutorService executorService;
@@ -33,6 +31,7 @@ public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
             try {
                 byte[] receiveMessage = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
+                serverSocket.receive(receivePacket);
                 executorService.execute(new UDPRequestHandler(receivePacket,serverSocket, invoker));
             } catch (IOException e) {
                 if (serverSocket.isClosed()) {

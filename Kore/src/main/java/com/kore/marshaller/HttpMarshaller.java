@@ -1,14 +1,10 @@
 package com.kore.marshaller;
 
-import com.kore.httpmessage.HttpRequestModel;
-import com.kore.httpmessage.HttpResponseModel;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
+
+import com.kore.httpmessage.HttpRequestModel;
+import com.kore.httpmessage.HttpResponseModel;
 
 public class HttpMarshaller implements Marshaller {
 

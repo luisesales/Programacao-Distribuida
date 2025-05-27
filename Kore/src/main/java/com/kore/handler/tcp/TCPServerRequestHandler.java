@@ -6,10 +6,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 import com.kore.invoker.Invoker;
 
-public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
+public class TCPServerRequestHandler{
     private ServerSocket serverSocket;
 
     private final ExecutorService executorService;

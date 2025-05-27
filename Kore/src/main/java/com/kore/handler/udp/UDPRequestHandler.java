@@ -1,18 +1,18 @@
-﻿package com.kore.handler.udp;
+package com.kore.handler.udp;
 
-import com.kore.exceptions.ServerRequestHandlerException;
-import com.kore.marshaller.HttpMarshaller;
-import com.kore.invoker.Invoker;
-import com.kore.exceptions.BadConstructorException;
-import com.kore.httpmessage.*;
-
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.kore.exceptions.BadConstructorException;
+import com.kore.exceptions.ServerRequestHandlerException;
+import com.kore.httpmessage.HttpRequestModel;
+import com.kore.httpmessage.HttpResponseModel;
+import com.kore.invoker.Invoker;
+import com.kore.marshaller.HttpMarshaller;
 
 class UDPRequestHandler implements Runnable {
     private final DatagramPacket clientPacket;
@@ -33,8 +33,7 @@ class UDPRequestHandler implements Runnable {
     public void run() {
         handle();
     }
-
-    @Override
+    
     public void handle() {
         HttpRequestModel request = readRequest();
         if (request == null) {
