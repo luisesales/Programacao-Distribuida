@@ -53,5 +53,11 @@ public class RouteResolver {
 
         return pattern.matcher(route).matches();
     }
-
+    public Object createServant(Class<?> clazz) {
+        try {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create servant for class: " + clazz.getName(), e);
+        }
+    }
 }

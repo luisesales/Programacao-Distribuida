@@ -15,14 +15,17 @@ public class Bank {
     private HashMap<Integer, Float> accounts = new HashMap<>();
     private String name;
 
+    @Get("/name")
     public String getName() {
         return name;
     }
 
+    @Put("/name")
     public void setName(String name) {
         this.name = name;
     }
 
+    @Post("/create")    
     public void addConta(int accountnumber) {
         accounts.put(accountnumber, 0.0f);
         

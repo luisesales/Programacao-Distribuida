@@ -14,7 +14,7 @@ import com.kore.exceptions.InvokerException;
 import com.kore.exceptions.LookupException;
 import com.kore.exceptions.MarshallerException;
 import com.kore.httpmessage.*;
-import com.kore.lifecycle.LookupService;
+import com.kore.lookup.LookupService;
 import com.kore.marshaller.Marshaller;
 
 
@@ -40,6 +40,13 @@ public class Invoker {
                 return response;
 
             Class<?> clazz = lookupService.getRoute(fullRoute);
+
+        
+            if (clazz == null) {
+                throw new LookupException("No class found for route: " + fullRoute);
+            }
+            servant = routeResolver.createServant(clazz);
+
             Method targetMethod = routeResolver.findAnnotatedMethod(clazz, httpMethod, fullRoute);
 
             Object[] params = targetMethod.getParameterCount() != 0
@@ -55,17 +62,19 @@ public class Invoker {
             else
                 response.mountResponse(500, "Internal Server Error", "Internal Server Error");
 
-            
-
-        } catch (LookupException  | NullPointerException e) {
+        } catch (LookupException | NullPointerException e) {
             response.mountResponse(404, "Not Found", "Endpoint not found: " + fullRoute);
         } catch (MarshallerException e) {
             response.mountResponse(400, "Bad Request", e.getMessage());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            response.mountResponse(500, "Internal Server Error", "Error creating service instance: " + e.getMessage());
         } catch (Exception e) {
-            response.mountResponse(500, "Internal Server Error",  "Internal Server Error: " + e.getMessage());
+            response.mountResponse(500, "Internal Server Error", "Internal Server Error: " + e.getMessage());
         }
         return response;
     }
+
+    
 
     private Object[] resolveParams(Method targetMethod, Class<?> clazz,HttpRequestModel request) {
         List<Object> params = new ArrayList<>();

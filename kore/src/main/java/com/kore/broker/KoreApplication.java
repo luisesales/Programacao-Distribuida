@@ -5,8 +5,8 @@ import com.kore.handler.interfaces.*;
 import com.kore.handler.tcp.*;
 import com.kore.handler.udp.*;
 import com.kore.invoker.Invoker;
+import com.kore.lookup.LookupService;
 import com.kore.annotations.Component;
-import com.kore.lifecycle.LookupService;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
