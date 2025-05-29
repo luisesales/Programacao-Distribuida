@@ -32,7 +32,9 @@ class TCPRequestHandler implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("\nHandler Started for " + this.clientSocket);                
         handle();
+        System.out.println("Handler Terminated for " + this.clientSocket + "\n");
     }
     
     public void handle() {
