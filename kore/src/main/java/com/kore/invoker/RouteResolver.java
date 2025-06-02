@@ -57,9 +57,9 @@ public class RouteResolver {
         return pattern.matcher(route).matches();
     }
     public Object createServant(Class<?> clazz) {        
+        System.out.println("Vou Criar o Servant: " + clazz.getName());
         return servantCache.computeIfAbsent(clazz, key -> {
-            try {
-                // Cria uma nova instância se não existir
+            try {                
                 return key.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to create servant for class: " + key.getName(), e);

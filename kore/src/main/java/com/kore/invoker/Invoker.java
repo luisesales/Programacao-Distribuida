@@ -45,8 +45,11 @@ public class Invoker {
             if (clazz == null) {
                 throw new LookupException("No class found for route: " + fullRoute);
             }
+            
             servant = routeResolver.createServant(clazz);
-
+            System.out.println("Servant created: " + clazz.getName());
+            System.out.println("Invoking method for route: " + fullRoute + " with HTTP method: " + httpMethod);
+            
             Method targetMethod = routeResolver.findAnnotatedMethod(clazz, httpMethod, fullRoute);
 
             Object[] params = targetMethod.getParameterCount() != 0
