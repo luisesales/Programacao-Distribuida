@@ -1,6 +1,7 @@
 package com.kore.invoker;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import com.kore.annotations.methods.Delete;
@@ -10,6 +11,8 @@ import com.kore.annotations.methods.Put;
 import com.kore.annotations.methods.RequestMap;
 
 public class RouteResolver {
+    private final ConcurrentHashMap<Class<?>, Object> servantCache = new ConcurrentHashMap<>();
+
     public Method findAnnotatedMethod(Class<?> clazz, String httpMethod, String fullRoute) {
         String baseRoute = clazz.getAnnotation(RequestMap.class).value();
 
@@ -53,11 +56,14 @@ public class RouteResolver {
 
         return pattern.matcher(route).matches();
     }
-    public Object createServant(Class<?> clazz) {
-        try {
-            return clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create servant for class: " + clazz.getName(), e);
-        }
+    public Object createServant(Class<?> clazz) {        
+        return servantCache.computeIfAbsent(clazz, key -> {
+            try {
+                // Cria uma nova instância se não existir
+                return key.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create servant for class: " + key.getName(), e);
+            }
+        });
     }
 }
