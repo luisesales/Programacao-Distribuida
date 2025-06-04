@@ -30,18 +30,24 @@ public class ParamResolver {
         Map<String, String> pathVariables = new HashMap<>();
 
         String path = url.split("\\?")[0];
+        System.out.println("Extracting path variables from route template: " + routeTemplate + " and path: " + path);
 
         String regex = templateToRegex(routeTemplate);
+        System.out.println("Generated regex: " + regex);
 
         Pattern pattern = Pattern.compile(regex);
+        System.out.println("Compiling pattern: " + pattern.pattern());
 
         Matcher matcher = pattern.matcher(path);
+        System.out.println("Matching path: " + path + " against pattern: " + pattern.pattern());
 
         if (matcher.matches()) {
             for (String groupName : getTemplateVariableNames(routeTemplate)) {
+                System.out.println("Found path variable: " + groupName + " with value: " + matcher.group(groupName));
                 pathVariables.put(groupName, matcher.group(groupName));
             }
         }
+        System.out.println("Extracted path variables: " + pathVariables);
         return pathVariables;
     }
 

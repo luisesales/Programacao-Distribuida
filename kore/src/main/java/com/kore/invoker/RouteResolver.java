@@ -32,11 +32,11 @@ public class RouteResolver {
     }
 
     private boolean matchesAnnotation(Method method, String httpMethod, String route) {
-        return switch (httpMethod) {
+        return switch (httpMethod) {            
             case "GET" -> method.isAnnotationPresent(Get.class) &&
                     matchesRoute(route, method.getAnnotation(Get.class).value());
             case "POST" -> method.isAnnotationPresent(Post.class) &&
-                    matchesRoute(route, method.getAnnotation(Post.class).value());
+                    matchesRoute(route, method.getAnnotation(Post.class).value());            
             case "PUT" -> method.isAnnotationPresent(Put.class) &&
                     matchesRoute(route, method.getAnnotation(Put.class).value());
             case "DELETE" -> method.isAnnotationPresent(Delete.class) &&
@@ -59,7 +59,8 @@ public class RouteResolver {
     public Object createServant(Class<?> clazz) {        
         System.out.println("Creating a Servant: " + clazz.getName());
         return servantCache.computeIfAbsent(clazz, key -> {
-            try {                
+            try {     
+                System.out.println("Instantiating servant for class: " + key.getName());                 
                 return key.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to create servant for class: " + key.getName(), e);

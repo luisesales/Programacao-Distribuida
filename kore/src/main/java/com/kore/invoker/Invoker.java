@@ -34,11 +34,13 @@ public class Invoker {
         var response = new HttpResponseModel();
         String fullRoute = request.getUrl();
         String httpMethod = request.getMethod();
+        if(httpMethod == "OPTIONS") {
+            response.mountResponse(200, "OK", "OK");
+            return response;
+        }
         Object servant = null;
         try {
-            if (response.getStatusCode() == 401 || response.getStatusCode() == 403)
-                return response;
-
+        
             Class<?> clazz = lookupService.getRoute(fullRoute);
 
         
@@ -47,19 +49,21 @@ public class Invoker {
             }
             
             servant = routeResolver.createServant(clazz);
-            System.out.println("Servant created: " + clazz.getName());
+            System.out.println("Servant created: " + servant.getClass().getName());
             System.out.println("Invoking method for route: " + fullRoute + " with HTTP method: " + httpMethod);
             
             Method targetMethod = routeResolver.findAnnotatedMethod(clazz, httpMethod, fullRoute);
-
+            System.out.println("Target method found: " + (targetMethod != null ? targetMethod.getName() : "null"));
             Object[] params = targetMethod.getParameterCount() != 0
                     ? resolveParams(targetMethod, clazz, request)
                     : null;
-
+            System.out.println("Resolved parameters: " + (params != null ? params.length : 0));
+            System.out.println("Resolved parameters: " + (params != null ? params[0] : null));
             Object result = (params == null)
                     ? targetMethod.invoke(servant)
                     : targetMethod.invoke(servant, params);
-
+            System.out.println("Method invoked successfully: " + targetMethod.getName());
+            System.out.println("Result: " + (result != null ? result.toString() : "null"));
             if (result != null)
                 response.mountResponse(200, "OK", result.toString());
             else
@@ -83,10 +87,11 @@ public class Invoker {
         List<Object> params = new ArrayList<>();
 
         String routeTemplate = getRouteTemplate(clazz,targetMethod);
-        Map<String,String> pathVariables = ParamResolver.extractPathVariables(routeTemplate,request.getUrl());
+        Map<String,String> pathVariables = ParamResolver.extractPathVariables(routeTemplate,request.getUrl());        
         Map<String,String> queryParams = ParamResolver.extractQueryParams(request.getUrl());
 
         for (Parameter parameter : targetMethod.getParameters()) {
+            System.out.println("Processing parameter: " + parameter + " of name:" + parameter.getClass().getName()+ " of type: " + parameter.getType().getName());
             if (parameter.isAnnotationPresent(PathVariable.class)) {
                 String pathVariableName = parameter.getAnnotation(PathVariable.class).value();
                 String pathVariableValue = pathVariables.get(pathVariableName);
@@ -109,7 +114,8 @@ public class Invoker {
         String classTemplate = clazz.getAnnotation(RequestMap.class).value();
 
         String methodTemplate = getMethodTemplate(targetMethod);
-
+        System.out.println("Class Template: " + classTemplate);
+        System.out.println("Method Template: " + methodTemplate);
         return classTemplate + methodTemplate;
     }
 
@@ -120,6 +126,7 @@ public class Invoker {
         }
 
         var annotation = annotations[0];
+        
         return switch (annotation) {
             case Get get -> get.value();
             case Post post -> post.value();

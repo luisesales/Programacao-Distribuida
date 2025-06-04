@@ -3,6 +3,7 @@ package com.kore.application;
 import java.util.HashMap;
 
 import com.kore.annotations.Component;
+import com.kore.annotations.methods.Delete;
 import com.kore.annotations.methods.Get;
 import com.kore.annotations.methods.Post;
 import com.kore.annotations.methods.Put;
@@ -30,31 +31,59 @@ public class Bank {
     }
 
     @Put("/name")
-    public String setName(@PathVariable("name") String name) {
+    public String setName(@RequestParam("name") String name) {
         System.out.println("Alterando nome do banco para: " + name);
         this.name = name;
         return "Nome alterado com sucesso: "+name;
     }
 
     @Post("/create/{accountnumber}")    
-    public String addConta(@RequestParam("accountnumber") int accountnumber) {
+    public String addConta(@PathVariable("accountnumber") int accountnumber) {
         System.out.println("Criando conta: " + accountnumber);
-        accounts.put(accountnumber, 0.0f);
-        return "Conta adicionada: "+accounts.getOrDefault(accountnumber, 0.0f);
+        if (accounts.containsKey(accountnumber)) {
+            return "Conta já existe: " + accountnumber;
+        } else {
+            accounts.put(accountnumber, 0.0f);
+            return "Conta criada com sucesso: " + accountnumber;
+        }
         
-    }    
+    }
 
     @Post("/deposit/{accountnumber}")
-    public String depositar( @RequestParam("accountnumber") int accountnumber, @PathVariable("value") float value) {
+    public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
         System.out.println("Depositando " + value + " na conta: " + accountnumber);
-        float current = accounts.getOrDefault(accountnumber, 0.0f);
-        accounts.put(accountnumber, current + value);
-        return "Valor depositado com sucesso"+value+" na conta: "+accounts.getOrDefault(accountnumber, 0.0f); 
+        if (accounts.containsKey(accountnumber)) {            
+            float current = accounts.getOrDefault(accountnumber, 0.0f);
+            accounts.put(accountnumber, current + value);
+            return "Valor depositado com sucesso "+value+" na conta: "+accounts.getOrDefault(accountnumber, 0.0f); 
+        } else {
+            return "Conta não encontrada: " + accountnumber;
+        }
+        
+        
+        
+    }
+
+    @Delete("/delete/{accountnumber}")
+    public String deleteConta(@PathVariable("accountnumber") int accountnumber) {
+        System.out.println("Excluindo conta: " + accountnumber);
+        if (accounts.containsKey(accountnumber)) {
+            accounts.remove(accountnumber);
+            return "Conta excluída com sucesso: " + accountnumber;
+        } else {
+            return "Conta não encontrada: " + accountnumber;
+        }
     }
 
     @Get("/balance/{accountnumber}")
-    public String saldo(@RequestParam("accountnumber") int accountnumber) {
+    public String saldo(@PathVariable("accountnumber") int accountnumber) {
         System.out.println("Consultando saldo da conta: " + accountnumber);
-        return "Saldo atual: "+accounts.getOrDefault(accountnumber, 0.0f);
+        if (accounts.containsKey(accountnumber)) {            
+            return "Saldo atual: "+accounts.getOrDefault(accountnumber, 0.0f);
+        } else {
+            return "Conta não encontrada: " + accountnumber;
+        }
+
+       
     }
 }

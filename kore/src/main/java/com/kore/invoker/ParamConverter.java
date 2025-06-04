@@ -7,6 +7,7 @@ import com.kore.exceptions.MarshallerException;
 
 public class ParamConverter {
     public Object convertToType(String value, Class<?> targetType) {
+        System.out.println("Converting value: " + value + " to type: " + targetType.getName());
         if (value == null) {
             return null;
         }
