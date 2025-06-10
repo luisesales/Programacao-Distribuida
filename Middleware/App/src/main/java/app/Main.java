@@ -1,6 +1,11 @@
+package main.java.app;
+
+import com.kore.annotations.KoreApplication;
+
+@KoreApplication
 public class Main {
 
     public static void main(String[] args) {            
-        com.kore.KoreApplication.run(Main.class, args);
+        com.kore.broker.KoreApplication.run(Main.class, args);        
     }
 }
