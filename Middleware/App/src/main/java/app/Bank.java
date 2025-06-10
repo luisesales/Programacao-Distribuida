@@ -1,4 +1,4 @@
-package com.kore.application;
+package main.java.app;
 
 import java.util.HashMap;
 
@@ -19,7 +19,7 @@ import com.kore.annotations.strategy.CreationStrategyType;
 @Scope(ScopeType.STATIC_INSTANCE)
 @CreationStrategy(CreationStrategyType.LAZY_ACQUISITION)
 @Component
-public class Bank {
+public class Bank{
 
     private HashMap<Integer, Float> accounts = new HashMap<>();
     private String name;
