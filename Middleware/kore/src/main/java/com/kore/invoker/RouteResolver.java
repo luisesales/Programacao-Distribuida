@@ -14,17 +14,20 @@ public class RouteResolver {
     private final ConcurrentHashMap<Class<?>, Object> servantCache = new ConcurrentHashMap<>();
 
     public Method findAnnotatedMethod(Class<?> clazz, String httpMethod, String fullRoute) {
+        System.out.println("Find annotated Method");
+        System.out.println("Received Full Route: "+fullRoute);
         String baseRoute = clazz.getAnnotation(RequestMap.class).value();
+        System.out.println("Base Route: "+baseRoute);
 
         if (baseRoute.endsWith("/") && fullRoute.startsWith("/")) {
             fullRoute = fullRoute.substring(1);
         }
-
+        System.out.println("Substringed Full Route: "+fullRoute);
         String methodRoute = fullRoute.substring(baseRoute.length());
         methodRoute = methodRoute.split("\\?")[0];
-
+        System.out.println("Method Route: "+methodRoute);
         for (Method method : clazz.getDeclaredMethods()) {
-            if (matchesAnnotation(method, httpMethod, methodRoute)) {
+            if (matchesAnnotation(method, httpMethod, methodRoute)) {                
                 return method;
             }
         }
@@ -32,6 +35,8 @@ public class RouteResolver {
     }
 
     private boolean matchesAnnotation(Method method, String httpMethod, String route) {
+        System.out.println("Mehotd Received: "+httpMethod);
+        System.out.println("Route: "+route);
         return switch (httpMethod) {            
             case "GET" -> method.isAnnotationPresent(Get.class) &&
                     matchesRoute(route, method.getAnnotation(Get.class).value());
