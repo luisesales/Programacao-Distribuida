@@ -1,4 +1,4 @@
-package microservicesai.bank.microservicesaibank;
+package microservicesai.bank.microservicesaibank.controllers;
 
 import java.util.HashMap;
 
@@ -12,14 +12,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @SpringBootApplication
 @RestController
 @RequestMapping("/")
-public class Bank{
-
-    private HashMap<Integer, Float> accounts = new HashMap<>();
+public class BankController{
+    private final HashMap<Integer, Float> accounts = new HashMap<>();
     private String name = "Default";
+
+    @GetMapping("/")
+    public String getLocal() {
+        System.out.println("Consultando pagina inicial");
+        return String.format("Bem vindo ao Banco %s", name);
+    }
 
     @GetMapping("/name")
     public String getName() {
@@ -56,9 +60,6 @@ public class Bank{
         } else {
             return String.format("Conta não encontrada: %s",accountnumber);
         }
-        
-        
-        
     }
 
     @DeleteMapping("/delete/{accountnumber}")

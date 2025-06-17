@@ -8,10 +8,10 @@
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>microservicesai.bank</groupId>
-	<artifactId>microservicesaibank</artifactId>
+	<groupId>microservices.bank</groupId>
+	<artifactId>microservicesbank</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>microservicesaibank</name>
+	<name>microservicesbank</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
