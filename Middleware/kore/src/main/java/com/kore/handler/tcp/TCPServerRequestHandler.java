@@ -27,6 +27,12 @@ public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
                 if (serverSocket.isClosed()) {
                     break;
                 }
+            } finally{
+                try{
+                    serverSocket.close();
+                }catch(IOException e){
+                    e.printStackTrace();;
+                }
             }
         }
     }

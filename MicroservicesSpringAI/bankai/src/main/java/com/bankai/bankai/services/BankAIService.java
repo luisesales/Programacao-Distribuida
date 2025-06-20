@@ -9,10 +9,17 @@ import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
 
 import com.bankai.bankai.interfaces.ChatService;
+import com.google.api.client.util.Value;
 
 public class BankAIService implements ChatService {
     private final ChatClient chatClient;
     private RelevancyEvaluator evaluator;
+
+    @Value("classpath:prompt/systemTemplate.st")
+    Resource systemTemplate;
+
+    @Value("classpath:prompt/userTemplate.st")
+    Resource userTemplate;
 
     public BankAIService(ChatClient.Builder chatClientBuilderOpenAI){
         ChatOptions chatOptions = ChatOptions.builder().model("gpt-3.5").build();        
@@ -21,8 +28,15 @@ public class BankAIService implements ChatService {
 
     }
     @Override
-    public String getAnswer(String prompt) {
-        String answer = chatClient.prompt().user(prompt).call().content();
+    public String getAnswer(String prompt) {        
+        String answer = chatClient.prompt()
+            .system(systemSpec -> systemSpec 
+                .text(systemTemplate)
+                .param("Banco", "BankAI"))
+            .user(userSpec -> userSpec
+                .text(userTemplate)
+                .param("Pergunta", prompt))
+                call().content();
         EvaluationRequest request = new EvaluationRequest(prompt, null, answer);
         EvaluationResponse response = evaluator.evaluate(request);
         if(!response.isPass())

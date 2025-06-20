@@ -38,6 +38,8 @@ public class UDPServerRequestHandler implements ServerRequestHandlerInterface {
                 if (serverSocket.isClosed()) {
                     break;
                 }
+            }finally{
+                serverSocket.close();
             }
         }
     }
