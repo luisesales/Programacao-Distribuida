@@ -1,0 +1,49 @@
+spring:
+  application.name: embedding-service
+
+  ai:
+    chat:
+      observations:
+        log-prompt: true
+    retry:
+      max-attempts: 1      
+      on-client-errors: false   
+    openai.embedding.enabled: false   
+    ollama.embedding.enabled: false
+    
+
+
+---
+spring:
+  config.activate.on-profile: openai
+  ai:
+    openai:
+      api-key: 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
+      chat:
+        options:
+          model: gpt-3.5-turbo
+      embedding:
+        api-key: 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
+        enabled: true
+        options:
+          model: text-embedding-ada-002
+
+---
+spring:
+  config.activate.on-profile: ollama
+  ai:
+    ollama:
+      base-url: http://localhost:11434  
+      embedding:
+        enabled: true
+        options:
+          model: mxbai-embed-large
+
+---
+spring:
+  config.activate.on-profile: internal
+
+  ai:
+    embedding:
+      transformer:
+        enabled: true

@@ -1,0 +1,62 @@
+server:
+  port: 8080
+spring:
+  application.name: embedding-service
+  ai:
+    chat:
+      observations:
+        log-prompt: true
+    retry:
+      max-attempts: 1      
+      on-client-errors: false   
+    openai.embedding.enabled: false   
+    ollama.embedding.enabled: false
+    
+
+
+---
+spring:
+  config.activate.on-profile: openai
+  ai:
+  
+    openai:
+      api-key: 
+      chat:
+        options:
+          model: gpt-4.1
+      embedding:
+        api-key: 
+        enabled: true
+        options:
+          model: text-embedding-ada-002
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        sse:
+          connections:
+            server:
+              stdio: false
+              url: http://localhost:8081
+              sse-endpoint: /sse
+              sse-message-endpoint: /mcp/messages  
+
+---
+spring:
+  config.activate.on-profile: ollama
+  ai:
+    ollama:
+      base-url: http://localhost:11434  
+      embedding:
+        enabled: true
+        options:
+          model: mxbai-embed-large
+
+---
+spring:
+  config.activate.on-profile: internal
+
+  ai:
+    embedding:
+      transformer:
+        enabled: true

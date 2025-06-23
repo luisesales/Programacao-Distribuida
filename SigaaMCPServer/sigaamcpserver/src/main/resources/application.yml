@@ -1,0 +1,25 @@
+server:
+  port: 8081
+spring:
+    application:
+        name: sigaa-mcp-server
+ai:
+    mcp:
+      server:
+        stdio: false
+        enabled: true
+        type: SYNC
+        name: sigaa-mcp-server 
+        version: 1.0.0
+        sse-endpoint: /sse
+        sse-message-endpoint: /mcp/messages
+        
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+logging:
+  level:
+    io.modelcontextprotocol: TRACE
+    org.springframework.ai.mcp: TRACE
