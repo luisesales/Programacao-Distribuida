@@ -1,6 +1,19 @@
 package bankmcpserver.bankmcpserver.mcpserver;
 
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import br.imd.ufrn.sigaamcpserver.service.DiscentesService;
+
+@Component
 public class BankAIServer {
+
+    private final BankService bankService;
+
+    public SigaaTools(BankService bankService) {
+        this.bankService = bankService;
+    }
+
     @Tool(
         name = "verificarNomedoBanco",
         description = "Retorna o nome atual do Banco salvo na variável name"
