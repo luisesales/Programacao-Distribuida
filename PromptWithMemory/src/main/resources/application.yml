@@ -18,12 +18,12 @@ spring:
   config.activate.on-profile: openai
   ai:
     openai:
-      api-key: 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
+      api-key: 
       chat:
         options:
           model: gpt-3.5-turbo
       embedding:
-        api-key: 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
+        api-key: 
         enabled: true
         options:
           model: text-embedding-ada-002
