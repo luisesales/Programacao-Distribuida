@@ -7,19 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.kore.annotations.methods.*;
-import com.kore.annotations.parameters.*;
+import com.kore.annotations.methods.Delete;
+import com.kore.annotations.methods.Get;
+import com.kore.annotations.methods.Post;
+import com.kore.annotations.methods.Put;
+import com.kore.annotations.methods.RequestMap;
+import com.kore.annotations.parameters.PathVariable;
+import com.kore.annotations.parameters.RequestBody;
+import com.kore.annotations.parameters.RequestParam;
 import com.kore.exceptions.BadConstructorException;
 import com.kore.exceptions.InvokerException;
 import com.kore.exceptions.LookupException;
 import com.kore.exceptions.MarshallerException;
-import com.kore.httpmessage.*;
+import com.kore.httpmessage.HttpRequestModel;
+import com.kore.httpmessage.HttpResponseModel;
 import com.kore.lookup.LookupService;
-import com.kore.marshaller.Marshaller;
 
 
-public class Invoker {
-    private Marshaller marshaller;
+public class Invoker {    
     private RouteResolver routeResolver;
     private ParamConverter paramConverter;
     private LookupService lookupService;
@@ -34,7 +39,7 @@ public class Invoker {
         var response = new HttpResponseModel();
         String fullRoute = request.getUrl();
         String httpMethod = request.getMethod();
-        if(httpMethod == "OPTIONS") {
+        if(httpMethod.equals("OPTIONS")) {
             response.mountResponse(200, "OK", "OK");
             return response;
         }

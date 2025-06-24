@@ -15,8 +15,5 @@ public class BankmcpserverApplication {
 	public ToolCallbackProvider regBankAITools(BankAITools mcpServer){
 		return MethodCallbackProvider.builder.toolObjects(mcpServer).build();
 	}
-	@Bean
-	public VectorStore vectorStore(EmbeddingModel embeddingModel) {
-		return SimpleVectorStore.builder(embeddingModel).build();
-	}		
+		
 }

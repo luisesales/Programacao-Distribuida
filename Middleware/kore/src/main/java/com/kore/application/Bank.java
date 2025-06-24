@@ -1,4 +1,4 @@
-package app;
+package com.kore.application;
 
 import java.util.HashMap;
 

@@ -5,8 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 
+import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 import com.kore.invoker.Invoker;
 
 public class UDPServerRequestHandler implements ServerRequestHandlerInterface {
@@ -26,12 +26,13 @@ public class UDPServerRequestHandler implements ServerRequestHandlerInterface {
     public UDPServerRequestHandler(int port, Invoker invoker){
         start(port);
 
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 byte[] receiveMessage = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveMessage, receiveMessage.length);
+                System.out.println("Waiting for UDP Datagram Packets");
                 serverSocket.receive(receivePacket);
                 executorService.execute(new UDPRequestHandler(receivePacket,serverSocket, invoker));
             } catch (IOException e) {

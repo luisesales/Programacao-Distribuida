@@ -5,8 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 
+import com.kore.handler.interfaces.ServerRequestHandlerInterface;
 import com.kore.invoker.Invoker;
 
 public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
@@ -17,23 +17,18 @@ public class TCPServerRequestHandler implements ServerRequestHandlerInterface {
     public TCPServerRequestHandler(int port, Invoker invoker){
         start(port);
 
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
 
-        while (!Thread.currentThread().isInterrupted()) {
+        while (true) {
             try {
+                System.out.println("Waiting for TCP Sockets");
                 Socket clientSocket = serverSocket.accept();
                 executorService.execute(new TCPRequestHandler(clientSocket, invoker));
             } catch (IOException e) {
                 if (serverSocket.isClosed()) {
                     break;
                 }
-            } finally{
-                try{
-                    serverSocket.close();
-                }catch(IOException e){
-                    e.printStackTrace();;
-                }
-            }
+            }             
         }
     }
     

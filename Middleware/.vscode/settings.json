@@ -1,3 +1,15 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.debug.settings.onBuildFailureProceed": true,
+    "jdk.project.jdkhome": "",
+    "java.configuration.detectJdksAtStart": true,
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-24",
+            "path": "C:\\Users\\Luís Eduardo Sales\\OneDrive\\Documentos\\Programas a excluir no futuro\\Java Open JDK\\jdk-24",
+            "default": true
+        },
+
+    ],
+    "java.format.settings.url": ".vscode/java-formatter.xml"
 }
