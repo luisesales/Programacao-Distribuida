@@ -13,7 +13,7 @@ spring:
   config.activate.on-profile: openai
   ai:
     openai:
-      api-key: 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
+      api-key: 
       embedding:
         enabled: true
         options:
