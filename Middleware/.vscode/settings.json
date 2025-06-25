@@ -1,7 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.debug.settings.onBuildFailureProceed": true,
-    "jdk.project.jdkhome": "",
+    "jdk.project.jdkhome": "21",
     "java.configuration.detectJdksAtStart": true,
     "java.configuration.runtimes": [
         {
