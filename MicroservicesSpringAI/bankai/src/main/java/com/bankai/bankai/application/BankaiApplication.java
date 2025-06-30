@@ -1,5 +1,6 @@
 package com.bankai.bankai.application;
 
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +14,7 @@ public class BankaiApplication {
 		SpringApplication.run(BankaiApplication.class, args);
 	}
 	@Bean
-	public VectorStore vectorStore() {
+	public VectorStore vectorStore(EmbeddingModel embeddingModel) {
 		return SimpleVectorStore.builder(embeddingModel).build();
 	}	
 

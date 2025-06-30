@@ -1,0 +1,71 @@
+server:
+  port: 8085
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET,POST,PUT,DELETE
+            statuses: BAD_GATEWAY
+            backoff:
+              firstBackoff: 20ms
+              maxBackoff: 100ms
+              factor: 2
+              basedOnPreviousValue: false
+#      routes:
+#        - id: product-service
+#          uri: lb://spring-product-stock
+#          predicates:
+#            - Path=/stock/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: stock_CB
+#                slidingWindowSize: 20
+#                permittedNumberOfCallsInHalfOpenState: 5
+#                failureRateThreshold: 50
+#                waitDurationInOpenState: 15000
+#        - id: order-service
+#          uri: lb://spring-product-order
+#          predicates:
+#            - Path=/orders/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: orders_CB
+#                slidingWindowSize: 20
+#                permittedNumberOfCallsInHalfOpenState: 5
+#                failureRateThreshold: 50
+#                waitDurationInOpenState: 15000
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: "http://localhost:8081/eureka/,http://localhost:8082/eureka/,http://localhost:8083/eureka/"
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    circuitbreakers:
+      enabled: true

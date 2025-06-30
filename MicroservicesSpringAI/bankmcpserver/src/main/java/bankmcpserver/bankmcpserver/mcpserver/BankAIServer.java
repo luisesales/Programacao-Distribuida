@@ -10,7 +10,7 @@ public class BankAIServer {
 
     private final BankService bankService;
 
-    public SigaaTools(BankService bankService) {
+    public BankAIServer(BankService bankService) {
         this.bankService = bankService;
     }
 
