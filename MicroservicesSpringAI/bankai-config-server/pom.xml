@@ -8,7 +8,7 @@
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>bankaiconfigserver</groupId>
+	<groupId>com.bankai.configserver</groupId>
 	<artifactId>bankai-config-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankai-config-server</name>

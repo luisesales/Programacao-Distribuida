@@ -8,7 +8,7 @@
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>bankaimcpserver</groupId>
+	<groupId>com.bankai.mcpserver</groupId>
 	<artifactId>bankai-mcp-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankai-mcp-server</name>

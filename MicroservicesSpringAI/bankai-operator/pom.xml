@@ -8,7 +8,7 @@
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>bankai-operator</groupId>
+	<groupId>bankai.operator</groupId>
 	<artifactId>bankai-operator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankai-operator</name>
