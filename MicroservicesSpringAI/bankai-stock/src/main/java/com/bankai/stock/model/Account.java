@@ -11,17 +11,28 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long bankId;
     private String name;
     private double balance;
     private boolean isActive;
+
 
     public Long getId() {
         return id;
     }
 
+    public Long getbankId() {
+        return bankId;
+    }
+
+
     public String getName() {
         return name;
     }    
+
+    public void setBankId(Long bankId){
+        this.bankId = bankId;
+    }
 
     public void setName(String name) {
         this.name = name;

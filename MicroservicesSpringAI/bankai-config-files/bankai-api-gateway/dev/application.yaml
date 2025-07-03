@@ -20,8 +20,8 @@ spring:
               factor: 2
               basedOnPreviousValue: false
 #      routes:
-#        - id: product-service
-#          uri: lb://spring-product-stock
+#        - id: account-service
+#          uri: lb://bankai-stock
 #          predicates:
 #            - Path=/stock/**
 #          filters:
