@@ -3,6 +3,7 @@ package com.bankai.stock.controllers;
 import java.util.HashMap;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,27 +22,9 @@ import com.bankai.stock.services.AccountService;
 public class AccountController{
     @Autowired
     private AccountService accountService;
-    private final HashMap<Integer, Float> accounts = new HashMap<>();
-    private String name = "Default";
+    //private final HashMap<Integer, Float> accounts = new HashMap<>();
+    //private String name = "Default";
 
-    @GetMapping("/")
-    public String getLocal() {
-        System.out.println("Consultando pagina inicial");
-        return String.format("Bem vindo ao Banco %s", name);
-    }
-
-    @GetMapping("/name")
-    public String getName() {
-        System.out.println("Consultando nome do banco");
-        return String.format("%s", name);
-    }
-
-    @PutMapping("/name")
-    public String setName(@RequestParam("name") String name) {
-        System.out.println("Alterando nome do banco para: " + name);
-        this.name = name;
-        return String.format("Nome alterado com sucesso: %s",name);
-    }
 
     @PostMapping("/create/{accountnumber}")    
     public String addConta(@PathVariable("accountnumber") int accountnumber) {
@@ -56,7 +39,7 @@ public class AccountController{
     }
 
     @PostMapping("/deposit/{accountnumber}")
-    public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
+    public String deposit( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
         System.out.println("Depositando " + value + " na conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {            
             float current = accounts.getOrDefault(accountnumber, 0.0f);
@@ -68,7 +51,7 @@ public class AccountController{
     }
 
     @DeleteMapping("/delete/{accountnumber}")
-    public String deleteConta(@PathVariable("accountnumber") int accountnumber) {
+    public String deleteAccount(@PathVariable("accountnumber") int accountnumber) {
         System.out.println("Excluindo conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {
             accounts.remove(accountnumber);
@@ -79,7 +62,7 @@ public class AccountController{
     }
 
     @GetMapping("/balance/{accountnumber}")
-    public String saldo(@PathVariable("accountnumber") int accountnumber) {
+    public String balance(@PathVariable("accountnumber") int accountnumber) {
         System.out.println("Consultando saldo da conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {            
             return String.format("Saldo atual: %s",accounts.getOrDefault(accountnumber, 0.0f));

@@ -1,11 +1,17 @@
 package com.bankai.operator.controllers;
 
-import java.util.HashMap;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping; 
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bankai.operator.model.Bank;
+import com.bankai.operator.services.BankService;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,42 +20,46 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @SpringBootApplication
 @RestController
-@RequestMapping("/")
+@RequestMapping("/banks")
 public class BankController{
-    private final HashMap<Integer, Float> accounts = new HashMap<>();
-    private String name = "Default";
+    @Autowired
+    private BankService bankService;
 
     @GetMapping("/")
     public String getLocal() {
         System.out.println("Consultando pagina inicial");
-        return String.format("Bem vindo ao Banco %s", name);
+        return String.format("Bem vindo a páginas de Bancos operados por IA");
     }
 
-    @GetMapping("/name")
-    public String getName() {
-        System.out.println("Consultando nome do banco");
-        return String.format("%s", name);
+    @GetMapping
+    public ResponseEntity<List<Bank>> getAllBanks() {
+        return ResponseEntity.ok(bankService.getAllBanks());
     }
 
-    @PutMapping("/name")
-    public String setName(@RequestParam("name") String name) {
-        System.out.println("Alterando nome do banco para: " + name);
-        this.name = name;
-        return String.format("Nome alterado com sucesso: %s",name);
+    @GetMapping("/{bankId}")
+    public ResponseEntity<List<Bank>> getBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(bankService.getBank(bankId));
     }
 
-    @PostMapping("/create/{accountnumber}")    
-    public String addConta(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Criando conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {
-            return String.format("Conta já existe: %s", accountnumber);
-        } else {
-            accounts.put(accountnumber, 0.0f);
-            return String.format("Conta criada com sucesso: %s",accountnumber);
-        }
-        
+    @GetMapping("/{bankId}/accounts")
+    public ResponseEntity<List<Bank>> getAccountsByBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(bankService.getAccountsByBank(bankId));
     }
 
+    @PutMapping("/{bankId}")
+    public ResponseEntity<List<Bank>> updateBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(bankService.updateBank(bankId));
+    }
+
+    @PostMapping("/{bankId}")
+    public ResponseEntity<List<Bank>> createBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(bankService.createBank(bankId));
+    }
+
+    @DeleteMapping("/{bankId}")
+    public ResponseEntity<List<Bank>> deleteBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(bankService.deleteBank(bankId));
+    }
     @PostMapping("/deposit/{accountnumber}")
     public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
         System.out.println("Depositando " + value + " na conta: " + accountnumber);
