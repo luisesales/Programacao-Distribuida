@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 
+import com.bankai.stock.model.Acocunt;
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.services.BankService;
 
@@ -55,8 +56,8 @@ public class BankController{
         }
     }
 
-    @PostMapping("/{bankId}")
-    public ResponseEntity<Bank> createBank(@PathVariable String name) {
+    @PostMapping
+    public ResponseEntity<Bank> createBank(@RequestParam String name) {
         return ResponseEntity.ok(bankService.createBank(name));
     }
 
@@ -67,38 +68,6 @@ public class BankController{
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-    @PostMapping("/deposit/{accountnumber}")
-    public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
-       /* System.out.println("Depositando " + value + " na conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {            
-            float current = accounts.getOrDefault(accountnumber, 0.0f);
-            accounts.put(accountnumber, current + value);
-            return String.format("Valor depositado com sucesso %s na conta: %s",value,accounts.getOrDefault(accountnumber, 0.0f)); 
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }*/
-    }
-
-    @DeleteMapping("/delete/{accountnumber}")
-    public String deleteConta(@PathVariable("accountnumber") int accountnumber) {
-        /*System.out.println("Excluindo conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {
-            accounts.remove(accountnumber);
-            return String.format("Conta excluída com sucesso: %s",accountnumber);
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }*/
-    }
-
-    @GetMapping("/balance/{accountnumber}")
-    public String saldo(@PathVariable("accountnumber") int accountnumber) {
-        /*System.out.println("Consultando saldo da conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {            
-            return String.format("Saldo atual: %s",accounts.getOrDefault(accountnumber, 0.0f));
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }*/
     }
 }
 

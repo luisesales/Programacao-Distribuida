@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bankai.stock.services.AccountService;
+import com.bankai.stock.model.Account;
 
 @SpringBootApplication
 @RestController
@@ -28,9 +29,14 @@ public class AccountController{
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
+    @GetMapping("/{bankId}")
+    public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId) {
+        return ResponseEntity.ok(accountService.getAccountsByBank(bankId));
+    }
+
 
     @PostMapping    
-    public ResposeEntity<Account> createAccount(@RequestBody Account account) {
+    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
         return ResponseEntity.ok(accountService.createAccount(account));        
     }
 
@@ -44,7 +50,7 @@ public class AccountController{
     }
 
     @PutMapping("/{accountId}")    
-    public ResposeEntity<Account> updateAccount(@PathVariable("accountId") int accountId) {
+    public ResposeEntity<Account> updateAccount(@PathVariable("accountId") Long accountId) {
         return ResponseEntity.ok(accountService.updateAccount(accountId));
         
     }
@@ -55,13 +61,13 @@ public class AccountController{
     }
 
     @PostMapping("/{accountId}/draw")
-    public ResposeEntity<Account> draw(@PathVariable("accountId") int accountId, @RequestParam("value") float value) {
+    public ResposeEntity<Account> draw(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
         return ResponseEntity.ok(accountService.draw(accountId,value));
     }
 
     @GetMapping("/{accountId}/balance")
-    public ResposeEntity<float> balance(@PathVariable("accountId") int accountId) {
-        return ResponseEntity.ok(accountService.balance(accountId));
+    public ResposeEntity<float> balance(@PathVariable("accountId") Long accountId) {
+        return ResponseEntity.ok(accountService.getAccountById(accountId).balance);
     }
     
 }

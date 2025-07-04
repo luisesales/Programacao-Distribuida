@@ -18,28 +18,30 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+    public List<Account> getAccountsByBank(Long bankId){
+        return accountRepository.findByBankId(bankId);
+    }
+
     public Optional<Account> getAccountByName(String name) {
         return accountRepository.findByName(name);
     }
-     public Optional<Account> getAccountById(Long id) {
-        return accountRepository.findById(id);
+     public Optional<Account> getAccountById(Long accountId) {
+        return accountRepository.findById(accountId);
     }
 
     public Account addAccount(Account Account) {
         return accountRepository.save(Account);
     }
 
-    public boolean deleteAccount(Long id) {
-        if (accountRepository.existsById(id)) {
-            accountRepository.deleteById(id);
+    public boolean deleteAccount(Long accountId) {
+        if (accountRepository.existsById(accountId)) {
+            accountRepository.deleteById(accountId);
             return true;
         }
         return false;
     }
 
-
-
-    public boolean isAccountActive(Long id) {
-        return AccountRepository.findById(id).isActive();
+    public boolean isAccountActive(Long accountId) {
+        return accountRepository.findById(accountId).isActive();
     }
 }
