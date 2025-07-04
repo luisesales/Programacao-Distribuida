@@ -52,8 +52,8 @@ public class BankController{
     }
 
     @PostMapping("/{bankId}")
-    public ResponseEntity<List<Bank>> createBank(@PathVariable Long bankId) {
-        return ResponseEntity.ok(bankService.createBank(bankId));
+    public ResponseEntity<Bank> createBank(@PathVariable String name) {
+        return ResponseEntity.ok(bankService.createBank(name));
     }
 
     @DeleteMapping("/{bankId}")

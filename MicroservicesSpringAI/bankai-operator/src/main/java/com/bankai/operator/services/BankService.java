@@ -23,28 +23,19 @@ public class BankService {
     }
 
     public List<Account> getAccountsByBank(Long accountId) {
-        return bankRepository.findByAccountId(accountId);
+        return bankRepository.findBybankId(accountId);
     }
 
-    public Bank createBank(Long accountId, String name) {
+    public Bank createBank(String name) {
         ResponseEntity<String> isAvailable = bankServiceInterface.checkAvailabilityAndUpdate();
 
-        Bank bank = new bank();
-        bank.setName(name);
-        bank.setId(accountId);
+        Bank bank = new Bank();
+        bank.setName(name);        
         return bankRepository.save(bank);
     }
 
     public Bank getBank(Long id){
         ResponseEntity<String> isAvailable = bankServiceInterface
-        if()
-    }
-
-    public Bank createBank(Long accountId, int quantity) {
-        ResponseEntity<String> isAvailable = bankServiceInterface.checkAvailabilityAndUpdate(accountId, quantity);
-
-        Bank bank = new bank();
-        bank.setAccountId(accountId);
-        return bankRepository.save(bank);
+        return bankRepository.findById(id);
     }
 }

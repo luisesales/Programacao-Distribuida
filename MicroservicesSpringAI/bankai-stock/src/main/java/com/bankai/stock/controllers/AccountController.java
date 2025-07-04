@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ import com.bankai.stock.services.AccountService;
 
 @SpringBootApplication
 @RestController
-@RequestMapping("/stock")
+@RequestMapping("/accounts")
 public class AccountController{
     @Autowired
     private AccountService accountService;
@@ -27,14 +28,8 @@ public class AccountController{
 
 
     @PostMapping("/create/{accountnumber}")    
-    public String addConta(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Criando conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {
-            return String.format("Conta já existe: %s", accountnumber);
-        } else {
-            accounts.put(accountnumber, 0.0f);
-            return String.format("Conta criada com sucesso: %s",accountnumber);
-        }
+    public ResposeEntity<List<Account>> addConta(@PathVariable("accountnumber") int accountnumber) {
+        return ResponseEntity.ok(accountService.addAccount(null))
         
     }
 
