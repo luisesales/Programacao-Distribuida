@@ -1,6 +1,5 @@
 package com.bankai.stock.controllers;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,48 +22,46 @@ import com.bankai.stock.services.AccountService;
 public class AccountController{
     @Autowired
     private AccountService accountService;
-    //private final HashMap<Integer, Float> accounts = new HashMap<>();
-    //private String name = "Default";
+
+    @GetMapping
+    public ResponseEntity<List<Account>> getAllAccounts() {
+        return ResponseEntity.ok(accountService.getAllAccounts());
+    }
 
 
-    @PostMapping("/create/{accountnumber}")    
-    public ResposeEntity<List<Account>> addConta(@PathVariable("accountnumber") int accountnumber) {
-        return ResponseEntity.ok(accountService.addAccount(null))
+    @PostMapping    
+    public ResposeEntity<Account> createAccount(@RequestBody Account account) {
+        return ResponseEntity.ok(accountService.createAccount(account));        
+    }
+
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<String> deleteAccount(@PathVariable Long accountId) {
+        if (accountService.deleteAccount(accountId)) {
+            return ResponseEntity.ok("Conta com ID " + accountId + " foi excluido com sucesso!");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{accountId}")    
+    public ResposeEntity<Account> updateAccount(@PathVariable("accountId") int accountId) {
+        return ResponseEntity.ok(accountService.updateAccount(accountId));
         
     }
 
-    @PostMapping("/deposit/{accountnumber}")
-    public String deposit( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
-        System.out.println("Depositando " + value + " na conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {            
-            float current = accounts.getOrDefault(accountnumber, 0.0f);
-            accounts.put(accountnumber, current + value);
-            return String.format("Valor depositado com sucesso %s na conta: %s",value,accounts.getOrDefault(accountnumber, 0.0f)); 
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }
+    @PostMapping("/{accountId}/deposit")
+    public ResposeEntity<Account> deposit(@PathVariable("accountId") int accountId, @RequestParam("value") float value) {
+        return ResponseEntity.ok(accountService.deposit(accountId,value));
     }
 
-    @DeleteMapping("/delete/{accountnumber}")
-    public String deleteAccount(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Excluindo conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {
-            accounts.remove(accountnumber);
-            return String.format("Conta excluída com sucesso: %s",accountnumber);
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }
+    @PostMapping("/{accountId}/draw")
+    public ResposeEntity<Account> draw(@PathVariable("accountId") int accountId, @RequestParam("value") float value) {
+        return ResponseEntity.ok(accountService.draw(accountId,value));
     }
 
-    @GetMapping("/balance/{accountnumber}")
-    public String balance(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Consultando saldo da conta: " + accountnumber);
-        if (accounts.containsKey(accountnumber)) {            
-            return String.format("Saldo atual: %s",accounts.getOrDefault(accountnumber, 0.0f));
-        } else {
-            return String.format("Conta não encontrada: %s",accountnumber);
-        }
-
-       
+    @GetMapping("/{accountId}/balance")
+    public ResposeEntity<float> balance(@PathVariable("accountId") int accountId) {
+        return ResponseEntity.ok(accountService.balance(accountId));
     }
+    
 }

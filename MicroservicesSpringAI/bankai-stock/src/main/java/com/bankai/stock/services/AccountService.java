@@ -12,26 +12,26 @@ import java.util.Optional;
 public class AccountService {
 
     @Autowired
-    private AccountRepository AccountRepository;
+    private AccountRepository accountRepository;
 
     public List<Account> getAllAccounts() {
-        return AccountRepository.findAll();
+        return accountRepository.findAll();
     }
 
     public Optional<Account> getAccountByName(String name) {
-        return AccountRepository.findByName(name);
+        return accountRepository.findByName(name);
     }
      public Optional<Account> getAccountById(Long id) {
-        return AccountRepository.findById(id);
+        return accountRepository.findById(id);
     }
 
     public Account addAccount(Account Account) {
-        return AccountRepository.save(Account);
+        return accountRepository.save(Account);
     }
 
     public boolean deleteAccount(Long id) {
-        if (AccountRepository.existsById(id)) {
-            AccountRepository.deleteById(id);
+        if (accountRepository.existsById(id)) {
+            accountRepository.deleteById(id);
             return true;
         }
         return false;

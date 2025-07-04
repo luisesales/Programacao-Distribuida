@@ -6,6 +6,7 @@ import com.bankai.operator.repository.BankRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -15,27 +16,37 @@ public class BankService {
     @Autowired
     private BankRepository bankRepository;
 
-    @Autowired
-    private BankServiceInterface bankServiceInterface;
-
     public List<Bank> getAllBanks() {
         return bankRepository.findAll();
     }
 
-    public List<Account> getAccountsByBank(Long accountId) {
-        return bankRepository.findBybankId(accountId);
+    public Optional<List<Account>> getAccountsByBank(Long accountId) {
+        return bankRepository.findById(accountId);
     }
 
     public Bank createBank(String name) {
-        ResponseEntity<String> isAvailable = bankServiceInterface.checkAvailabilityAndUpdate();
-
         Bank bank = new Bank();
         bank.setName(name);        
         return bankRepository.save(bank);
     }
 
-    public Bank getBank(Long id){
-        ResponseEntity<String> isAvailable = bankServiceInterface
+    public Optional<Bank> getBank(Long id){
         return bankRepository.findById(id);
     }
+
+    public Bank updateBank(Long id, String name) {
+        Bank bank = bankRepository.findById(id).orElseThrow();
+        bank.setName(name); 
+        return bankRepository.save(bank);                       
+    }
+
+    public boolean deleteBank(Long id) {    
+        if(bankRepository.existsById(id)){
+            bankRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    
 }

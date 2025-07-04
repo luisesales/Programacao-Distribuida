@@ -1,4 +1,4 @@
-package com.bankai.model;
+package com.bankai.stock.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

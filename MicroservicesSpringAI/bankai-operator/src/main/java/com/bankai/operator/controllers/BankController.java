@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping; 
-import org.springframework.web.bind.annotation.RestController;
 
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.services.BankService;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping; 
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,18 +37,22 @@ public class BankController{
     }
 
     @GetMapping("/{bankId}")
-    public ResponseEntity<List<Bank>> getBank(@PathVariable Long bankId) {
+    public ResponseEntity<Optional<Bank>> getBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(bankService.getBank(bankId));
     }
 
     @GetMapping("/{bankId}/accounts")
-    public ResponseEntity<List<Bank>> getAccountsByBank(@PathVariable Long bankId) {
+    public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(bankService.getAccountsByBank(bankId));
     }
 
     @PutMapping("/{bankId}")
-    public ResponseEntity<List<Bank>> updateBank(@PathVariable Long bankId) {
-        return ResponseEntity.ok(bankService.updateBank(bankId));
+    public ResponseEntity<Bank> updateBank(@PathVariable Long bankId, @RequestParam String name) {
+        try {
+            return ResponseEntity.ok(bankService.updateBank(bankId, name));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/{bankId}")
@@ -57,42 +61,44 @@ public class BankController{
     }
 
     @DeleteMapping("/{bankId}")
-    public ResponseEntity<List<Bank>> deleteBank(@PathVariable Long bankId) {
-        return ResponseEntity.ok(bankService.deleteBank(bankId));
+    public ResponseEntity<String> deleteBank(@PathVariable Long bankId) {
+        if (bankService.deleteBank(bankId)) {
+            return ResponseEntity.ok("Banco com ID " + bankId + " foi excluido com sucesso!");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
     @PostMapping("/deposit/{accountnumber}")
     public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {
-        System.out.println("Depositando " + value + " na conta: " + accountnumber);
+       /* System.out.println("Depositando " + value + " na conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {            
             float current = accounts.getOrDefault(accountnumber, 0.0f);
             accounts.put(accountnumber, current + value);
             return String.format("Valor depositado com sucesso %s na conta: %s",value,accounts.getOrDefault(accountnumber, 0.0f)); 
         } else {
             return String.format("Conta não encontrada: %s",accountnumber);
-        }
+        }*/
     }
 
     @DeleteMapping("/delete/{accountnumber}")
     public String deleteConta(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Excluindo conta: " + accountnumber);
+        /*System.out.println("Excluindo conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {
             accounts.remove(accountnumber);
             return String.format("Conta excluída com sucesso: %s",accountnumber);
         } else {
             return String.format("Conta não encontrada: %s",accountnumber);
-        }
+        }*/
     }
 
     @GetMapping("/balance/{accountnumber}")
     public String saldo(@PathVariable("accountnumber") int accountnumber) {
-        System.out.println("Consultando saldo da conta: " + accountnumber);
+        /*System.out.println("Consultando saldo da conta: " + accountnumber);
         if (accounts.containsKey(accountnumber)) {            
             return String.format("Saldo atual: %s",accounts.getOrDefault(accountnumber, 0.0f));
         } else {
             return String.format("Conta não encontrada: %s",accountnumber);
-        }
-
-       
+        }*/
     }
 }
 
