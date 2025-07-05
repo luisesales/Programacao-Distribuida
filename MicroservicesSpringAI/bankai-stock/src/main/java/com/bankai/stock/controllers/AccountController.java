@@ -78,7 +78,7 @@ public class AccountController{
     }
 
     @GetMapping("/{accountId}/balance")
-    public ResponseEntity<double> balance(@PathVariable Long accountId) {
+    public ResponseEntity<Double> balance(@PathVariable Long accountId) {
         try {
             return ResponseEntity.ok(accountService.getAccountBalance(accountId));
         } catch (Exception e) {
