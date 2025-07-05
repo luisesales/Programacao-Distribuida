@@ -48,9 +48,9 @@ public interface AccountServiceInterface {
     @CircuitBreaker(name= "stockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
     @Retry(name= "retrystockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
     @Bulkhead(name= "bulkheadstockdeleteservice", fallbackMethod = "checkDeleteAvailabilityAndUpdateFallback")
-    ResponseEntity<String> checkDeleteAvailability(@PathVariable accountId);
+    ResponseEntity<String> checkDeleteAvailability(@PathVariable Long accountId);
 
-    default ResponseEntity<String> checkCreateAvailabilityFallback(Account account) {
+    default ResponseEntity<String> checkDeleteAvailabilityFallback(Long accountId) {
         return ResponseEntity.status(503).body("O serviço de sacar está indisponível.");
     }
 

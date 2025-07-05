@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.bankai.stock.services.AccountService;
 import com.bankai.stock.model.Account;
@@ -50,24 +51,39 @@ public class AccountController{
     }
 
     @PutMapping("/{accountId}")    
-    public ResposeEntity<Account> updateAccount(@PathVariable("accountId") Long accountId) {
-        return ResponseEntity.ok(accountService.updateAccount(accountId));
-        
+    public ResponseEntity<Account> updateAccount(@PathVariable("accountId") Long accountId, @RequestBody Account account) {
+        try {
+            return ResponseEntity.ok(accountService.updateAccount(accountId, account));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }               
     }
 
     @PostMapping("/{accountId}/deposit")
-    public ResposeEntity<Account> deposit(@PathVariable("accountId") int accountId, @RequestParam("value") float value) {
-        return ResponseEntity.ok(accountService.deposit(accountId,value));
+    public ResponseEntity<Account> deposit(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
+        try {
+            return ResponseEntity.ok(accountService.deposit(accountId,value));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }         
     }
 
     @PostMapping("/{accountId}/draw")
-    public ResposeEntity<Account> draw(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
-        return ResponseEntity.ok(accountService.draw(accountId,value));
+    public ResponseEntity<Account> draw(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
+        try {
+            return ResponseEntity.ok(accountService.draw(accountId,value));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }         
     }
 
     @GetMapping("/{accountId}/balance")
-    public ResposeEntity<float> balance(@PathVariable("accountId") Long accountId) {
-        return ResponseEntity.ok(accountService.getAccountById(accountId).balance);
+    public ResponseEntity<double> balance(@PathVariable Long accountId) {
+        try {
+            return ResponseEntity.ok(accountService.getAccountBalance(accountId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }           
     }
     
 }

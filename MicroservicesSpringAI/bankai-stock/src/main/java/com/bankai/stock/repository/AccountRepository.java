@@ -1,8 +1,9 @@
 package com.bankai.stock.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import br.ufrn.imd.model.Account;
+import com.bankai.stock.model.Account;
 import java.util.Optional;
+import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByName(String name);

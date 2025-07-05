@@ -46,6 +46,10 @@ public class Account {
         this.balance = balance;
     }
 
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     public void deposit(double value){
         this.balance += value;
     }
