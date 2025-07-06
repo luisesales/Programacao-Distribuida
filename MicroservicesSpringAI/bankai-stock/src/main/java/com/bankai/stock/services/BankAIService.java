@@ -1,7 +1,5 @@
 package com.bankai.stock.services;
 
-import java.lang.module.ModuleDescriptor.Builder;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -44,7 +42,7 @@ public class BankAIService implements ChatService {
 
     public BankAIService(ChatClient.Builder chatClientBuilderOpenAI,  DocumentReader documentReader){
         
-        ChatOptions chatOptions = ChatOptions.builder().model("gpt-3.5").build();        
+        ChatOptions chatOptions = ChatOptions.builder().model("gpt-3.5-turbo").build();        
         this.chatClient = chatClientBuilderOpenAI.defaultOptions(chatOptions).build();
         this.documentReader = documentReader;
         evaluator = new RelevancyEvaluator(chatClientBuilderOpenAI);
@@ -59,7 +57,7 @@ public class BankAIService implements ChatService {
             .user(userSpec -> userSpec
                 .text(userTemplate)
                 .param("Pergunta", prompt))
-                call().content();
+            .call().content();
         EvaluationRequest request = new EvaluationRequest(prompt, null, answer);
         EvaluationResponse response = evaluator.evaluate(request);
         if(!response.isPass())

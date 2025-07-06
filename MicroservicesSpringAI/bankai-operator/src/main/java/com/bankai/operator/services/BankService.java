@@ -1,7 +1,7 @@
 package com.bankai.operator.services;
 
 
-import com.bankai.stock.model.Account;
+import com.bankai.operator.model.Account;
 import com.bankai.operator.feign.AccountServiceInterface;
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.repository.BankRepository;

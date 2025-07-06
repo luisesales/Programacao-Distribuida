@@ -3,10 +3,10 @@ package com.bankai.stock.prompt;
 import java.util.List;
 
 import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.ai.reader.tika.TikaDocumentReader;
 
 @Component
 class DocumentReader {

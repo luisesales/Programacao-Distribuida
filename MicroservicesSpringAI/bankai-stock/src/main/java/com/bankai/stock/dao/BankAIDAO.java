@@ -2,12 +2,11 @@ package com.bankai.stock.dao;
 
 import java.util.List;
 
-
+import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.ai.document.Document;
 
 @Repository
 public class BankAIDAO{

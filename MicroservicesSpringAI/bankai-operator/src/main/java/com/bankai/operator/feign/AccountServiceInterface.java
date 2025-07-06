@@ -2,16 +2,16 @@ package com.bankai.operator.feign;
 
 import java.util.List;
 
-import com.bankai.stock.model.Account;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.bankai.operator.model.Account;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -32,7 +32,6 @@ public interface AccountServiceInterface {
     default ResponseEntity<String> checkAccountsAvailabilityFallback(Long bankId) {
         return ResponseEntity.status(503).body("O serviço de verificar contas está indisponível.");
     }
-
 
     @PostMapping("/stock")
     @CircuitBreaker(name= "stockcreateservice", fallbackMethod = "checkCreateAvailabilityFallback")
