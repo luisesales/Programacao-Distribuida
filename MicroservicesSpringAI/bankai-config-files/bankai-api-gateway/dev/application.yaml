@@ -33,7 +33,7 @@ spring:
 #                failureRateThreshold: 50
 #                waitDurationInOpenState: 15000
 #        - id: order-service
-#          uri: lb://spring-product-order
+#          uri: lb://bankai-operator
 #          predicates:
 #            - Path=/orders/**
 #          filters:
