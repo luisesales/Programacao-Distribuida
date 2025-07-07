@@ -1,9 +1,9 @@
-package bankai.mcpserver.mcpserver;
+package com.bankai.mcpserver.mcpserver;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
-import br.imd.ufrn.sigaamcpserver.service.DiscentesService;
+import com.bankai.mcpserver.services.DiscentesService;
 
 @Component
 public class BankAIServer {
