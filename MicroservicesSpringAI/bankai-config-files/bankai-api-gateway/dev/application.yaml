@@ -19,31 +19,31 @@ spring:
               maxBackoff: 100ms
               factor: 2
               basedOnPreviousValue: false
-#      routes:
-#        - id: account-service
-#          uri: lb://bankai-stock
-#          predicates:
-#            - Path=/stock/**
-#          filters:
-#            - name: CircuitBreaker
-#              args:
-#                name: stock_CB
-#                slidingWindowSize: 20
-#                permittedNumberOfCallsInHalfOpenState: 5
-#                failureRateThreshold: 50
-#                waitDurationInOpenState: 15000
-#        - id: order-service
-#          uri: lb://bankai-operator
-#          predicates:
-#            - Path=/orders/**
-#          filters:
-#            - name: CircuitBreaker
-#              args:
-#                name: orders_CB
-#                slidingWindowSize: 20
-#                permittedNumberOfCallsInHalfOpenState: 5
-#                failureRateThreshold: 50
-#                waitDurationInOpenState: 15000
+      routes:
+        - id: account-service
+          uri: lb://bankai-stock
+          predicates:
+            - Path=/stock/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: stock_CB
+                slidingWindowSize: 20
+                permittedNumberOfCallsInHalfOpenState: 5
+                failureRateThreshold: 50
+                waitDurationInOpenState: 15000
+        - id: order-service
+          uri: lb://bankai-operator
+          predicates:
+            - Path=/operator/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: operator_CB
+                slidingWindowSize: 20
+                permittedNumberOfCallsInHalfOpenState: 5
+                failureRateThreshold: 50
+                waitDurationInOpenState: 15000
 
 eureka:
   instance:
