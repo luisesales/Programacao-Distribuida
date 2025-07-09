@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.bankai.stock.services.AccountService;
 import com.bankai.stock.model.Account;
 
-@SpringBootApplication
 @RestController
 @RequestMapping("/accounts")
 public class AccountController{

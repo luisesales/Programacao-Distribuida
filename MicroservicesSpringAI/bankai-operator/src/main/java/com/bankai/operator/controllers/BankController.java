@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,6 @@ import com.bankai.operator.model.Account;
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.services.BankService;
 
-@SpringBootApplication
 @RestController
 @RequestMapping("/banks")
 public class BankController{
@@ -34,10 +32,10 @@ public class BankController{
         return String.format("Bem vindo a páginas de Bancos operados por IA");
     }
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<List<Bank>> getAllBanks() {
         return ResponseEntity.ok(bankService.getAllBanks());
-    }
+    }*/
 
     @GetMapping("/{bankId}")
     public ResponseEntity<Optional<Bank>> getBank(@PathVariable Long bankId) {

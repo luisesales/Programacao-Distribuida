@@ -1,5 +1,5 @@
 package com.bankai.stock.interfaces;
 
-public interface ChatService {
+public interface ChatServiceAi {
     String getAnswer(String question);
 }

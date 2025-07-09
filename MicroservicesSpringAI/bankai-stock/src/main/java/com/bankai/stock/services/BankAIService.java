@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import com.bankai.stock.interfaces.ChatService;
+import com.bankai.stock.interfaces.ChatServiceAi;
 import com.google.api.client.util.Value;
 
 @Service
-public class BankAIService implements ChatService {
+public class BankAIService implements ChatServiceAi {
     private final ChatClient chatClient;
     private RelevancyEvaluator evaluator;
     private final DocumentReader documentReader;
