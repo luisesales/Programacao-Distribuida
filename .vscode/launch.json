@@ -1,0 +1,141 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"            
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "app.Main",
+            "projectName": "app-App"
+        },
+        {
+            "type": "java",
+            "name": "BankaiOperatorApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.operator.application.MicroservicesaibankApplication",
+            "projectName": "bankai.operator-bankai-operator",
+            "vmArgs": "-Dspring.profiles.active=operator-server-1" 
+        },
+        {
+            "type": "java",
+            "name": "BankaiOperatorApplication2",
+            "request": "launch",
+            "mainClass": "com.bankai.operator.application.MicroservicesaibankApplication",
+            "projectName": "bankai.operator-bankai-operator",
+            "vmArgs": "-Dspring.profiles.active=operator-server-2" 
+        },
+        {
+            "type": "java",
+            "name": "EmbeddingApplication",
+            "request": "launch",
+            "mainClass": "br.imd.ufrn.embedding.EmbeddingApplication",
+            "projectName": "br.imd.ufrn-embeddingsvectorstore"
+        },
+        {
+            "type": "java",
+            "name": "EmbeddingApplication(1)",
+            "request": "launch",
+            "mainClass": "br.imd.ufrn.embedding.EmbeddingApplication",
+            "projectName": "br.imd.ufrn-embeddings"
+        },
+        {
+            "type": "java",
+            "name": "PromptApplication",
+            "request": "launch",
+            "mainClass": "br.imd.ufrn.prompt.PromptApplication",
+            "projectName": "br.imd.ufrn-prompt"
+        },
+        {
+            "type": "java",
+            "name": "SigaamcpserverApplication",
+            "request": "launch",
+            "mainClass": "br.imd.ufrn.sigaamcpserver.SigaamcpserverApplication",
+            "projectName": "br.imd.ufrn-sigaamcpserver"
+        },
+        {
+            "type": "java",
+            "name": "Main(1)",
+            "request": "launch",
+            "mainClass": "com.kore.application.Main",
+            "projectName": "com-kore"
+        },
+        {
+            "type": "java",
+            "name": "BankAIAPI",
+            "request": "launch",
+            "mainClass": "com.bankai.api.gateway.BankAIAPI",
+            "projectName": "com.bankai.api.gateway-bankai-api-gateway",
+            "vmArgs": "-Dspring.profiles.active=dev"         
+        },
+        {
+            "type": "java",
+            "name": "BankaiConfigServerApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.configserver.BankaiConfigServerApplication",
+            "projectName": "com.bankai.configserver-bankai-config-server"
+        },
+        {
+            "type": "java",
+            "name": "BankaidiscoveryserviceApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
+            "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
+            "vmArgs": "-Dspring.profiles.active=discovery-server-1"                
+            
+        },
+        {
+            "type": "java",
+            "name": "BankaidiscoveryserviceApplication2",
+            "request": "launch",
+            "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
+            "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
+            "vmArgs": "-Dspring.profiles.active=discovery-server-2"                
+            
+        },
+        {
+            "type": "java",
+            "name": "BankaidiscoveryserviceApplication3",
+            "request": "launch",
+            "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
+            "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
+            "vmArgs": "-Dspring.profiles.active=discovery-server-3"                
+            
+        },
+        {
+            "type": "java",
+            "name": "BankmcpserverApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.mcpserver.application.BankmcpserverApplication",
+            "projectName": "com.bankai.mcpserver-bankai-mcp-server",
+            "vmArgs": "-Dspring.profiles.active=mcp-server"
+        },
+        {
+            "type": "java",
+            "name": "BankaiStockApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.stock.application.BankaiApplication",
+            "projectName": "com.bankai.stock-bankai-stock",
+            "vmArgs": "-Dspring.profiles.active=stock-server-1"
+            
+        },
+        {
+            "type": "java",
+            "name": "BankaiStockApplication2",
+            "request": "launch",
+            "mainClass": "com.bankai.stock.application.BankaiApplication",
+            "projectName": "com.bankai.stock-bankai-stock",
+            "vmArgs": "-Dspring.profiles.active=stock-server-2"
+            
+        }
+    ]
+}
