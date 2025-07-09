@@ -1,19 +1,26 @@
 package com.bankai.operator.services;
 
 
-import com.bankai.operator.model.Account;
-import com.bankai.operator.feign.AccountServiceInterface;
-import com.bankai.operator.model.Bank;
-import com.bankai.operator.repository.BankRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
-import java.util.List;
+import com.bankai.operator.feign.AccountServiceInterface;
+import com.bankai.operator.model.Account;
+import com.bankai.operator.model.Bank;
+import com.bankai.operator.repository.BankRepository;
 
+/*
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+ */
 @Service
 public class BankService {
+
+    //private static final Logger log = LoggerFactory.getLooger(BankService.class);
 
     @Autowired
     private BankRepository bankRepository;

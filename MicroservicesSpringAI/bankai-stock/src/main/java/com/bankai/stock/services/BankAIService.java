@@ -12,17 +12,18 @@ import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.EvaluationResponse;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.bankai.stock.interfaces.ChatServiceAi;
-import com.google.api.client.util.Value;
 
 @Service
 public class BankAIService implements ChatServiceAi {
     private final ChatClient chatClient;
     private RelevancyEvaluator evaluator;
     private final DocumentReader documentReader;
+
 
     @Value("classpath:prompt/systemTemplate.st")
     Resource systemTemplate;

@@ -8,10 +8,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-public class MicroservicesaibankApplication {
+public class BankAiOperator {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MicroservicesaibankApplication.class, args);
+		SpringApplication.run(BankAiOperator.class, args);
 	}
 
 }

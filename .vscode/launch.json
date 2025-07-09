@@ -4,12 +4,27 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "java",
+            "name": "BankAiOperator",
+            "request": "launch",
+            "mainClass": "com.bankai.operator.application.BankAiOperator",
+            "projectName": "bankai.operator-bankai-operator",
+            "vmArgs": "-Dspring.profiles.active=operator-server-1" 
+        },
+        {
+            "type": "java",
+            "name": "BankAiOperator2",
+            "request": "launch",
+            "mainClass": "com.bankai.operator.application.BankAiOperator",
+            "projectName": "bankai.operator-bankai-operator",
+            "vmArgs": "-Dspring.profiles.active=operator-server-2" 
+        },        
         {
             "type": "java",
             "name": "Current File",
             "request": "launch",
-            "mainClass": "${file}"            
+            "mainClass": "${file}"
         },
         {
             "type": "java",
@@ -17,22 +32,6 @@
             "request": "launch",
             "mainClass": "app.Main",
             "projectName": "app-App"
-        },
-        {
-            "type": "java",
-            "name": "BankaiOperatorApplication",
-            "request": "launch",
-            "mainClass": "com.bankai.operator.application.MicroservicesaibankApplication",
-            "projectName": "bankai.operator-bankai-operator",
-            "vmArgs": "-Dspring.profiles.active=operator-server-1" 
-        },
-        {
-            "type": "java",
-            "name": "BankaiOperatorApplication2",
-            "request": "launch",
-            "mainClass": "com.bankai.operator.application.MicroservicesaibankApplication",
-            "projectName": "bankai.operator-bankai-operator",
-            "vmArgs": "-Dspring.profiles.active=operator-server-2" 
         },
         {
             "type": "java",
@@ -75,7 +74,7 @@
             "request": "launch",
             "mainClass": "com.bankai.api.gateway.BankAIAPI",
             "projectName": "com.bankai.api.gateway-bankai-api-gateway",
-            "vmArgs": "-Dspring.profiles.active=dev"         
+            "vmArgs": "-Dspring.profiles.active=dev"
         },
         {
             "type": "java",
@@ -90,8 +89,7 @@
             "request": "launch",
             "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
             "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
-            "vmArgs": "-Dspring.profiles.active=discovery-server-1"                
-            
+            "vmArgs": "-Dspring.profiles.active=discovery-server-1"
         },
         {
             "type": "java",
@@ -99,8 +97,7 @@
             "request": "launch",
             "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
             "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
-            "vmArgs": "-Dspring.profiles.active=discovery-server-2"                
-            
+            "vmArgs": "-Dspring.profiles.active=discovery-server-2"
         },
         {
             "type": "java",
@@ -108,8 +105,7 @@
             "request": "launch",
             "mainClass": "com.bankai.discoveryservice.BankaidiscoveryserviceApplication",
             "projectName": "com.bankai.discoveryservice-bankai-discovery-service",
-            "vmArgs": "-Dspring.profiles.active=discovery-server-3"                
-            
+            "vmArgs": "-Dspring.profiles.active=discovery-server-3"
         },
         {
             "type": "java",
@@ -126,7 +122,6 @@
             "mainClass": "com.bankai.stock.application.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
             "vmArgs": "-Dspring.profiles.active=stock-server-1"
-            
         },
         {
             "type": "java",
@@ -135,7 +130,6 @@
             "mainClass": "com.bankai.stock.application.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
             "vmArgs": "-Dspring.profiles.active=stock-server-2"
-            
         }
     ]
 }

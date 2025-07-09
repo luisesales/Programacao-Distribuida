@@ -24,18 +24,11 @@ public class BankController{
     @Autowired
     private BankService bankService;
 
-    
 
-    @GetMapping("/")
-    public String getLocal() {
-        System.out.println("Consultando pagina inicial");
-        return String.format("Bem vindo a páginas de Bancos operados por IA");
-    }
-
-    /*@GetMapping
+    @GetMapping
     public ResponseEntity<List<Bank>> getAllBanks() {
         return ResponseEntity.ok(bankService.getAllBanks());
-    }*/
+    }
 
     @GetMapping("/{bankId}")
     public ResponseEntity<Optional<Bank>> getBank(@PathVariable Long bankId) {
