@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,7 +67,7 @@ public class AccountController{
     }
 
     @PostMapping("/{accountId}/deposit")
-    public ResponseEntity<Account> deposit(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
+    public ResponseEntity<Account> deposit(@PathVariable("accountId") Long accountId, @RequestParam("value") double value) {
         try {
             return ResponseEntity.ok(accountService.deposit(accountId,value));
         } catch (Exception e) {
@@ -77,7 +76,7 @@ public class AccountController{
     }
 
     @PostMapping("/{accountId}/draw")
-    public ResponseEntity<Account> draw(@PathVariable("accountId") Long accountId, @RequestParam("value") float value) {
+    public ResponseEntity<Account> draw(@PathVariable("accountId") Long accountId, @RequestParam("value") double value) {
         try {
             return ResponseEntity.ok(accountService.draw(accountId,value));
         } catch (Exception e) {

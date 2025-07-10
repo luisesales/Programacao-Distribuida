@@ -13,5 +13,4 @@ public class BankAiOperator {
 	public static void main(String[] args) {
 		SpringApplication.run(BankAiOperator.class, args);
 	}
-
 }

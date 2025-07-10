@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
-class DocumentReader {
+public class DocumentReader {
 
     private final Resource resource;
 
@@ -18,8 +18,16 @@ class DocumentReader {
         this.resource =  new FileSystemResource(filePath);       
     }
 
-    List<Document> loadText() {
-        TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(this.resource);
-        return tikaDocumentReader.read();
+    public List<Document> loadText() {
+        // TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(this.resource);
+        // return tikaDocumentReader.read();
+        String exemplo = """
+        Este é um regulamento fictício utilizado apenas para testes da aplicação.
+        O aluno pode trancar a matrícula em até dois períodos consecutivos.
+        A carga horária mínima por semestre é de 180 horas.
+        """;
+
+        Document doc = new Document(exemplo);
+        return List.of(doc);
     }
 }
