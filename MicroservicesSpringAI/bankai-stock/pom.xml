@@ -27,7 +27,7 @@
   	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<spring-ai.version>1.0.0-M6</spring-ai.version>
+		<spring-ai.version>1.0.0</spring-ai.version>
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
 	</properties>
 	<dependencies>
@@ -41,16 +41,20 @@
 			<artifactId>spring-shell-starter</artifactId>
 			<version>3.4.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-client</artifactId>
 			<version>${spring-ai.version}</version>
+		</dependency> -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
+				<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+				<version>${spring-ai.version}</version>
+		</dependency> -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
@@ -80,18 +84,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-				<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-				<version>${spring-ai.version}</version>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-advisors-vector-store</artifactId>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-vector-store</artifactId>
+
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -131,10 +133,6 @@
   			<artifactId>dotenv-java</artifactId>
   			<version>3.0.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
-		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -154,16 +152,6 @@
             </dependency>
 		</dependencies>
 	</dependencyManagement>
-	<repositories>
-        <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 	<build>
 		<plugins>
 			<plugin>

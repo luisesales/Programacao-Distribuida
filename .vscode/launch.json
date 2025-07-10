@@ -8,7 +8,7 @@
             "type": "java",
             "name": "BankAiOperator",
             "request": "launch",
-            "mainClass": "com.bankai.operator.application.BankAiOperator",
+            "mainClass": "com.bankai.operator.BankAiOperator",
             "projectName": "bankai.operator-bankai-operator",
             "vmArgs": "-Dspring.profiles.active=operator-server-1" 
         },
@@ -16,7 +16,7 @@
             "type": "java",
             "name": "BankAiOperator2",
             "request": "launch",
-            "mainClass": "com.bankai.operator.application.BankAiOperator",
+            "mainClass": "com.bankai.operator.BankAiOperator",
             "projectName": "bankai.operator-bankai-operator",
             "vmArgs": "-Dspring.profiles.active=operator-server-2" 
         },        
@@ -65,7 +65,7 @@
             "type": "java",
             "name": "Main(1)",
             "request": "launch",
-            "mainClass": "com.kore.application.Main",
+            "mainClass": "com.kore.Main",
             "projectName": "com-kore"
         },
         {
@@ -111,15 +111,23 @@
             "type": "java",
             "name": "BankmcpserverApplication",
             "request": "launch",
-            "mainClass": "com.bankai.mcpserver.application.BankmcpserverApplication",
+            "mainClass": "com.bankai.mcpserver.BankmcpserverApplication",
             "projectName": "com.bankai.mcpserver-bankai-mcp-server",
-            "vmArgs": "-Dspring.profiles.active=mcp-server"
+            "vmArgs": "-Dspring.profiles.active=mcp-server-1"
+        },
+        {
+            "type": "java",
+            "name": "BankmcpserverApplication",
+            "request": "launch",
+            "mainClass": "com.bankai.mcpserver.BankmcpserverApplication",
+            "projectName": "com.bankai.mcpserver-bankai-mcp-server",
+            "vmArgs": "-Dspring.profiles.active=mcp-server-2"
         },
         {
             "type": "java",
             "name": "BankaiStockApplication",
             "request": "launch",
-            "mainClass": "com.bankai.stock.application.BankaiApplication",
+            "mainClass": "com.bankai.stock.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
             "vmArgs": "-Dspring.profiles.active=stock-server-1"
         },
@@ -127,7 +135,7 @@
             "type": "java",
             "name": "BankaiStockApplication2",
             "request": "launch",
-            "mainClass": "com.bankai.stock.application.BankaiApplication",
+            "mainClass": "com.bankai.stock.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
             "vmArgs": "-Dspring.profiles.active=stock-server-2"
         }

@@ -1,4 +1,4 @@
-package com.bankai.operator.feign;
+package com.bankai.mcpserver.feign;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.bankai.operator.model.Account;
+import com.bankai.mcpserver.model.Account;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -24,11 +24,11 @@ public interface AccountServiceInterface {
     @GetMapping("/accounts/bank/{bankId}")
     ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId);
 
-    @GetMapping("/accounts/{accountId}")    
+    @GetMapping("/accounts/{bankId}")    
     @CircuitBreaker(name= "stockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Retry(name= "retrystockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Bulkhead(name= "bulkheadstockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")    
-    ResponseEntity<Optional<Account>> checkAccountsAvailability(@PathVariable Long accountId);
+    ResponseEntity<Optional<Account>> checkAccountsAvailability(@PathVariable Long bankId);
 
     default ResponseEntity<Optional<Account>> checkAccountsAvailabilityFallback(Long bankId) {
         return ResponseEntity.status(503).body(Optional.empty());
@@ -53,10 +53,11 @@ public interface AccountServiceInterface {
     default ResponseEntity<String> checkDeleteAvailabilityFallback(Long accountId) {
         return ResponseEntity.status(503).body("O serviço de sacar está indisponível.");
     }
+
     @GetMapping("/accounts/{accountId}/balance")
-    @CircuitBreaker(name= "stockbalanceservice", fallbackMethod = "checkBalanceAvailabilityFallback")
-    @Retry(name= "retrystockbalanceservice", fallbackMethod = "checkBalanceAvailabilityFallback")
-    @Bulkhead(name= "bulkheadstockbalanceservice", fallbackMethod = "checkBalanceAvailabilityFallback")
+    @CircuitBreaker(name= "stockbalanceservice", fallbackMethod = "checkDepositAvailabilityFallback")
+    @Retry(name= "retrystockbalanceservice", fallbackMethod = "checkDepositAvailabilityFallback")
+    @Bulkhead(name= "bulkheadstockbalanceservice", fallbackMethod = "checkDepositAvailabilityFallback")
     ResponseEntity<Double> checkBalanceAvailability(@PathVariable Long accountId);
 
     default ResponseEntity<Double> checkBalanceAvailabilityFallback(Long accountId) {

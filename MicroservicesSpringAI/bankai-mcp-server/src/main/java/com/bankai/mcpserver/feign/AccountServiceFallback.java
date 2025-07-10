@@ -1,4 +1,4 @@
-package com.bankai.operator.feign;
+package com.bankai.mcpserver.feign;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.bankai.operator.model.Account;
+import com.bankai.mcpserver.model.Account;
 
 @Component
 public class AccountServiceFallback implements AccountServiceInterface {
@@ -42,6 +42,7 @@ public class AccountServiceFallback implements AccountServiceInterface {
     public ResponseEntity<Optional<Account>> checkAccountsAvailability(Long bankId){
         return ResponseEntity.status(503).body(Optional.empty());
     }
+
     @Override 
     public ResponseEntity<Double> checkBalanceAvailability(Long accountId) {
         return ResponseEntity.status(503).body(0.0);
