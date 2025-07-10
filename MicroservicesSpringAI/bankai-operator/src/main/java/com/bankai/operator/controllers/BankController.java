@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bankai.operator.model.Account;
@@ -53,6 +54,30 @@ public class BankController{
     @PostMapping
     public ResponseEntity<Bank> createBank(@RequestParam String name) {
         return ResponseEntity.ok(bankService.createBank(name));
+    }
+
+    @PostMapping("/accounts")
+    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+        return ResponseEntity.ok(bankService.createAccount(account));
+    }
+
+    @GetMapping("/accounts/{accountId}")
+    public ResponseEntity<Double> balanceAccount(@RequestParam Long accountId) {
+        return ResponseEntity.ok(bankService.balanceAccount(accountId));
+    }
+
+    @DeleteMapping("/accounts/{accountId}")
+    public ResponseEntity<String> deleteAccount(@RequestParam Long accountId) {
+        return ResponseEntity.ok(bankService.deleteAccount(accountId));
+    }
+    @PostMapping("/accounts/{accountId}/deposit")
+    public ResponseEntity<Account> depositAccount(@RequestParam Long accountId, @PathVariable double value) {
+        return ResponseEntity.ok(bankService.depositAccount(accountId, value));
+    }
+
+    @PostMapping("/accounts/{accountId}/draw")
+    public ResponseEntity<Account> drawAccount(@RequestParam Long accountId, @PathVariable double value) {
+        return ResponseEntity.ok(bankService.drawAccount(accountId, value));
     }
 
     @DeleteMapping("/{bankId}")

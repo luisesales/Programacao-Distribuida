@@ -24,13 +24,13 @@ public interface AccountServiceInterface {
     @GetMapping("/accounts/bank/{bankId}")
     ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId);
 
-    @GetMapping("/accounts/{bankId}")    
+    @GetMapping("/accounts/{accountId}")    
     @CircuitBreaker(name= "stockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Retry(name= "retrystockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Bulkhead(name= "bulkheadstockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")    
-    ResponseEntity<Optional<Account>> checkAccountsAvailability(@PathVariable Long bankId);
+    ResponseEntity<Optional<Account>> checkAccountsAvailability(@PathVariable Long accountId);
 
-    default ResponseEntity<Optional<Account>> checkAccountsAvailabilityFallback(Long bankId) {
+    default ResponseEntity<Optional<Account>> checkAccountsAvailabilityFallback(Long accountId) {
         return ResponseEntity.status(503).body(Optional.empty());
     }
 

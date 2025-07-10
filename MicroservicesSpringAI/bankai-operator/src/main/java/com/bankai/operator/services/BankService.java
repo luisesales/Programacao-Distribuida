@@ -37,6 +37,10 @@ public class BankService {
        return accountServiceInterface.getAccountsByBank(bankId).getBody();        
     }
 
+    public Optional<Account> getAccount(Long accountId){
+        return accountServiceInterface.checkAccountsAvailability(accountId).getBody();
+    }
+
     public Account createAccount(Account account){
         return accountServiceInterface.checkCreateAvailability(account).getBody();
     }
@@ -51,6 +55,10 @@ public class BankService {
 
     public Account drawAccount(Long accountId, double value){
         return accountServiceInterface.checkDrawAvailability(accountId,value).getBody();
+    }
+
+    public double balanceAccount(Long accountId){
+        return accountServiceInterface.checkBalanceAvailability(accountId).getBody();
     }
 
     public Bank createBank(String name) {
