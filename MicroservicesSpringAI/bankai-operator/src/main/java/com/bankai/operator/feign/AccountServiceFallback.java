@@ -2,6 +2,7 @@ package com.bankai.operator.feign;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,23 +14,23 @@ import com.bankai.operator.model.Account;
 public class AccountServiceFallback implements AccountServiceInterface {
 
     @Override
-    public List<Account> getAccountsByBank(@PathVariable Long bankId){
-        return Collections.emptyList();
+    public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId){
+        return ResponseEntity.status(503).body(Collections.emptyList());
     }
 
     @Override
-    public ResponseEntity<String> checkDepositAvailability(Long accountId, int value) {
-        return ResponseEntity.status(503).body("O serviço de depósito está indisponível.");
+    public ResponseEntity<Account> checkDepositAvailability(Long accountId, double value) {
+        return ResponseEntity.status(503).body(new Account());
     }
 
     @Override
-    public ResponseEntity<String> checkDrawAvailability(Long accountId, int value) {
-        return ResponseEntity.status(503).body("O serviço de sacar está indisponível.");
+    public ResponseEntity<Account> checkDrawAvailability(Long accountId, double value) {
+        return ResponseEntity.status(503).body(new Account());
     }
 
     @Override
-    public ResponseEntity<String> checkCreateAvailability(Account account) {
-        return ResponseEntity.status(503).body("O serviço de criar contas está indisponível.");
+    public ResponseEntity<Account> checkCreateAvailability(Account account) {
+        return ResponseEntity.status(503).body(new Account());
     }
 
     @Override
@@ -38,7 +39,7 @@ public class AccountServiceFallback implements AccountServiceInterface {
     }
 
     @Override 
-    public ResponseEntity<String> checkAccountsAvailability(Long bankId){
-        return ResponseEntity.status(503).body("O serviço de verificar contas está indisponível.");
+    public ResponseEntity<Optional<Account>> checkAccountsAvailability(Long bankId){
+        return ResponseEntity.status(503).body(Optional.empty());
     }
 }

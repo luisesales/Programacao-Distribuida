@@ -1,6 +1,7 @@
 package com.bankai.operator.feign;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -20,33 +21,35 @@ import io.github.resilience4j.retry.annotation.Retry;
 @FeignClient(value = "bankai-stock")
 public interface AccountServiceInterface {
 
-    @GetMapping("/stock/{bankId}")
-    List<Account> getAccountsByBank(@PathVariable Long bankId);
+    @GetMapping("/accounts/bank/{bankId}")
+    ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId);
 
-    @GetMapping("/stock/{bankId}")
+    @GetMapping("/accounts/{bankId}")
+    /*
     @CircuitBreaker(name= "stockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Retry(name= "retrystockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
     @Bulkhead(name= "bulkheadstockaccountservice", fallbackMethod = "checkAccountsAvailabilityFallback")
-    ResponseEntity<String> checkAccountsAvailability(@PathVariable Long bankId);
+    */
+    ResponseEntity<Optional<Account>> checkAccountsAvailability(@PathVariable Long bankId);
 
-    default ResponseEntity<String> checkAccountsAvailabilityFallback(Long bankId) {
-        return ResponseEntity.status(503).body("O serviço de verificar contas está indisponível.");
+    default ResponseEntity<Optional<Account>> checkAccountsAvailabilityFallback(Long bankId) {
+        return ResponseEntity.status(503).body(Optional.empty());
     }
 
-    @PostMapping("/stock")
-    @CircuitBreaker(name= "stockcreateservice", fallbackMethod = "checkCreateAvailabilityFallback")
-    @Retry(name= "retrystockcreateservice", fallbackMethod = "checkCreateAvailabilityFallback")
-    @Bulkhead(name= "bulkheadstockcreateservice", fallbackMethod = "checkCreateAvailabilityAndUpdateFallback")
-    ResponseEntity<String> checkCreateAvailability(@RequestBody Account account);
+    @PostMapping("/accounts")
+    // @CircuitBreaker(name= "stockcreateservice", fallbackMethod = "checkCreateAvailabilityFallback")
+    // @Retry(name= "retrystockcreateservice", fallbackMethod = "checkCreateAvailabilityFallback")
+    // @Bulkhead(name= "bulkheadstockcreateservice", fallbackMethod = "checkCreateAvailabilityAndUpdateFallback")
+    ResponseEntity<Account> checkCreateAvailability(@RequestBody Account account);
 
-    default ResponseEntity<String> checkCreateAvailabilityFallback(Account account) {
-        return ResponseEntity.status(503).body("O serviço de sacar está indisponível.");
+    default ResponseEntity<Account> checkCreateAvailabilityFallback(Account account) {
+        return ResponseEntity.status(503).body(new Account());
     }
 
-    @DeleteMapping("/stock/{accountId}")
-    @CircuitBreaker(name= "stockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
-    @Retry(name= "retrystockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
-    @Bulkhead(name= "bulkheadstockdeleteservice", fallbackMethod = "checkDeleteAvailabilityAndUpdateFallback")
+    @DeleteMapping("/accounts/{accountId}")
+    // @CircuitBreaker(name= "stockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
+    // @Retry(name= "retrystockdeleteservice", fallbackMethod = "checkDeleteAvailabilityFallback")
+    // @Bulkhead(name= "bulkheadstockdeleteservice", fallbackMethod = "checkDeleteAvailabilityAndUpdateFallback")
     ResponseEntity<String> checkDeleteAvailability(@PathVariable Long accountId);
 
     default ResponseEntity<String> checkDeleteAvailabilityFallback(Long accountId) {
@@ -54,23 +57,23 @@ public interface AccountServiceInterface {
     }
 
 
-    @PostMapping("/stock/{accountId}/deposit")
-    @CircuitBreaker(name= "stockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
-    @Retry(name= "retrystockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
-    @Bulkhead(name= "bulkheadstockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
-    ResponseEntity<String> checkDepositAvailability(@PathVariable Long accountId, @RequestParam int value);
+    @PostMapping("/accounts/{accountId}/deposit")
+    // @CircuitBreaker(name= "stockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
+    // @Retry(name= "retrystockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
+    // @Bulkhead(name= "bulkheadstockdepositservice", fallbackMethod = "checkDepositAvailabilityFallback")
+    ResponseEntity<Account> checkDepositAvailability(@PathVariable Long accountId, @RequestParam double value);
 
-    default ResponseEntity<String> checkDepositAvailabilityFallback(Long accountId, int value) {
-        return ResponseEntity.status(503).body("O serviço de depósito está indisponível.");
+    default ResponseEntity<Account> checkDepositAvailabilityFallback(Long accountId, double value) {
+        return ResponseEntity.status(503).body(new Account());
     }
 
-    @PostMapping("/stock/{accountId}/draw")
-    @CircuitBreaker(name= "stockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
-    @Retry(name= "retrystockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
-    @Bulkhead(name= "bulkheadstockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
-    ResponseEntity<String> checkDrawAvailability(@PathVariable Long accountId, @RequestParam int value);
+    @PostMapping("/accounts/{accountId}/draw")
+    // @CircuitBreaker(name= "stockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
+    // @Retry(name= "retrystockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
+    // @Bulkhead(name= "bulkheadstockdrawservice", fallbackMethod = "checkDrawAvailabilityFallback")
+    ResponseEntity<Account> checkDrawAvailability(@PathVariable Long accountId, @RequestParam double value);
 
-    default ResponseEntity<String> checkDrawAvailabilityFallback(Long accountId, int value) {
-        return ResponseEntity.status(503).body("O serviço de sacar está indisponível.");
+    default ResponseEntity<Account> checkDrawAvailabilityFallback(Long accountId, double value) {
+        return ResponseEntity.status(503).body(new Account());
     }
 }

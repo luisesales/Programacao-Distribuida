@@ -1,6 +1,7 @@
 package com.bankai.stock.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,11 +30,19 @@ public class AccountController{
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
-    @GetMapping("/{bankId}")
+    @GetMapping("/bank/{bankId}")
     public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(accountService.getAccountsByBank(bankId));
     }
 
+    @GetMapping("/{accountId}")    
+    public ResponseEntity<Optional<Account>> getAccountById(@PathVariable Long accountId) {
+        try {
+            return ResponseEntity.ok(accountService.getAccountById(accountId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }               
+    }
 
     @PostMapping    
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {

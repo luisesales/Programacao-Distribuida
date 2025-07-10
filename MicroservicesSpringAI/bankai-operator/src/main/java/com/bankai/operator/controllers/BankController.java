@@ -19,7 +19,7 @@ import com.bankai.operator.model.Bank;
 import com.bankai.operator.services.BankService;
 
 @RestController
-@RequestMapping("/banks")
+@RequestMapping("/bank")
 public class BankController{
     @Autowired
     private BankService bankService;
@@ -27,6 +27,7 @@ public class BankController{
 
     @GetMapping
     public ResponseEntity<List<Bank>> getAllBanks() {
+        System.out.println("Eu entrei no get mapping inicial");
         return ResponseEntity.ok(bankService.getAllBanks());
     }
 

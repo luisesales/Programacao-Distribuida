@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.bankai.operator.feign.AccountServiceFallback;
 import com.bankai.operator.feign.AccountServiceInterface;
 import com.bankai.operator.model.Account;
 import com.bankai.operator.model.Bank;
@@ -26,23 +27,30 @@ public class BankService {
     private BankRepository bankRepository;
 
     @Autowired
-    private AccountServiceInterface accountServiceInterface;
+    private AccountServiceFallback accountServiceInterface;
 
     public List<Bank> getAllBanks() {
         return bankRepository.findAll();
     }
 
-    public List<Account> getAccountsByBank(Long bankId) {
-        ResponseEntity<String> isAvailable = accountServiceInterface.checkAccountsAvailability(bankId);
+    public List<Account> getAccountsByBank(Long bankId) { 
+       return accountServiceInterface.getAccountsByBank(bankId).getBody();        
+    }
 
-        if (!isAvailable.getStatusCode().is2xxSuccessful()) {
-            throw new IllegalArgumentException("Serviço de contas indisponível");
-        }
-        List<Account> accounts = accountServiceInterface.getAccountsByBank(bankId);
-        if (accounts == null || accounts.isEmpty()) {
-            throw new IllegalArgumentException("Não existem contas para este banco");
-        }
-        return accounts;
+    public Account createAccount(Account account){
+        return accountServiceInterface.checkCreateAvailability(account).getBody();
+    }
+
+    public String deleteAccount(Long accountId){
+        return accountServiceInterface.checkDeleteAvailability(accountId).getBody();
+    }
+
+    public Account depositAccount(Long accountId, double value){
+        return accountServiceInterface.checkDepositAvailability(accountId,value).getBody();
+    }
+
+    public Account drawAccount(Long accountId, double value){
+        return accountServiceInterface.checkDrawAvailability(accountId,value).getBody();
     }
 
     public Bank createBank(String name) {

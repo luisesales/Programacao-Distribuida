@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.ReflectionUtils.MethodCallback;
 
+import com.bankai.mcpserver.mcpserver.BankAIServer;
+
 @SpringBootApplication
 public class BankmcpserverApplication {
 
@@ -14,14 +16,16 @@ public class BankmcpserverApplication {
 		SpringApplication.run(BankmcpserverApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	public VectorStore vectorStore(EmbeddingModel embeddingModel) {
 		return SimpleVectorStore.builder(embeddingModel).build();
 	}
 
 	@Bean
-	public ToolCallbackProvider regBankAITools(BankAITools mcpServer){
+	public ToolCallbackProvider regBankAITools(BankAISer mcpServer){
 		return MethodCallbackProvider.builder.toolObjects(mcpServer).build();
-	}
+	}*/
+	@Bean
+	public List<ToolCallbackProvider> 
 		
 }
