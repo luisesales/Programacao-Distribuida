@@ -8,26 +8,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.evaluation.EvaluationRequest;
-import org.springframework.ai.evaluation.EvaluationResponse;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.http.HttpHeaders;
 
-import com.bankai.stock.model.BankAI;
 import com.bankai.stock.interfaces.ChatServiceAi;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.bankai.stock.model.BankAI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,8 +49,13 @@ public class BankAIService implements ChatServiceAi {
             .build();
 
 
-    public BankAIService(ChatModel chatModel, BankAI bankAI){     
-        this.chatClient = ChatClient.builder(chatModel).build();
+    public BankAIService(ChatModel chatModel, BankAI bankAI, ToolCallbackProvider tools){     
+        this.chatClient = ChatClient.builder(chatModel)
+            .defaultToolCallbacks(tools)
+            .defaultAdvisors(
+                MessageChatMemoryAdvisor.builder(chatMemory))
+                .build()
+        .build();
         this.bankAI = bankAI;
         // this.evaluator = RelevancyEvaluator.builder()
         //                     .chatClientBuilder(ChatClient.builder(chatModel))

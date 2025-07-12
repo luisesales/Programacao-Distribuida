@@ -129,6 +129,7 @@
             "request": "launch",
             "mainClass": "com.bankai.stock.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
+            "runAgs": ["--env-file", "bankai-stock/src/main/java/com/bankai/stock/resources/.env"],
             "vmArgs": "-Dspring.profiles.active=stock-server-1"
         },
         {
@@ -137,6 +138,7 @@
             "request": "launch",
             "mainClass": "com.bankai.stock.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
+            "runAgs": ["--env-file", "bankai-stock/src/main/java/com/bankai/stock/resources/.env"],
             "vmArgs": "-Dspring.profiles.active=stock-server-2"
         }
     ]
