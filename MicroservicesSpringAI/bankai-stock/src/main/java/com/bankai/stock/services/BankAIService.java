@@ -25,7 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.http.HttpHeaders;
 
-import com.bankai.stock.dao.BankAIDAO;
+import com.bankai.stock.model.BankAI;
 import com.bankai.stock.interfaces.ChatServiceAi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class BankAIService implements ChatServiceAi {
     private final ChatClient chatClient;
-    private final BankAIDAO bankAIDAO;
+    private final BankAI bankAI;
     // private RelevancyEvaluator evaluator;
 
 
@@ -52,9 +52,9 @@ public class BankAIService implements ChatServiceAi {
             .build();
 
 
-    public BankAIService(ChatModel chatModel, BankAIDAO bankAIDAO){     
+    public BankAIService(ChatModel chatModel, BankAI bankAI){     
         this.chatClient = ChatClient.builder(chatModel).build();
-        this.bankAIDAO = bankAIDAO;
+        this.bankAI = bankAI;
         // this.evaluator = RelevancyEvaluator.builder()
         //                     .chatClientBuilder(ChatClient.builder(chatModel))
         //                     .build();
@@ -62,7 +62,7 @@ public class BankAIService implements ChatServiceAi {
 
     @Override
     public String getAnswer(String prompt) {
-        List<Document> relatedDocuments = bankAIDAO.findClosestMatches(prompt, 3);
+        List<Document> relatedDocuments = bankAI.findClosestMatches(prompt, 3);
         if (relatedDocuments == null || relatedDocuments.isEmpty()) {
             return "Desculpe, não encontrei informações relevantes para sua pergunta.";
         }

@@ -1,4 +1,4 @@
-package com.bankai.stock.dao;
+package com.bankai.stock.model;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BankAIDAO{
+public class BankAI{
      @Autowired
      VectorStore vectorStore;
    

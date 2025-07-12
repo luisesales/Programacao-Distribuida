@@ -44,6 +44,12 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -115,8 +121,7 @@
 
 		<dependency>
 			<groupId>org.springframework.retry</groupId>
-			<artifactId>spring-retry</artifactId>
-			<version>2.0.10</version> <!-- ou superior -->
+			<artifactId>spring-retry</artifactId>			
 		</dependency>
 
 		<dependency>

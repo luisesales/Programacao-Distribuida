@@ -1,6 +1,6 @@
 package com.bankai.stock;
 
-import com.bankai.stock.dao.BankAIDAO;
+import com.bankai.stock.model.BankAI;
 import com.bankai.stock.prompt.DocumentReader;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class BankaiApplication {
 	}
 
 	@Bean
-    public CommandLineRunner initVectorStore(DocumentReader documentReader, BankAIDAO bankAIDAO) {
+    public CommandLineRunner initVectorStore(DocumentReader documentReader, BankAI bankAI) {
         return args -> {
             System.out.println("Iniciando a ingestão de documentos para o VectorStore...");
             List<Document> loadedDocuments = documentReader.loadText();
@@ -38,7 +38,7 @@ public class BankaiApplication {
             TokenTextSplitter textSplitter = new TokenTextSplitter();
             List<Document> chunks = textSplitter.apply(loadedDocuments);
 
-            bankAIDAO.add(chunks);
+            bankAI.add(chunks);
             System.out.println("Documentos ingeridos no VectorStore com sucesso!");
         };
     }
