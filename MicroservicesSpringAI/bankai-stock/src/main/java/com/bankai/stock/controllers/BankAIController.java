@@ -1,12 +1,18 @@
 package com.bankai.stock.controllers;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bankai.stock.services.BankAIService;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/chat")
@@ -18,9 +24,22 @@ public class BankAIController{
         this.bankAIService = bankAIService;
     }
 
-    @GetMapping    
-    public String getAnswer(@RequestParam("question") String prompt) {
-       return bankAIService.getAnswer(prompt);
+    @RateLimiter(name = "aiservice", fallbackMethod = "chatServiceRateFallback")
+    @Retry(name= "retrychatservice", fallbackMethod = "chatServiceFallback")
+    @Bulkhead(name= "bulkheadchatservice", fallbackMethod = "chatServiceFallback")
+    @CircuitBreaker(name= "circuitchatservice", fallbackMethod = "chatServiceFallback")
+    @PostMapping
+    public ResponseEntity<String> chatService(@RequestParam("question") String prompt) {
+        return ResponseEntity.status(200).body(bankAIService.getAnswer(prompt));
     }
+
+    public ResponseEntity<String> chatServiceFallback() {
+        return ResponseEntity.status(503).body("O Serviço de Chat está indisponível");
+    }
+
+    public ResponseEntity<String> chatServiceRateFallback(Throwable t) {
+        return ResponseEntity.status(503).body("Rate limit exceeded or other error: " + t.getMessage());
+    }
+
 }
 

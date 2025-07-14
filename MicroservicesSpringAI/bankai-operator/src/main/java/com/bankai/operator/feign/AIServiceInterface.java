@@ -9,10 +9,10 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 
-@FeignClient(value = "bankai-mcp-server")
+@FeignClient(value = "bankai-stock")
 public interface AIServiceInterface {
 
-    @PostMapping("/question")
+    @PostMapping("/chat")
     @CircuitBreaker(name= "bankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")
     @Retry(name= "retrybankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")
     @Bulkhead(name= "bulkheadbankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")

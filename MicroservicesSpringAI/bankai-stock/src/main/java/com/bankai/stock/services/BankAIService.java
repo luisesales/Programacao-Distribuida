@@ -49,12 +49,11 @@ public class BankAIService implements ChatServiceAi {
             .build();
 
 
-    public BankAIService(ChatModel chatModel, BankAI bankAI, ToolCallbackProvider tools){     
+    public BankAIService(ChatModel chatModel, BankAI bankAI, ToolCallbackProvider tools, ChatMemory chatMemory){     
         this.chatClient = ChatClient.builder(chatModel)
             .defaultToolCallbacks(tools)
             .defaultAdvisors(
-                MessageChatMemoryAdvisor.builder(chatMemory))
-                .build()
+                    MessageChatMemoryAdvisor.builder(chatMemory).build())
         .build();
         this.bankAI = bankAI;
         // this.evaluator = RelevancyEvaluator.builder()
