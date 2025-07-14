@@ -1,7 +1,7 @@
 package com.bankai.stock.controllers;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +28,7 @@ public class BankAIController{
     @Retry(name= "retrychatservice", fallbackMethod = "chatServiceFallback")
     @Bulkhead(name= "bulkheadchatservice", fallbackMethod = "chatServiceFallback")
     @CircuitBreaker(name= "circuitchatservice", fallbackMethod = "chatServiceFallback")
-    @PostMapping
+    @GetMapping
     public ResponseEntity<String> chatService(@RequestParam("question") String prompt) {
         return ResponseEntity.status(200).body(bankAIService.getAnswer(prompt));
     }

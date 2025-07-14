@@ -28,6 +28,8 @@ import com.bankai.stock.model.BankAI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import reactor.core.publisher.Flux;
+
 @Service
 public class BankAIService implements ChatServiceAi {
     private final ChatClient chatClient;
@@ -65,7 +67,7 @@ public class BankAIService implements ChatServiceAi {
     public String getAnswer(String prompt) {
         List<Document> relatedDocuments = bankAI.findClosestMatches(prompt, 3);
         if (relatedDocuments == null || relatedDocuments.isEmpty()) {
-            return "Desculpe, não encontrei informações relevantes para sua pergunta.";
+               return "Desculpe, não encontrei informações relevantes para sua pergunta.";
         }
 
         String context = relatedDocuments.stream()
@@ -88,8 +90,9 @@ public class BankAIService implements ChatServiceAi {
         String answer = "";
         try {
             System.out.println("Sending prompt to AI model...");
+            // throw new IOException("Simulated failure for testing fallback mechanism"); // Simulate an error for testing
 
-            answer = chatClient.prompt()
+            Flux<String> flux = chatClient.prompt()
                 .system(systemSpec -> systemSpec
                     .text(systemTemplate)
                     .param("Banco", "BankAI")
@@ -97,8 +100,18 @@ public class BankAIService implements ChatServiceAi {
                 .user(userSpec -> userSpec
                     .text(userTemplate)
                     .param("Pergunta", prompt))
-                .call()
+                .stream()
                 .content();
+
+            answer = flux.collectList()
+                    .map(list -> String.join("", list))
+                    .block(); 
+
+            if (answer == null || answer.isEmpty()) {
+                return "Desculpe, não consegui processar sua pergunta.";
+            }
+
+            System.out.println("Resposta da IA:" + answer);
                 
         } catch (Exception springAiException) {
             System.out.println("Spring AI falhou. Fallback para WebClient. Erro:");
@@ -109,19 +122,6 @@ public class BankAIService implements ChatServiceAi {
                 return "Desculpe, estou com problemas para me conectar ao serviço de IA no momento.";
             }
         }
-
-        // EvaluationRequest request = new EvaluationRequest(prompt, relatedDocuments, answer);
-        // try {
-        //     EvaluationResponse response = evaluator.evaluate(request);
-        //     if (!response.isPass()) {
-        //         return "Não posso lhe ajudar com isso no momento, posso ajudar com outra coisa?";
-        //     }
-        // } catch (Exception ex) {
-        //     ex.printStackTrace();
-        //     return "Erro ao processar a resposta da IA. Tente novamente mais tarde.";
-        // } finally {
-        //     chatMemory.add("default", new AssistantMessage(answer));
-        // }
 
         chatMemory.add("default", new AssistantMessage(answer));
 
@@ -138,7 +138,7 @@ public class BankAIService implements ChatServiceAi {
         try {
             String response = client.post()
                     .bodyValue(Map.of(
-                            "model", "gpt-4", // ou "gpt-4", "gpt-4o" conforme seu plano
+                            "model", "gpt-4",
                             "messages", List.of(
                                     Map.of("role", "system", "content", fillTemplate(systemTemplate, context, prompt)),
                                     Map.of("role", "user", "content", fillTemplate(userTemplate, context, prompt))

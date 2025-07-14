@@ -47,16 +47,29 @@ public class BankAITools {
     //     return "Conta "+accountId+" deletada com sucesso!";
     // }
 
-    // @Tool(
-    //     name = "criarContanoBanco",
-    //     description = "Cria uma conta no banco dado que seja fornecido um nome para a conta e uma conta com esse nome já não exista"
-    // )
-    // public String criarContanoBanco(
-    //     Account account
-    // ) {
-    //     System.out.println("Criando Conta " + name);
-    //     return "Conta "+account.namename+" criada com sucesso!";
-    // }
+    @Tool(
+        name = "criarContanoBanco",
+        description = "Cria uma conta no banco dado que seja fornecido um nome para a conta e uma conta com esse nome já não exista"
+    )
+    public Account criarContanoBanco(
+        @ToolParam(description = "@ToolParameter(name = \"id\", description = \"Identificador único da conta\", required = false)\n" + //
+                        "    private Long id;\n" + //
+                        "\n" + //
+                        "    @ToolParameter(name = \"bankId\", description = \"Identificador do banco associado à conta\", required = true)\n" + //
+                        "    private Long bankId;\n" + //
+                        "\n" + //
+                        "    @ToolParameter(name = \"name\", description = \"Nome do titular da conta\", required = true)\n" + //
+                        "    private String name;\n" + //
+                        "\n" + //
+                        "    @ToolParameter(name = \"balance\", description = \"Saldo atual da conta\", required = false)\n" + //
+                        "    private double balance;\n" + //
+                        "\n" + //
+                        "    @ToolParameter(name = \"isActive\", description = \"Indica se a conta está ativa\", required = false)\n" + //
+                        "    private boolean isActive;") Account account
+    ) {
+        System.out.println("Entrei na Tool create Account do MCP Server");
+        return accountService.checkCreateAvailability(account).getBody();
+    }
 
     @Tool(
         name = "depositarNaContaNoBanco",

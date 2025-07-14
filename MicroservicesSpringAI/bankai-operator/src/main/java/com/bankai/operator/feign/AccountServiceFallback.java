@@ -46,4 +46,9 @@ public class AccountServiceFallback implements AccountServiceInterface {
     public ResponseEntity<Double> checkBalanceAvailability(Long accountId) {
         return ResponseEntity.status(503).body(0.0);
     }
+
+    @Override
+    public ResponseEntity<String> checkPromptAvailability(String prompt) {
+        return ResponseEntity.status(503).body("O serviço de IA está indisponível.");
+    }
 }

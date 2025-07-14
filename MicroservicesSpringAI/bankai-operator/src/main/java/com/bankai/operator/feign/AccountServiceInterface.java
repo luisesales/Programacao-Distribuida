@@ -83,4 +83,14 @@ public interface AccountServiceInterface {
     default ResponseEntity<Account> checkDrawAvailabilityFallback(Long accountId, double value) {
         return ResponseEntity.status(503).body(new Account());
     }
+
+    @PostMapping("/chat")
+    @CircuitBreaker(name= "bankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")
+    @Retry(name= "retrybankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")
+    @Bulkhead(name= "bulkheadbankaiquestionservice", fallbackMethod = "checkPromptAvailabilityFallback")
+    ResponseEntity<String> checkPromptAvailability(@RequestParam String prompt);
+
+    default ResponseEntity<String> checkPromptAvailabilityFallback(String prompt) {
+        return ResponseEntity.status(503).body("O serviço de IA está indisponível.");
+    }
 }
