@@ -67,31 +67,31 @@ public class BankController{
     }
 
     @GetMapping("/accounts/{accountId}/balance")
-    public ResponseEntity<Double> balanceAccount(@RequestParam Long accountId) {
+    public ResponseEntity<Double> balanceAccount(@PathVariable Long accountId) {
         return ResponseEntity.ok(bankService.balanceAccount(accountId));
     }
 
     @GetMapping("/accounts/{accountId}")
-    public ResponseEntity<Optional<Account>> getAccount(@RequestParam Long accountId) {
+    public ResponseEntity<Optional<Account>> getAccount(@PathVariable Long accountId) {
         return ResponseEntity.ok(bankService.getAccount(accountId));
     }
 
     @PutMapping("/accounts/{accountId}")
-    public ResponseEntity<Account> updateAccount(@RequestParam Long accountId, @RequestBody Account account) {
+    public ResponseEntity<Account> updateAccount(@PathVariable Long accountId, @RequestBody Account account) {
         return ResponseEntity.ok(bankService.updateAccount(accountId,account));
     }
 
     @DeleteMapping("/accounts/{accountId}")
-    public ResponseEntity<String> deleteAccount(@RequestParam Long accountId) {
+    public ResponseEntity<String> deleteAccount(@PathVariable Long accountId) {
         return ResponseEntity.ok(bankService.deleteAccount(accountId));
     }
     @PostMapping("/accounts/{accountId}/deposit")
-    public ResponseEntity<Account> depositAccount(@RequestParam Long accountId, @PathVariable double value) {
+    public ResponseEntity<Account> depositAccount(@PathVariable Long accountId, @RequestParam double value) {
         return ResponseEntity.ok(bankService.depositAccount(accountId, value));
     }
 
     @PostMapping("/accounts/{accountId}/draw")
-    public ResponseEntity<Account> drawAccount(@RequestParam Long accountId, @PathVariable double value) {
+    public ResponseEntity<Account> drawAccount(@PathVariable Long accountId, @RequestParam double value) {
         return ResponseEntity.ok(bankService.drawAccount(accountId, value));
     }
 
