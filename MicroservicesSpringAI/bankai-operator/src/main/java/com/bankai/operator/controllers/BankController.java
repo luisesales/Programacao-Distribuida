@@ -28,16 +28,21 @@ public class BankController{
 
     @GetMapping
     public ResponseEntity<List<Bank>> getAllBanks() {
-        System.out.println("Eu entrei no get mapping inicial");
         return ResponseEntity.ok(bankService.getAllBanks());
     }
+
 
     @GetMapping("/{bankId}")
     public ResponseEntity<Optional<Bank>> getBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(bankService.getBank(bankId));
     }
 
-    @GetMapping("/{bankId}/accounts")
+    @GetMapping("/accounts")
+    public ResponseEntity<List<Account>> gatAllAccounts() {
+        return ResponseEntity.ok(bankService.getAccounts());
+    }
+
+    @GetMapping("/accounts/byBank/{bankId}")
     public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(bankService.getAccountsByBank(bankId));
     }
@@ -61,9 +66,19 @@ public class BankController{
         return ResponseEntity.ok(bankService.createAccount(account));
     }
 
-    @GetMapping("/accounts/{accountId}")
+    @GetMapping("/accounts/{accountId}/balance")
     public ResponseEntity<Double> balanceAccount(@RequestParam Long accountId) {
         return ResponseEntity.ok(bankService.balanceAccount(accountId));
+    }
+
+    @GetMapping("/accounts/{accountId}")
+    public ResponseEntity<Optional<Account>> getAccount(@RequestParam Long accountId) {
+        return ResponseEntity.ok(bankService.getAccount(accountId));
+    }
+
+    @PutMapping("/accounts/{accountId}")
+    public ResponseEntity<Account> updateAccount(@RequestParam Long accountId, @RequestBody Account account) {
+        return ResponseEntity.ok(bankService.updateAccount(accountId,account));
     }
 
     @DeleteMapping("/accounts/{accountId}")
@@ -87,6 +102,11 @@ public class BankController{
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/chat")
+    public ResponseEntity<String> aiChat(@RequestParam String question) {
+        return ResponseEntity.ok(bankService.aiChat(question));
     }
 }
 

@@ -24,6 +24,11 @@ public class AccountServiceFallback implements AccountServiceInterface {
     }
 
     @Override
+    public ResponseEntity<Account> checkUpdateAvailability(Long accountId,Account account) {
+        return ResponseEntity.status(503).body(new Account());
+    }
+
+    @Override
     public ResponseEntity<Account> checkDrawAvailability(Long accountId, double value) {
         return ResponseEntity.status(503).body(new Account());
     }
@@ -37,11 +42,17 @@ public class AccountServiceFallback implements AccountServiceInterface {
     public ResponseEntity<String> checkDeleteAvailability(Long accountId) {
         return ResponseEntity.status(503).body("O serviço de deletar contas está indisponível.");
     }
+    
+    @Override 
+    public ResponseEntity<List<Account>> checkAllAccountsAvailability(){
+        return ResponseEntity.status(503).body(Collections.emptyList());
+    }
 
     @Override 
     public ResponseEntity<Optional<Account>> checkAccountsAvailability(Long bankId){
         return ResponseEntity.status(503).body(Optional.empty());
     }
+
     @Override 
     public ResponseEntity<Double> checkBalanceAvailability(Long accountId) {
         return ResponseEntity.status(503).body(0.0);

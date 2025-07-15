@@ -37,9 +37,18 @@ public class BankService {
        return accountServiceInterface.getAccountsByBank(bankId).getBody();        
     }
 
+    public List<Account> getAccounts() { 
+       return accountServiceInterface.checkAllAccountsAvailability().getBody();        
+    }
+
     public Optional<Account> getAccount(Long accountId){
         return accountServiceInterface.checkAccountsAvailability(accountId).getBody();
     }
+
+    public Account updateAccount(Long accountId,Account account){
+        return accountServiceInterface.checkUpdateAvailability(accountId,account).getBody();
+    }
+
 
     public Account createAccount(Account account){
         return accountServiceInterface.checkCreateAvailability(account).getBody();
@@ -83,6 +92,10 @@ public class BankService {
             return true;
         }
         return false;
+    }
+    
+    public String aiChat(String question){
+        return accountServiceInterface.checkPromptAvailability(question).getBody();
     }
 
     

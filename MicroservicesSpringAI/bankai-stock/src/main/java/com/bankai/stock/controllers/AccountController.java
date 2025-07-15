@@ -29,7 +29,7 @@ public class AccountController{
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
-    @GetMapping("/bank/{bankId}")
+    @GetMapping("/byBank/{bankId}")
     public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId) {
         return ResponseEntity.ok(accountService.getAccountsByBank(bankId));
     }

@@ -52,7 +52,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     serviceUrl:
-      defaultZone: "http://localhost:8081/eureka/,http://localhost:8082/eureka/,http://localhost:8083/eureka/"
+      defaultZone: "http://peer1:8761/eureka/,http://peer2:8762/eureka/,http://peer3:8763/eureka/"
 
 management:
   endpoint:
