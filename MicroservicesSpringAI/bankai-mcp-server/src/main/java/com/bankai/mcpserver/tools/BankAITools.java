@@ -78,6 +78,7 @@ public class BankAITools {
     public Account depositarNaContaNoBanco(
         @ToolParam(description = "É um double que permite até dois caracteres flutuantes e um id em long") double value, Long accountId
     ) {
+         System.out.println("Entrei na Tool deposit Account do MCP Server");
         return accountService.checkDepositAvailability(accountId,value).getBody();
     }
 
@@ -88,6 +89,7 @@ public class BankAITools {
     public Account sacarNaContaNoBanco(
         @ToolParam(description = "É um double que permite até dois caracteres flutuantes e um id em long") double value, Long accountId
     ) {
+         System.out.println("Entrei na Tool draw Account do MCP Server");
         return accountService.checkDrawAvailability(accountId,value).getBody();
     }
 
@@ -98,6 +100,7 @@ public class BankAITools {
     public Double balancoNaContaNoBanco(
         @ToolParam(description = "É uma id em long") Long accountId
     ) {
+         System.out.println("Entrei na Tool balance Account do MCP Server");
         return accountService.checkBalanceAvailability(accountId).getBody();
     }
 }

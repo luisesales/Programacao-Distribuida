@@ -37,7 +37,7 @@ public class BankAIController{
     }
 
     public ResponseEntity<String> chatServiceRateFallback(Throwable t) {
-        return ResponseEntity.status(503).body("Rate limit exceeded or other error: " + t.getMessage());
+        return ResponseEntity.status(200).body("Rate limit exceeded: " + t.getMessage());
     }
 
 }
