@@ -2,7 +2,6 @@ package com.bankai.mcpserver.tools;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bankai.mcpserver.feign.AccountServiceFallback;
@@ -11,9 +10,12 @@ import com.bankai.mcpserver.model.Account;
 @Component
 public class BankAITools {
 
-    @Autowired
-    private AccountServiceFallback accountService;
+    
+    private final AccountServiceFallback accountService;
 
+    public BankAITools(){
+        this.accountService = new AccountServiceFallback();
+    }
 
     // @Tool(
     //     name = "verificarNomedoBanco",
