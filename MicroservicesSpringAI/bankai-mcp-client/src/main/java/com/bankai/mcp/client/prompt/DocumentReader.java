@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentReader {
 
-    private final Resource resource;
+    //private final Resource resource;
 
     DocumentReader() {
-        String filePath = "C:/Users/nelio/Documents/Regulamentograd.pdf";
-        this.resource =  new FileSystemResource(filePath);       
+        //String filePath = "C:/Users/nelio/Documents/Regulamentograd.pdf";
+        //this.resource =  new FileSystemResource(filePath);       
     }
 
     public List<Document> loadText() {
@@ -23,8 +23,7 @@ public class DocumentReader {
         // return tikaDocumentReader.read();
         String exemplo = """
         Este é um regulamento fictício utilizado apenas para testes da aplicação.
-        O aluno pode trancar a matrícula em até dois períodos consecutivos.
-        A carga horária mínima por semestre é de 180 horas.
+        usuário pode Sacar Depositar, ver saldo e criar contas utilizando o serviço de IA.
         """;
 
         Document doc = new Document(exemplo);
