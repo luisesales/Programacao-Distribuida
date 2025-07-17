@@ -44,6 +44,18 @@ spring:
                 permittedNumberOfCallsInHalfOpenState: 5
                 failureRateThreshold: 50
                 waitDurationInOpenState: 15000
+        - id: chat-service
+          uri: lb://bankai-chat
+          predicates:
+            - Path=/chat/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: chat_CB
+                slidingWindowSize: 20
+                permittedNumberOfCallsInHalfOpenState: 5
+                failureRateThreshold: 50
+                waitDurationInOpenState: 15000
 
 eureka:
   instance:
