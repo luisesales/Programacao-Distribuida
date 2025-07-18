@@ -147,7 +147,6 @@
             "request": "launch",
             "mainClass": "com.bankai.stock.BankaiApplication",
             "projectName": "com.bankai.stock-bankai-stock",
-            "envFile": "${workspaceFolder}/MicroservicesSpringAI/bankai-stock/src/main/resources/.env",
             "vmArgs": "-Dspring.profiles.active=stock-server-1"
         },
         {
@@ -155,8 +154,7 @@
             "name": "BankaiStockApplication2",
             "request": "launch",
             "mainClass": "com.bankai.stock.BankaiApplication",
-            "projectName": "com.bankai.stock-bankai-stock",
-            "envFile": "${workspaceFolder}/MicroservicesSpringAI/bankai-stock/src/main/resources/.env",
+            "projectName": "com.bankai.stock-bankai-stock",        
             "vmArgs": "-Dspring.profiles.active=stock-server-2"
         }
     ]
