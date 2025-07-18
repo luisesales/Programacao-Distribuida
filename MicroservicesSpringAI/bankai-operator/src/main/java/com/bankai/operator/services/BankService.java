@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.bankai.operator.feign.AccountServiceFallback;
-import com.bankai.operator.feign.AccountServiceInterface;
+import com.bankai.operator.feign.ChatServiceFallback;
 import com.bankai.operator.model.Account;
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.repository.BankRepository;
@@ -21,13 +20,19 @@ import com.bankai.operator.repository.BankRepository;
 @Service
 public class BankService {
 
-    //private static final Logger log = LoggerFactory.getLooger(BankService.class);
-
     @Autowired
     private BankRepository bankRepository;
 
     @Autowired
     private AccountServiceFallback accountServiceInterface;
+
+    private final ChatServiceFallback chatServiceInterface;
+
+    //private static final Logger log = LoggerFactory.getLooger(BankService.class);
+
+    public BankService() {
+        this.chatServiceInterface = new ChatServiceFallback();        
+    }
 
     public List<Bank> getAllBanks() {
         return bankRepository.findAll();
@@ -95,7 +100,7 @@ public class BankService {
     }
     
     public String aiChat(String question){
-        return accountServiceInterface.checkPromptAvailability(question).getBody();
+        return chatServiceInterface.checkPromptAvailability(question).getBody();
     }
 
     
