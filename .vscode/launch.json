@@ -11,7 +11,7 @@
             "mainClass": "com.bankai.mcp.client.BankaiMcpClientApplication",
             "projectName": "com.bankai.mcp.client-bankai-mcp-client",
             "envFile": "${workspaceFolder}/MicroservicesSpringAI/bankai-mcp-client/src/main/resources/.env",
-            "vmArgs": "-Dspring.profiles.active=mcp-client-1"
+            "vmArgs": "-Dspring.profiles.active=mcp-client-server-1"
         },
         {
             "type": "java",
@@ -20,7 +20,7 @@
             "mainClass": "com.bankai.mcp.client.BankaiMcpClientApplication",
             "projectName": "com.bankai.mcp.client-bankai-mcp-client",
             "envFile": "${workspaceFolder}/MicroservicesSpringAI/bankai-mcp-client/src/main/resources/.env",
-            "vmArgs": "-Dspring.profiles.active=mcp-client-2"
+            "vmArgs": "-Dspring.profiles.active=mcp-client-server-2"
         },
         {
             "type": "java",
