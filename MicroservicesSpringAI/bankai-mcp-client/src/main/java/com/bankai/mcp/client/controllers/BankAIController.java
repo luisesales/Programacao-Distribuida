@@ -1,5 +1,7 @@
 package com.bankai.mcp.client.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,9 @@ import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
 @RequestMapping("/chat")
-public class BankAIController{
+public class BankAIController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BankAIController.class);
 
     private final BankAIService bankAIService;
 
@@ -29,16 +33,19 @@ public class BankAIController{
     @CircuitBreaker(name= "circuitchatservice", fallbackMethod = "chatServiceFallback")
     @GetMapping
     public ResponseEntity<String> chatService(@RequestParam("question") String prompt) {
-        return ResponseEntity.status(200).body(bankAIService.getAnswer(prompt));
+        logger.info("Received chat request with prompt: '{}'", prompt);
+        String answer = bankAIService.getAnswer(prompt);
+        logger.info("Returning AI answer for prompt: '{}'", prompt);
+        return ResponseEntity.status(200).body(answer);
     }
 
     public ResponseEntity<String> chatServiceFallback() {
+        logger.warn("Chat service fallback triggered. AI service is unavailable.");
         return ResponseEntity.status(503).body("O Serviço de Chat está indisponível");
     }
 
     public ResponseEntity<String> chatServiceRateFallback(Throwable t) {
+        logger.warn("Rate limit exceeded for chat service. Error: {}", t.getMessage());
         return ResponseEntity.status(200).body("Rate limit exceeded: " + t.getMessage());
     }
-
 }
-

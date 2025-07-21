@@ -36,11 +36,15 @@
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <source>21</source>
+          <target>21</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>
   <properties>
-    <maven.compiler.source>21</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
   </properties>
 </project>

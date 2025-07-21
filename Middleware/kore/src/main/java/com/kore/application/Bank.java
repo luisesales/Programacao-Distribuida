@@ -2,6 +2,8 @@ package com.kore.application;
 
 import java.util.HashMap;
 
+import com.kore.application.Account;
+
 import com.kore.annotations.Component;
 import com.kore.annotations.methods.Delete;
 import com.kore.annotations.methods.Get;
@@ -9,6 +11,7 @@ import com.kore.annotations.methods.Post;
 import com.kore.annotations.methods.Put;
 import com.kore.annotations.methods.RequestMap;
 import com.kore.annotations.parameters.PathVariable;
+import com.kore.annotations.parameters.RequestBody;
 import com.kore.annotations.parameters.RequestParam;
 import com.kore.annotations.scope.Scope;
 import com.kore.annotations.scope.ScopeType;
@@ -48,6 +51,19 @@ public class Bank{
         }
         
     }
+
+    @Post("/createset/{accountnumber}")    
+    public String addSetConta(@PathVariable("accountnumber") int accountnumber, @RequestBody Account body) {
+        System.out.println("Criando conta: " + accountnumber);
+        if (accounts.containsKey(accountnumber)) {
+            return "Conta já existe: " + accountnumber;
+        } else {
+            accounts.put(accountnumber, 0.0f);
+            return "Conta criada com sucesso: " + accountnumber;
+        }
+        
+    }
+
 
     @Post("/deposit/{accountnumber}")
     public String depositar( @PathVariable("accountnumber") int accountnumber, @RequestParam("value") float value) {

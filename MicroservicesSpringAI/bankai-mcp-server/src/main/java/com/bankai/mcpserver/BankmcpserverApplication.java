@@ -5,12 +5,14 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 import com.bankai.mcpserver.tools.BankAITools;
 
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableFeignClients
 public class BankmcpserverApplication {
 
 	public static void main(String[] args) {

@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bankai.operator.feign.AccountServiceFallback;
-import com.bankai.operator.feign.ChatServiceFallback;
+import com.bankai.operator.feign.AccountServiceInterface;
+import com.bankai.operator.feign.ChatServiceInterface;
 import com.bankai.operator.model.Account;
 import com.bankai.operator.model.Bank;
 import com.bankai.operator.repository.BankRepository;
@@ -24,15 +24,14 @@ public class BankService {
     private BankRepository bankRepository;
 
     @Autowired
-    private AccountServiceFallback accountServiceInterface;
+    private AccountServiceInterface accountServiceInterface;
 
-    private final ChatServiceFallback chatServiceInterface;
+    @Autowired
+    private ChatServiceInterface chatServiceInterface;
 
-    //private static final Logger log = LoggerFactory.getLooger(BankService.class);
-
-    public BankService() {
-        this.chatServiceInterface = new ChatServiceFallback();        
-    }
+    /*public BankService() {
+        this.chatServiceInterface = new ChatServiceInterface();        
+    }*/
 
     public List<Bank> getAllBanks() {
         return bankRepository.findAll();

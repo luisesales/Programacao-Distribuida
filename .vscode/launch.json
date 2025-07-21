@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.kore.application.Main",
+            "projectName": "com-kore"
+        },
+        {
+            "type": "java",
             "name": "BankaiMcpClientApplication1",
             "request": "launch",
             "mainClass": "com.bankai.mcp.client.BankaiMcpClientApplication",
@@ -154,7 +161,7 @@
             "name": "BankaiStockApplication2",
             "request": "launch",
             "mainClass": "com.bankai.stock.BankaiApplication",
-            "projectName": "com.bankai.stock-bankai-stock",        
+            "projectName": "com.bankai.stock-bankai-stock",
             "vmArgs": "-Dspring.profiles.active=stock-server-2"
         }
     ]
