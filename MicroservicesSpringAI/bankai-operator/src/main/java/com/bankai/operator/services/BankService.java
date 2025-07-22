@@ -29,10 +29,6 @@ public class BankService {
     @Autowired
     private ChatServiceInterface chatServiceInterface;
 
-    /*public BankService() {
-        this.chatServiceInterface = new ChatServiceInterface();        
-    }*/
-
     public List<Bank> getAllBanks() {
         return bankRepository.findAll();
     }

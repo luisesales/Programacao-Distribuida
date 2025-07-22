@@ -8,25 +8,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable; // Não é necessário aqui, mas não causa problema
 
 import com.bankai.mcpserver.model.Account;
 
 @Component
 public class AccountServiceFallback implements AccountServiceInterface {
 
-    // Adicione um logger para depuração
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceFallback.class);
 
     @Override
-    public ResponseEntity<List<Account>> getAccountsByBank(@PathVariable Long bankId){
+    public ResponseEntity<List<Account>> getAccountsByBank(Long bankId){
         logger.warn("Fallback acionado para getAccountsByBank para bankId: {}. Retornando lista vazia.", bankId);
+        System.out.println("Fallback acionado para getAccountsByBank para bankId: " + bankId);
         return ResponseEntity.status(503).body(Collections.emptyList());
     }
 
     @Override
     public ResponseEntity<Account> checkDepositAvailability(Long accountId, double value) {
         logger.warn("Fallback acionado para checkDepositAvailability para accountId: {}. Retornando nova Account.", accountId);
+        System.out.println("Fallback acionado para checkDepositAvailability para accountId: " + accountId);
         return ResponseEntity.status(503).body(new Account());
     }
 
@@ -39,6 +39,7 @@ public class AccountServiceFallback implements AccountServiceInterface {
     @Override
     public ResponseEntity<Account> checkDrawAvailability(Long accountId, double value) {
         logger.warn("Fallback acionado para checkDrawAvailability para accountId: {}. Retornando nova Account.", accountId);
+        System.out.println("Fallback acionado para checkDrawAvailability para accountId: " + accountId);
         return ResponseEntity.status(503).body(new Account());
     }
 
@@ -69,6 +70,7 @@ public class AccountServiceFallback implements AccountServiceInterface {
     @Override
     public ResponseEntity<Double> checkBalanceAvailability(Long accountId) {
         logger.warn("Fallback acionado para checkBalanceAvailability para accountId: {}. Retornando 0.0.", accountId);
+        System.out.println("Fallback acionado para checkBalanceAvailability para accountId: " + accountId);
         return ResponseEntity.status(503).body(0.0);
     }
 }

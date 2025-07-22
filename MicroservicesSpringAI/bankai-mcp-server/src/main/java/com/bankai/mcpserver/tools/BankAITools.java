@@ -4,17 +4,19 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
-import com.bankai.mcpserver.feign.AccountServiceFallback;
 import com.bankai.mcpserver.model.Account;
+import com.bankai.mcpserver.service.BankAIService;
 
 @Component
 public class BankAITools {
 
+    // @Autowired
+    // private BankAIService bankAiService;
     
-    private final AccountServiceFallback accountService;
+    private final BankAIService bankAiService;
 
-    public BankAITools(){
-        this.accountService = new AccountServiceFallback();
+    public BankAITools(BankAIService bankAiService) {
+        this.bankAiService = bankAiService;
     }
 
     // @Tool(
@@ -70,7 +72,7 @@ public class BankAITools {
                         "    private boolean isActive;") Account account
     ) {
         System.out.println("Entrei na Tool create Account do MCP Server");
-        return accountService.checkCreateAvailability(account).getBody();
+        return bankAiService.createAccount(account);
     }
 
     @Tool(
@@ -80,8 +82,8 @@ public class BankAITools {
     public Account depositarNaContaNoBanco(
         @ToolParam(description = "É um double que permite até dois caracteres flutuantes e um id em long") double value, Long accountId
     ) {
-         System.out.println("Entrei na Tool deposit Account do MCP Server");
-        return accountService.checkDepositAvailability(accountId,value).getBody();
+        System.out.println("Entrei na Tool deposit Account do MCP Server");
+        return bankAiService.depositAccount(accountId, value);
     }
 
     @Tool(
@@ -91,8 +93,8 @@ public class BankAITools {
     public Account sacarNaContaNoBanco(
         @ToolParam(description = "É um double que permite até dois caracteres flutuantes e um id em long") double value, Long accountId
     ) {
-         System.out.println("Entrei na Tool draw Account do MCP Server");
-        return accountService.checkDrawAvailability(accountId,value).getBody();
+        System.out.println("Entrei na Tool draw Account do MCP Server");
+        return bankAiService.drawAccount(accountId, value);
     }
 
     @Tool(
@@ -102,7 +104,7 @@ public class BankAITools {
     public Double balancoNaContaNoBanco(
         @ToolParam(description = "É uma id em long") Long accountId
     ) {
-         System.out.println("Entrei na Tool balance Account do MCP Server");
-        return accountService.checkBalanceAvailability(accountId).getBody();
+        System.out.println("Entrei na Tool balance Account do MCP Server");
+        return bankAiService.balanceAccount(accountId);
     }
 }
