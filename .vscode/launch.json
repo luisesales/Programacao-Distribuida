@@ -142,7 +142,7 @@
         },
         {
             "type": "java",
-            "name": "BankmcpserverApplication",
+            "name": "BankmcpserverApplication2",
             "request": "launch",
             "mainClass": "com.bankai.mcpserver.BankmcpserverApplication",
             "projectName": "com.bankai.mcpserver-bankai-mcp-server",
